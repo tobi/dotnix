@@ -7,6 +7,8 @@ packages = [
   "home-manager",
   "curl",
   "wget",
+  "gnumake", "zlib.dev", "stdenv.cc", "openssl.dev", "libffi.dev", "pkg-config",
+  "libffi", "libyaml"
 ]
 
 packagesFrom = [

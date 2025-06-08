@@ -18,16 +18,21 @@ in
 
   # Global environment variables
   home.sessionVariables = {
-    MANPAGER = "sh -c 'col -bx | ${pkgs.bat}/bin/bat -l man -p'";
     EDITOR = "${pkgs.micro}/bin/micro";
+    MANPAGER = "sh -c 'col -bx | ${pkgs.bat}/bin/bat -l man -p'";
+
+    CPPFLAGS = "-I${pkgs.zlib.dev}/include -I${pkgs.openssl.dev}/include -I${pkgs.libffi.dev}/include";
+    LDFLAGS  = "-L${pkgs.zlib.out}/lib -L${pkgs.openssl.out}/lib -L${pkgs.libffi.out}/lib";
+
   } // lib.optionalAttrs isDarwin {
     # macOS specific environment variables
-    PATH = "/opt/homebrew/opt/ruby/bin:/Users/tobi/.pyenv/shims:$PATH";
-  } // lib.optionalAttrs isWsl {
+    # PATH = "/opt/homebrew/opt/ruby/bin:/Users/tobi/.pyenv/shims:$PATH";
+  } // lib.optionalAttrs isLinux {
     # WSL2 specific environment variables
-    LD_LIBRARY_PATH = "/usr/lib/wsl/lib:$LD_LIBRARY_PATH";
-    CUDA_PATH = "/usr/lib/wsl";
+    # LD_LIBRARY_PATH = "/usr/lib/wsl/lib:$LD_LIBRARY_PATH";
   };
+
+
 
   # Essential packages organized by category
   home.packages = with pkgs; [
@@ -38,7 +43,7 @@ in
     htop sysz mtr fswatch zstd
     
     # Development
-    gnumake sqlite zlib.dev stdenv.cc openssl.dev pkg-config
+    gnumake sqlite zlib.dev stdenv.cc openssl.dev libffi.dev pkg-config
     lazygit hyperfine tokei nixpkgs-fmt comma
     
     # Nice-to-have
@@ -51,9 +56,6 @@ in
         
   ] ++ lib.optionals isDarwin [
     # Darwin-specific packages (if any)
-  ] ++ lib.optionals isWsl [
-    # WSL-specific packages
-    nixos-wsl.wslutils
   ];
 
   # Git configuration
@@ -92,7 +94,6 @@ in
     enable = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
-
 
     # Profile setup that runs once per login
     profileExtra = ''
@@ -190,8 +191,6 @@ in
     enable = true;
     enableZshIntegration = true;
     settings.legacy_version_file = true;  # read .tool-versions
-    globalConfig.tools.bun   = "latest";
-    globalConfig.tools.uv = "latest";
   };
   
   # Enable additional tools with proper integrations
