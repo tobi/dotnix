@@ -1,0 +1,18 @@
+---
+description: 
+globs: *.nix
+alwaysApply: false
+---
+This is a nix repository. 
+
+# Dotfiles in Nix
+
+* `home/*` home-manager dotfile configuration
+* `machines/*` - configuration.*.nix for homelab boxes
+
+## Rules
+
+we are using determined nix. We always use flakes. We make things as simple and self contained as possible. We don't need to create all sorts of shell scripts or whatever. 
+
+- always write the inputs seciton last in a flake
+- use the nixos-mcp server to figure out the finer details of nixos packages

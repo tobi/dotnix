@@ -18,6 +18,11 @@ name = "check"
 command = "nix flake check --all-systems"
 help = "Check flake for errors"
 
+[[commands]]
+name = "iso"
+help = "build iso for usb-stick"
+command = "nix build .#nixosConfigurations.iso.config.system.build.isoImage"
+
 [[env]]
 name = "EDITOR"
 value = "micro"

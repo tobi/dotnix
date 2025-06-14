@@ -52,6 +52,7 @@ in
   ] ++ lib.optionals isLinux [
     # Linux-specific packages
     # nvidia-docker  # NVIDIA container runtime
+    # qemu
     
         
   ] ++ lib.optionals isDarwin [
@@ -141,8 +142,7 @@ in
       b = "bundle exec";
       
       # System management
-      reload = "nix develop ~/.env/home.nix -c home-manager switch --flake ~/.env/home.nix && source $HOME/.zshrc";
-      eenv = "e $(fd . ~/.env/home.nix | fzf -1)";
+      reload = "nix develop ~/dotnix/flake.nix -c home-manager switch --flake ~/dotnix/home.nix && source $HOME/.zshrc";
     };
   };
 
@@ -204,7 +204,9 @@ in
     enableZshIntegration = true;
     nix-direnv.enable = true;
   };
-  
+
   programs.gh.enable = true;
   programs.btop.enable = true;
+
+  xdg.configFile."ghostty/config".source = ./ghostty.config;
 }
