@@ -8,28 +8,24 @@ in
 {
   # Basic home configuration
   programs.home-manager.enable = true;
-  
+
   home.stateVersion = "25.05";
   home.username = username;
-  home.homeDirectory = if pkgs.stdenv.isDarwin
+  home.homeDirectory =
+    if pkgs.stdenv.isDarwin
     then "/Users/${username}"
     else "/home/${username}";
 
 
   # Global environment variables
   home.sessionVariables = {
-    EDITOR = "${pkgs.micro}/bin/micro";
-    MANPAGER = "sh -c 'col -bx | ${pkgs.bat}/bin/bat -l man -p'";
-
     CPPFLAGS = "-I${pkgs.zlib.dev}/include -I${pkgs.openssl.dev}/include -I${pkgs.libffi.dev}/include";
     LDFLAGS  = "-L${pkgs.zlib.out}/lib -L${pkgs.openssl.out}/lib -L${pkgs.libffi.out}/lib";
 
+    MANPAGER = "sh -c 'col -bx | ${pkgs.bat}/bin/bat -l man -p'";
+
   } // lib.optionalAttrs isDarwin {
     # macOS specific environment variables
-    # PATH = "/opt/homebrew/opt/ruby/bin:/Users/tobi/.pyenv/shims:$PATH";
-  } // lib.optionalAttrs isLinux {
-    # WSL2 specific environment variables
-    # LD_LIBRARY_PATH = "/usr/lib/wsl/lib:$LD_LIBRARY_PATH";
   };
 
 
@@ -37,24 +33,41 @@ in
   # Essential packages organized by category
   home.packages = with pkgs; [
     # Core utilities
-    fd bat fzf eza ripgrep wget curl jq mise
-    
+    fd
+    bat
+    fzf
+    eza
+    ripgrep
+    wget
+    curl
+    jq
+    age
+
     # System tools
-    htop sysz mtr fswatch zstd
-    
+    htop
+    sysz
+    mtr
+    fswatch
+    zstd
+
     # Development
     gnumake sqlite zlib.dev stdenv.cc openssl.dev libffi.dev pkg-config
     lazygit hyperfine tokei nixpkgs-fmt comma
-    
+
     # Nice-to-have
-    gum neofetch fortune
-    bat-extras.batgrep bat-extras.batman bat-extras.batdiff
+    gum
+    neofetch
+    fortune
+    bat-extras.batgrep
+    bat-extras.batman
+    bat-extras.batdiff
+    # bat-extras
   ] ++ lib.optionals isLinux [
     # Linux-specific packages
     # nvidia-docker  # NVIDIA container runtime
     # qemu
-    
-        
+
+
   ] ++ lib.optionals isDarwin [
     # Darwin-specific packages (if any)
   ];
@@ -62,7 +75,7 @@ in
   # Git configuration
   programs.git = {
     enable = true;
-    userName = "Tobias Lütke";
+    userName = "Tobi Lütke";
     userEmail = "tobi@lutke.com";
     extraConfig.init.defaultBranch = "main";
   };
@@ -70,7 +83,7 @@ in
   # Editor setup
   programs.micro = {
     enable = true;
-    #settings.clipboard = "terminal";
+    settings.clipboard = "terminal";
     settings.tabsize = 2;
     settings.tabstospaces = true;
   };
@@ -96,16 +109,13 @@ in
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
-    # Profile setup that runs once per login
-    profileExtra = ''
-      # Custom PATH setup
-      export PATH="$HOME/bin:$HOME/.local/bin:$HOME/.cargo/bin:$HOME/.env/bin:$HOME/.nix-profile/bin${lib.optionalString isDarwin ":/opt/dev/bin"}:$PATH"
-    '';
 
     # Interactive shell setup
     initContent = ''
-      # Performance optimization for WSL2 (Linux only)
-      # ${lib.optionalString isLinux "unsetopt PATH_DIRS"}
+      echo
+      export PATH="$HOME/bin:$HOME/.local/bin:$HOME/dotnix/home/bin:${lib.optionalString isDarwin ":/opt/dev/bin"}:$PATH"
+
+      [ -f ~/.zshrc.local ] && echo "* Adding ~/.zshrc.local" && source ~/.zshrc.local
 
       # Load environment variables and show fortune
       echo && ${pkgs.fortune}/bin/fortune -s
@@ -118,29 +128,29 @@ in
       cat = "bat -p";
       nano = "$EDITOR";
       sudo = "sudo -Es";
-      
+
       # Enhanced commands
       grep = "batgrep";
       diff = "batdiff";
       man = "batman";
-      
+
       # File operations
       ls = "eza --group-directories-first";
       ll = "eza -l --group-directories-first";
       la = "eza -a --group-directories-first";
       lla = "eza -la --group-directories-first";
-      tree = "eza --tree --group-directories-first";  
+      tree = "eza --tree --group-directories-first";
       ".." = "cd ..";
-      
+
       # Git shortcuts
       gs = "git status";
       gc = "git commit -m";
       gd = "git diff";
       gdc = "git diff --cached";
-      
+
       # Development
       b = "bundle exec";
-      
+
       # System management
       reload = "nix develop ~/dotnix/flake.nix -c home-manager switch --flake ~/dotnix/home.nix && source $HOME/.zshrc";
     };
@@ -157,29 +167,29 @@ in
       command_timeout = 200;
       format = "[$username$hostname](light blue) $directory$character";
       right_format = "$git_branch$git_status$cmd_duration$python$ruby";
-      
+
       username = {
         show_always = true;
         format = "[$user]($style)";
         style_user = "blue";
         style_root = "red bold";
       };
-      
+
       hostname = {
         ssh_only = true;
         format = "$ssh_symbol$hostname";
       };
-      
+
       directory = {
         truncation_length = 2;
         truncation_symbol = "…/";
       };
-      
+
       character = {
         success_symbol = "[❯](bold #A5D6A7)[❯](bold #FFF59D)[❯](bold #FFAB91)";
         error_symbol = "[✗](bold red)";
       };
-      
+
       # Disable unused modules
       git_metrics.disabled = true;
       gcloud.disabled = true;
@@ -191,14 +201,16 @@ in
     enable = true;
     enableZshIntegration = true;
     settings.legacy_version_file = true;  # read .tool-versions
+    globalConfig.tools.bun = "latest";
+    globalConfig.tools.uv = "latest";
   };
-  
+
   # Enable additional tools with proper integrations
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
   };
-  
+
   programs.direnv = {
     enable = true;
     enableZshIntegration = true;
