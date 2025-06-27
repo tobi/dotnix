@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, ... } @imports:
 let
   username = "tobi";
   isDarwin = pkgs.stdenv.isDarwin;
@@ -9,7 +9,7 @@ in
   # Basic home configuration
   programs.home-manager.enable = true;
 
-  # homeManagerModules.niri = niri.homeModules.niri;
+  # homeManagerModules.niri = imports.niri.homeModules.niri;
 
   home.stateVersion = "25.05";
   home.username = username;
@@ -44,6 +44,7 @@ in
     curl
     jq
     age
+    gh
 
     # System tools
     htop
@@ -218,7 +219,6 @@ in
     nix-direnv.enable = true;
   };
 
-  programs.gh.enable = true;
   programs.btop.enable = true;
 
   xdg.configFile."ghostty/config".source = ./config/ghostty.config;

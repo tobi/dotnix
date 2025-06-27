@@ -4,23 +4,43 @@ let
 in
 {
 
-   # Hyprland configuration
-  # wayland.windowManager.hyprland = {
-  #   enable = true;
-  #   extraConfig = builtins.readFile ./config/hyprland.conf;
-  # };
-
-  # wayland.windowManager.niri = {
-  #   enable = true;
-  # };
+  home.packages = with pkgs; [
+    wbg
+    mako
+    rustdesk
+  ];
 
   # programs.niri.enable = true;
   programs.vscode.enable = true;
+  programs.firefox.enable = true;
+  programs.fuzzel.enable = true;
+  programs.yazi.enable = true;
+  programs.swaylock.enable = true;
 
-  # wayland.windowManager.niri = {
-  #    enable = true;
-  # #   extraConfig = builtins.readFile ./config/hyprland.conf;
-  #  };
+  # programs.ruskdesk.enable = true;
+  # programs.mako.enable = true;
+
+  programs.waybar.settings = {
+    enable = true;
+    style = ./config/waybar.css;
+    mainBar.layer = "top";
+  };
+
+#   programs.waybar.settings = [
+#   {
+#     layer = "top";
+#     position = "top";
+#     height = 30;
+#     output = [ "eDP-1" "HDMI-A-1" ];
+#     modules-left = [ "sway/workspaces" "sway/mode" "wlr/taskbar" ];
+#     modules-center = [ "sway/window" "custom/hello-from-waybar" ];
+#     modules-right = [ "mpd" "custom/mymodule#with-css-id" "temperature" ];
+#   }
+# ];
+
+  home.sessionVariables = {
+    DISPLAY = ":0";
+  };
 
   # XDG configuration for proper application launching
   xdg = lib.mkIf isLinux {
