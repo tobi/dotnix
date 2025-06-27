@@ -79,29 +79,29 @@
   xdg.portal = {
     enable = true;
     wlr.enable = true;
-  #  extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    #  extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
     extraPortals = [ pkgs.xdg-desktop-portal-wlr pkgs.xdg-desktop-portal-gtk ];
     config.common.default = "*";
- };
+  };
 
 
   # Add useful packages to the live environment
   environment.systemPackages = with pkgs; [
     git
-    kitty          # Wayland-native terminal
-    ghostty        # Wayland-native terminal
-    fuzzel         # Wayland launcher (better than wofi)
-    chromium       # Chromium-style browser
-    waybar         # Wayland status bar
-    swww           # Wayland wallpaper daemon
-    grim           # Wayland screenshot tool
-    slurp          # Screen area selection for Wayland
-    wl-clipboard   # Wayland clipboard utilities
-    wlr-randr      # Monitor configuration for wlroots
-    kanshi         # Dynamic display configuration
-    anyrun         # Application launcher
+    kitty # Wayland-native terminal
+    ghostty # Wayland-native terminal
+    fuzzel # Wayland launcher (better than wofi)
+    chromium # Chromium-style browser
+    waybar # Wayland status bar
+    swww # Wayland wallpaper daemon
+    grim # Wayland screenshot tool
+    slurp # Screen area selection for Wayland
+    wl-clipboard # Wayland clipboard utilities
+    wlr-randr # Monitor configuration for wlroots
+    kanshi # Dynamic display configuration
+    anyrun # Application launcher
     xwayland-satellite
-    
+
     # anyrun-with-all-plugins # Application launcher with all plugins
     # File management
     gparted
@@ -113,6 +113,9 @@
     pavucontrol
     wireplumber
   ];
+
+  programs.nix-ld.enable = true;
+
 
   programs.zsh.enable = true; # Enable zsh
 
@@ -161,4 +164,4 @@
 
   # Home Manager configuration with version check disabled
   hardware.enableAllFirmware = true;
-} 
+}

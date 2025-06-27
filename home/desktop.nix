@@ -8,6 +8,9 @@ in
     wbg
     mako
     rustdesk
+    gcr
+    gnome-keyring
+    libsecret
   ];
 
   # programs.niri.enable = true;
@@ -22,31 +25,33 @@ in
 
   programs.waybar.settings = {
     enable = true;
-    style = ./config/waybar.css;
+    mainBar.style = builtins.readFile ./config/waybar.css;
     mainBar.layer = "top";
   };
 
-#   programs.waybar.settings = [
-#   {
-#     layer = "top";
-#     position = "top";
-#     height = 30;
-#     output = [ "eDP-1" "HDMI-A-1" ];
-#     modules-left = [ "sway/workspaces" "sway/mode" "wlr/taskbar" ];
-#     modules-center = [ "sway/window" "custom/hello-from-waybar" ];
-#     modules-right = [ "mpd" "custom/mymodule#with-css-id" "temperature" ];
-#   }
-# ];
+  #   programs.waybar.settings = [
+  #   {
+  #     layer = "top";
+  #     position = "top";
+  #     height = 30;
+  #     output = [ "eDP-1" "HDMI-A-1" ];
+  #     modules-left = [ "sway/workspaces" "sway/mode" "wlr/taskbar" ];
+  #     modules-center = [ "sway/window" "custom/hello-from-waybar" ];
+  #     modules-right = [ "mpd" "custom/mymodule#with-css-id" "temperature" ];
+  #   }
+  # ];
 
-  home.sessionVariables = {
-    DISPLAY = ":0";
+  services.gnome-keyring.enable = true;
+
+  programs.gh = {
+    enable = true;
+    settings.git_protocol = "ssh";
   };
 
   # XDG configuration for proper application launching
   xdg = lib.mkIf isLinux {
     enable = true;
-    configFile."hypr/hyprland.conf".source = ./config/hyprland.conf;
-    
+
     # Set default applications
     mimeApps = {
       enable = true;

@@ -22,7 +22,7 @@ in
   # Global environment variables
   home.sessionVariables = {
     CPPFLAGS = "-I${pkgs.zlib.dev}/include -I${pkgs.openssl.dev}/include -I${pkgs.libffi.dev}/include";
-    LDFLAGS  = "-L${pkgs.zlib.out}/lib -L${pkgs.openssl.out}/lib -L${pkgs.libffi.out}/lib";
+    LDFLAGS = "-L${pkgs.zlib.out}/lib -L${pkgs.openssl.out}/lib -L${pkgs.libffi.out}/lib";
 
     MANPAGER = "sh -c 'col -bx | ${pkgs.bat}/bin/bat -l man -p'";
 
@@ -54,8 +54,21 @@ in
     zstd
 
     # Development
-    gnumake sqlite zlib.dev stdenv.cc openssl.dev libffi.dev pkg-config
-    lazygit hyperfine tokei nixpkgs-fmt comma duckdb
+    gnumake
+    sqlite
+    zlib.dev
+    stdenv.cc
+    openssl.dev
+    libffi.dev
+    pkg-config
+    lazygit
+    hyperfine
+    tokei
+    nixpkgs-fmt
+    comma
+    duckdb
+    ffmpeg
+    pv
 
     # Nice-to-have
     gum
@@ -202,7 +215,7 @@ in
   programs.mise = {
     enable = true;
     enableZshIntegration = true;
-    settings.legacy_version_file = true;  # read .tool-versions
+    settings.legacy_version_file = true; # read .tool-versions
     globalConfig.tools.bun = "latest";
     globalConfig.tools.uv = "latest";
   };
