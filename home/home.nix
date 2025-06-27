@@ -9,6 +9,8 @@ in
   # Basic home configuration
   programs.home-manager.enable = true;
 
+  # homeManagerModules.niri = niri.homeModules.niri;
+
   home.stateVersion = "25.05";
   home.username = username;
   home.homeDirectory =
@@ -52,7 +54,7 @@ in
 
     # Development
     gnumake sqlite zlib.dev stdenv.cc openssl.dev libffi.dev pkg-config
-    lazygit hyperfine tokei nixpkgs-fmt comma
+    lazygit hyperfine tokei nixpkgs-fmt comma duckdb
 
     # Nice-to-have
     gum
@@ -123,10 +125,9 @@ in
 
     shellAliases = {
       # Editor and tools
-      e = "$EDITOR";
+      e = "nano";
       lg = "lazygit";
       cat = "bat -p";
-      nano = "$EDITOR";
       sudo = "sudo -Es";
 
       # Enhanced commands
@@ -152,7 +153,7 @@ in
       b = "bundle exec";
 
       # System management
-      reload = "nix develop ~/dotnix/flake.nix -c home-manager switch --flake ~/dotnix/home.nix && source $HOME/.zshrc";
+      reload = "nix develop ~/dotnix/flake.nix -c home-manager switch --flake ~/dotnix/home/flake.nix && source $HOME/.zshrc";
     };
   };
 
@@ -220,5 +221,5 @@ in
   programs.gh.enable = true;
   programs.btop.enable = true;
 
-  xdg.configFile."ghostty/config".source = ./ghostty.config;
+  xdg.configFile."ghostty/config".source = ./config/ghostty.config;
 }

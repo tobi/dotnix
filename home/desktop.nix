@@ -5,17 +5,27 @@ in
 {
 
    # Hyprland configuration
-  wayland.windowManager.hyprland = {
-    enable = true;
-    extraConfig = builtins.readFile ./hyprland.conf;
-  };
+  # wayland.windowManager.hyprland = {
+  #   enable = true;
+  #   extraConfig = builtins.readFile ./config/hyprland.conf;
+  # };
 
-  
+  # wayland.windowManager.niri = {
+  #   enable = true;
+  # };
+
+  # programs.niri.enable = true;
+  programs.vscode.enable = true;
+
+  # wayland.windowManager.niri = {
+  #    enable = true;
+  # #   extraConfig = builtins.readFile ./config/hyprland.conf;
+  #  };
 
   # XDG configuration for proper application launching
   xdg = lib.mkIf isLinux {
     enable = true;
-    configFile."hypr/hyprland.conf".source = ./hyprland.conf;
+    configFile."hypr/hyprland.conf".source = ./config/hyprland.conf;
     
     # Set default applications
     mimeApps = {

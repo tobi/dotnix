@@ -1,6 +1,6 @@
 {
   description = "Tobi's dotfiles";
-  outputs = { self, nixpkgs, home-manager, ... }:
+  outputs = { self, nixpkgs, home-manager, niri, ... }:
     let
       # Support both Linux and Darwin
       systems = [ "x86_64-linux" "aarch64-darwin" ];
@@ -12,23 +12,28 @@
       pkgsFor = system: import nixpkgs {
         inherit system;
         config.allowUnfree = true;
+        overlays = [ niri.overlays.niri ];
+        programs.niri.package = nixpkgs.niri-unstable;
       };
 
     in {
 
       # Home Manager configurations
       homeConfigurations = {
-        # windows
-        "tobi@zerg-wsl2" = home-manager.lib.homeManagerConfiguration  {
+        "tobi@frameling" = home-manager.lib.homeManagerConfiguration  {
           pkgs = pkgsFor "x86_64-linux";
-          modules = [ ./home.nix ];
+          modules = [ 
+            ./home.nix 
+            ./desktop.nix
+          ];
         };
 
-        "tobi@shopify-mbp-2" = home-manager.lib.homeManagerConfiguration {
+        "tobi@macbook-pro2" = home-manager.lib.homeManagerConfiguration {
           pkgs = pkgsFor "aarch64-darwin";
           modules = [ ./home.nix ];
         };
       };
+          programs.niri.enable = true; 
 
     };
 
@@ -40,6 +45,7 @@
     home-manager.url = "https://flakehub.com/f/nix-community/home-manager/0";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
+    niri.url = "github:sodiboo/niri-flake";
   };
 
 }
