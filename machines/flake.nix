@@ -1,6 +1,6 @@
 {
   description = "Tobi's homelab";
-  
+
   inputs = {
     nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0";
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
@@ -8,31 +8,33 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    niri.url = "github:sodiboo/niri-flake";
   };
 
-  outputs = { self, nixpkgs, devshell, nixos-wsl, determinate, home-manager, ... }:
+  outputs = { self, nixpkgs, devshell, nixos-wsl, determinate, home-manager, niri, ... }:
     let
       # Support both Linux and Darwin
       systems = [ "x86_64-linux" "aarch64-darwin" ];
-      
+
       # Helper function to generate packages for each system
       forEachSystem = nixpkgs.lib.genAttrs systems;
-      
+
       # Generate pkgs for each system
-      pkgsFor = system: import nixpkgs { 
+      pkgsFor = system: import nixpkgs {
         inherit system;
         config.allowUnfree = true;
-        overlays = [ devshell.overlays.default ];
+        overlays = [ devshell.overlays.default niri.overlays.niri ];
       };
 
-    in {
+    in
+    {
       # NixOS machine configurations
       nixosConfigurations = {
         "zerg-wsl2" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = { inherit nixos-wsl; };
-          modules = [ 
-            ./zerg-wsl2/configuration.nix 
+          modules = [
+            ./zerg-wsl2/configuration.nix
             determinate.nixosModules.default
           ];
         };
@@ -44,6 +46,14 @@
           # Pass home-manager to the module configuration
           specialArgs = { inherit home-manager; };
           modules = [ ./usb-stick/configuration.nix ];
+        };
+
+        "frameling" = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit niri; };
+          modules = [
+            ./frameling/configuration.nix
+          ];
         };
       };
 

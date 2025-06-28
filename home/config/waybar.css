@@ -1,5 +1,17 @@
 * {
-  color: #d3c6aa;
-  background-color: #2d353b;
-  margin-left: 10px;
+  border: none;
+  border-radius: 0;
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 13px;
+  min-height: 0;
 }
+
+window#waybar {
+  /* background-color: #2d353b;
+  border-bottom: 3px solid rgba(100, 114, 125, 0.5);
+  color: #d3c6aa; */
+  background-color: transparent;
+  transition-property: background-color;
+  transition-duration: .5s;
+}
+

@@ -5,7 +5,8 @@
 
 {
   imports =
-    [ (modulesPath + "/installer/scan/not-detected.nix")
+    [
+      (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
   boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "thunderbolt" "usb_storage" "sd_mod" ];
@@ -14,20 +15,24 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/2284f472-82f2-42d7-8038-920cda0d7564";
+    {
+      device = "/dev/disk/by-uuid/2284f472-82f2-42d7-8038-920cda0d7564";
       fsType = "ext4";
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/8059-DDE9";
+    {
+      device = "/dev/disk/by-uuid/8059-DDE9";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };
 
-  swapDevices = [ ];
+  swapDevices = [
+    { device = "/swapfile"; }
+  ];
 
-  hardware.bluetooth.enable = true;                # Enables Bluetooth support
-  hardware.bluetooth.powerOnBoot = true;           
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
 
   # NVIDIA driver configuration for Wayland
   hardware.graphics = {
@@ -38,7 +43,7 @@
   # hardware.nvidia = {
   #   modesetting.enable = true;
   #   # Use the proprietary driver
-  #   open = false; 
+  #   open = false;
   #   # Install the stable NVIDIA driver package
   #   package = config.boot.kernelPackages.nvidiaPackages.stable;
   #   # Power management (helps with compatibility)

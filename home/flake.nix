@@ -13,17 +13,17 @@
         inherit system;
         config.allowUnfree = true;
         overlays = [ niri.overlays.niri ];
-        programs.niri.package = nixpkgs.niri-unstable;
       };
 
-    in {
+    in
+    {
 
       # Home Manager configurations
       homeConfigurations = {
-        "tobi@frameling" = home-manager.lib.homeManagerConfiguration  {
+        "tobi@frameling" = home-manager.lib.homeManagerConfiguration {
           pkgs = pkgsFor "x86_64-linux";
-          modules = [ 
-            ./home.nix 
+          modules = [
+            ./home.nix
             ./desktop.nix
           ];
         };
@@ -33,7 +33,6 @@
           modules = [ ./home.nix ];
         };
       };
-          programs.niri.enable = true; 
 
     };
 

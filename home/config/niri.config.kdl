@@ -276,7 +276,6 @@ cursor {
 // This line starts waybar, a commonly used bar for Wayland compositors.
 spawn-at-startup "waybar"
 spawn-at-startup "xwayland-satellite"
-spawn-at-startup "wbg Pictures/background.jpg"
 spawn-at-startup "ghostty"
 
 // Uncomment this line to ask the clients to omit their client-side decorations if possible.
@@ -302,19 +301,19 @@ animations {
     // off
 
     // Slow down all animations by this factor. Values below 1 speed them up instead.
-    slowdown 2.0
+    slowdown 1.0
 
     workspace-switch {
         spring damping-ratio=1.0 stiffness=1000 epsilon=0.0001
     }
 
     window-open {
-        duration-ms 150
-        curve "ease-out-expo"
+        duration-ms 200
+        curve "ease-out-quad"
     }
 
     window-close {
-        duration-ms 150
+        duration-ms 200
         curve "ease-out-quad"
     }
 

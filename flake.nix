@@ -1,21 +1,34 @@
 {
   description = "Tobi's dotfiles/homelab";
-  outputs = { nixpkgs, devshell, home-manager, zen-browser, ... }:
+
+  inputs = {
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0";
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+    devshell.url = "github:numtide/devshell";
+    nixos-wsl.url = "github:nix-community/NixOS-WSL";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    niri.url = "github:sodiboo/niri-flake";
+    zen-browser.url = "github:MarceColl/zen-browser-flake";
+  };
+
+  outputs = { self, nixpkgs, devshell, nixos-wsl, determinate, home-manager, niri, zen-browser, ... }:
     let
       # Support both Linux and Darwin
       systems = [ "x86_64-linux" "aarch64-darwin" ];
-      
+
       # Helper function to generate packages for each system
       forEachSystem = nixpkgs.lib.genAttrs systems;
-      
+
       # Generate pkgs for each system
-      pkgsFor = system: import nixpkgs { 
+      pkgsFor = system: import nixpkgs {
         inherit system;
         config.allowUnfree = true;
-        overlays = [ devshell.overlays.default ];
+        overlays = [ devshell.overlays.default niri.overlays.niri ];
       };
 
-    in {
+    in
+    {
 
       # Development shells for both systems
       devShells = forEachSystem (system: {
@@ -24,13 +37,23 @@
 
       # NixOS configurations
       nixosConfigurations = {
-        iso = nixpkgs.lib.nixosSystem {
+        "zerg-wsl2" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          specialArgs = { 
-            inherit home-manager zen-browser;
-          };
+          specialArgs = { inherit nixos-wsl; };
           modules = [
-            ./machines/configuration.iso.nix
+            ./machines/zerg-wsl2/configuration.nix
+            determinate.nixosModules.default
+          ];
+        };
+
+        # New configuration for the live ISO
+        # RUN: nix build .#nixosConfigurations.iso.config.system.build.isoImage
+        "iso" = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          # Pass home-manager to the module configuration
+          specialArgs = { inherit home-manager zen-browser; };
+          modules = [
+            ./machines/usb-stick/configuration.nix
             # Add zen-browser overlay
             {
               nixpkgs.overlays = [
@@ -41,20 +64,16 @@
             }
           ];
         };
+
+        "frameling" = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit niri; };
+          modules = [
+            ./machines/frameling/configuration.nix
+          ];
+        };
       };
+
+      packages.x86_64-linux.iso = self.nixosConfigurations.iso.config.system.build.isoImage;
     };
-
-  inputs = {
-    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
-    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0";
-    
-    devshell.url = "github:numtide/devshell";
-    devshell.inputs.nixpkgs.follows = "nixpkgs";
-    
-    home-manager.url = "https://flakehub.com/f/nix-community/home-manager/0";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    
-    zen-browser.url = "github:MarceColl/zen-browser-flake";
-  };
-
 }
