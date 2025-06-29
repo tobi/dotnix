@@ -15,6 +15,7 @@
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
+    lazy-trees = true;
   };
 
   # Boot Configuration
@@ -142,6 +143,19 @@
     # Audio
     pavucontrol
     wireplumber
+
+    # Camera support and debugging
+    v4l-utils
+    cheese
+    pipewire
+
+    # Bluetooth and WebAuthn support
+    bluez
+    bluez-tools
+
+    # FIDO2/WebAuthn support
+    pcsclite
+    libfido2
   ];
 
 
@@ -157,18 +171,24 @@
     };
   };
 
+  # Udev rules for FIDO2/WebAuthn devices
+  services.udev.packages = [ pkgs.libfido2 ];
+
   # Services
   services = {
     flatpak.enable = true;
     blueman.enable = true;
     dbus.enable = true;
     gnome.gnome-keyring.enable = true;
+    power-profiles-daemon.enable = true;
     pulseaudio.enable = false;
     seatd.enable = true;
+    pcscd.enable = true; # Smart card and FIDO2 support
     pipewire = {
       enable = true;
       alsa.enable = true;
       pulse.enable = true;
+      jack.enable = true;
       extraConfig.pipewire."92-low-latency" = {
         context.properties = {
           default.clock.rate = 48000;
@@ -178,6 +198,7 @@
         };
       };
     };
+    pipewire.wireplumber.enable = true;
   };
 
   # Security
@@ -190,8 +211,23 @@
   xdg.portal = {
     enable = true;
     wlr.enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-wlr ];
-    config.common.default = "*";
+    xdgOpenUsePortal = true;
+
+    extraPortals = [
+      pkgs.xdg-desktop-portal-wlr
+      pkgs.xdg-desktop-portal-gtk
+    ];
+    config = {
+      common = {
+        default = [ "wlr" ];
+      };
+      niri = {
+        default = [ "wlr" "gtk" ];
+        "org.freedesktop.impl.portal.Camera" = [ "gtk" ];
+        "org.freedesktop.impl.portal.Screenshot" = [ "wlr" ];
+        "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ];
+      };
+    };
   };
 
   # Fonts
@@ -209,7 +245,7 @@
     isNormalUser = true;
     description = "Tobi";
     shell = pkgs.zsh;
-    extraGroups = [ "wheel" "networkmanager" "video" "render" "input" "gamemode" ];
+    extraGroups = [ "wheel" "networkmanager" "video" "render" "input" "gamemode" "bluetooth" ];
     initialHashedPassword = "";
   };
 }

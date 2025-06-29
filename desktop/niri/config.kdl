@@ -265,11 +265,12 @@ environment {
     QT_QPA_PLATFORM "wayland"
     CHROMIUM_FLAGS "--enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3"
     ELECTRON_OZONE_PLATFORM_HINT "auto"
+    GTK_THEME "Adwaita-dark"
 }
 
 cursor {
-    xcursor-theme "breeze_cursors"
-    xcursor-size 60
+    xcursor-theme "capitaine-cursors"
+    xcursor-size 26
 
     hide-when-typing
 }
@@ -566,12 +567,11 @@ binds {
     Mod+Ctrl+8 { move-column-to-workspace 8; }
     Mod+Ctrl+9 { move-column-to-workspace 9; }
 
-    Super+Return { spawn "ghostty"; }
-    Super+C { spawn "chromium" "--enable-features=UseOzonePlatform" "--ozone-platform=wayland" "--enable-wayland-ime" "--wayland-text-input-version=3"; }
+    Super+Return { spawn "~/dotnix/home/bin/open" "ghostty"; }
+    Super+C { spawn "~/dotnix/home/bin/open" "google-chrome"; }
+    Super+X { spawn "~/dotnix/home/bin/open" "cursor"; }
+    Super+A { spawn "~/dotnix/home/bin/open" "chatgpt"; }
     Alt+Space { spawn "fuzzel"; }
-    Super+A { spawn "ChatGPT"; }
-    // Alternatively, there are commands to move just a single window:
-    // Mod+Ctrl+1 { move-window-to-workspace 1; }
 
     // Switches focus between the current and the previous workspace.
     Mod+Tab { focus-workspace-previous; }

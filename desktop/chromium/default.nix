@@ -1,10 +1,22 @@
 { config, lib, pkgs, ... }:
 
 {
-  # Set default applications for Chromium
-  xdg.mimeApps.defaultApplications = {
-    "text/html" = "Chromium.desktop";
+  # Enable Chromium with Wayland support
+  programs.chromium = {
+    enable = false;
+    commandLineArgs = [
+      "--enable-features=UseOzonePlatform"
+      "--ozone-platform=wayland"
+      "--enable-wayland-ime"
+      "--wayland-text-input-version=3"
+    ];
   };
+
+  # Note: Google Chrome is now the default browser
+  # Uncomment the following if you want to make Chromium the default again:
+  # xdg.mimeApps.defaultApplications = {
+  #   "text/html" = "Chromium.desktop";
+  # };
 
   # Desktop entry for Chromium
   xdg.desktopEntries.Chromium = {

@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# This script launches a .desktop application by searching through specified directories
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 <desktop-file>"
+  exit 1
+fi
+
+# Convert input to lowercase
+input=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+
+# Directories to search for .desktop files
+search_dirs="
+  $HOME/.local/state/nix/profiles/home-manager/home-path/share/applications
+  $HOME/.nix-profile/share/applications
+  /usr/share/applications
+"
+
+# Search for the .desktop file
+for dir in $search_dirs; do
+  for file in "$dir"/*; do
+    # Convert filename to lowercase
+    filename=$(basename "$file" | tr '[:upper:]' '[:lower:]')
+    if [ "$filename" = "$input.desktop" ] || [ "$filename" = "$input" ]; then
+      echo "Opening xdg-open $file"
+      dex "$file"
+      exit 0
+    fi
+  done
+done
+
+echo "Error: $1.desktop not found in any of the specified directories."
+exec xdg-open "$1"
+exit 1
