@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... } @imports:
+{ config, pkgs, lib, ... }:
 let
   username = "tobi";
   isDarwin = pkgs.stdenv.isDarwin;
@@ -8,8 +8,6 @@ in
 {
   # Basic home configuration
   programs.home-manager.enable = true;
-
-  # homeManagerModules.niri = imports.niri.homeModules.niri;
 
   home.stateVersion = "25.05";
   home.username = username;
@@ -21,9 +19,9 @@ in
 
   # Global environment variables
   home.sessionVariables = {
-    CPPFLAGS = "-I${pkgs.zlib.dev}/include -I${pkgs.openssl.dev}/include -I${pkgs.libffi.dev}/include";
-    LDFLAGS = "-L${pkgs.zlib.out}/lib -L${pkgs.openssl.out}/lib -L${pkgs.libffi.out}/lib";
-
+    DOTFILES = "$HOME/dotnix";
+    # CPPFLAGS = "-I${pkgs.zlib.dev}/include -I${pkgs.openssl.dev}/include -I${pkgs.libffi.dev}/include";
+    # LDFLAGS = "-L${pkgs.zlib.out}/lib -L${pkgs.openssl.out}/lib -L${pkgs.libffi.out}/lib";
     MANPAGER = "sh -c 'col -bx | ${pkgs.bat}/bin/bat -l man -p'";
 
   } // lib.optionalAttrs isDarwin {
@@ -45,6 +43,7 @@ in
     jq
     age
     gh
+    cowsay
 
     # System tools
     htop
@@ -69,6 +68,7 @@ in
     duckdb
     ffmpeg
     pv
+    killall
 
     # Nice-to-have
     gum
@@ -141,13 +141,13 @@ in
       # Editor and tools
       e = "nano";
       lg = "lazygit";
-      cat = "bat -p";
       sudo = "sudo -Es";
 
       # Enhanced commands
-      grep = "batgrep";
-      diff = "batdiff";
-      man = "batman";
+      #cat = "bat -p";
+      #grep = "batgrep";
+      #diff = "batdiff";
+      #man = "batman";
 
       # File operations
       ls = "eza --group-directories-first";
@@ -233,6 +233,7 @@ in
   };
 
   programs.btop.enable = true;
+  programs.yazi.enable = true;
 
-  xdg.configFile."ghostty/config".source = ./config/ghostty.config;
+  # xdg.configFile."ghostty/config".source = ./config/ghostty.config;
 }

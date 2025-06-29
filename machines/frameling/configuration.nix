@@ -93,7 +93,8 @@
     xwayland.enable = true;
     nix-ld.enable = true;
     zsh.enable = true;
-    gamescope.enable = true;
+
+    fuse.userAllowOther = true;
     steam = {
       enable = true;
       remotePlay.openFirewall = true;
@@ -107,6 +108,9 @@
   environment.systemPackages = with pkgs; [
     # Core tools
     git
+    zsh
+    bash
+    fuse
 
     # Terminals
     kitty
@@ -160,6 +164,7 @@
     dbus.enable = true;
     gnome.gnome-keyring.enable = true;
     pulseaudio.enable = false;
+    seatd.enable = true;
     pipewire = {
       enable = true;
       alsa.enable = true;
@@ -185,7 +190,7 @@
   xdg.portal = {
     enable = true;
     wlr.enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-wlr pkgs.xdg-desktop-portal-gtk ];
+    extraPortals = [ pkgs.xdg-desktop-portal-wlr ];
     config.common.default = "*";
   };
 
