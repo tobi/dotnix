@@ -1,2 +1,19 @@
-.direnv
-result
+# Direnv
+/.direnv/
+
+# Build results
+/result
+/result-*
+
+# Nix build files
+*.drv
+
+# Editor backup files
+*~
+.#*
+
+# macOS
+.DS_Store
+
+# Age secrets
+*.age.tmp
