@@ -18,32 +18,16 @@ packagesFrom = [
 [[commands]]
 name = "switch"
 category = "nixos-rebuild"
-command = "sudo nixos-rebuild switch --flake ~/dotnix/machines"
+command = "sudo nixos-rebuild switch --flake ."
 help = "If this machine is nixos, switch to the config"
 
 [[commands]]
 name = "apply"
 category = "home-manager"
-command = "home-manager switch --flake ~/dotnix/home"
+command = "home-manager switch --flake ."
 help = "Apply home manager configuration"
-
-[[commands]]
-name = "apply-linux"
-category = "home-manager"
-command = "home-manager switch --flake ~/dotnix#tobi@linux"
-help = "Apply home manager configuration for Linux"
-
-[[commands]]
-name = "apply-darwin"
-category = "home-manager"
-command = "home-manager switch --flake ~/dotnix#tobi@darwin"
-help = "Apply home manager configuration for Darwin"
 
 [[commands]]
 name = "check"
 command = "nix flake check --all-systems"
 help = "Check flake for errors"
-
-[[env]]
-name = "EDITOR"
-value = "micro"

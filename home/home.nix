@@ -224,7 +224,7 @@ in
 
       # Disable unused modules
       git_metrics.disabled = true;
-      gcloud.disabled = true;
+      # gcloud.disabled = true;
       package.disabled = true;
     };
   };
@@ -232,9 +232,6 @@ in
   programs.mise = {
     enable = true;
     enableZshIntegration = true;
-    settings.legacy_version_file = true; # read .tool-versions
-    globalConfig.tools.bun = "latest";
-    globalConfig.tools.uv = "latest";
   };
 
   # Enable additional tools with proper integrations

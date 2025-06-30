@@ -1,5 +1,0 @@
-#!/usr/bin/env nix-shell
-#! nix-shell -i bash -p nix home-manager
-sudo nixos-rebuild switch --flake .
-cd ../../home
-home-manager switch --flake .

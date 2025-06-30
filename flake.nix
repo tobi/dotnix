@@ -1,7 +1,7 @@
 {
   description = "Tobi's dotfiles/homelab";
 
-  outputs = { self, nixpkgs, devshell, nixos-wsl, determinate, home-manager, niri, ... }:
+  outputs = { self, nixpkgs, determinate, home-manager, ... } @inputs:
     let
       # Support both Linux and Darwin
       systems = [ "x86_64-linux" "aarch64-darwin" ];
@@ -14,26 +14,21 @@
         inherit system;
         config.allowUnfree = true;
         overlays = [
-          devshell.overlays.default
-          niri.overlays.niri
-          # determinate.overlays.default
-          # home-manager.overlays.default
+          inputs.devshell.overlays.default
+          inputs.niri.overlays.niri
         ];
       };
 
     in
     {
 
-      # Development shells for both systems
-      devShells = forEachSystem (system: {
-        default = (pkgsFor system).devshell.fromTOML ./devshell.toml;
-      });
-
+      # ------------------------------------------------------------
       # NixOS configurations
+      # ------------------------------------------------------------
       nixosConfigurations = {
         "zerg-wsl2" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          specialArgs = { inherit nixos-wsl; };
+          specialArgs = { nixos-wsl = inputs.nixos-wsl; };
           modules = [
             ./machines/zerg-wsl2/configuration.nix
             determinate.nixosModules.default
@@ -45,9 +40,7 @@
         "iso" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           # Pass home-manager to the module configuration
-          specialArgs = {
-            inherit home-manager;
-          };
+          specialArgs = { home-manager = inputs.home-manager; };
           modules = [
             ./machines/usb-stick/configuration.nix
           ];
@@ -55,9 +48,7 @@
 
         "frameling" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          specialArgs = {
-            inherit niri;
-          };
+          specialArgs = { niri = inputs.niri; };
           modules = [
             ./machines/frameling/configuration.nix
             determinate.nixosModules.default
@@ -73,11 +64,38 @@
                   ./desktop/desktop.nix
                 ];
               };
-              home-manager.extraSpecialArgs = { inherit niri; };
+              home-manager.extraSpecialArgs = { niri = inputs.niri; };
             }
           ];
         };
       };
+
+      # ------------------------------------------------------------
+      # Home Manager configurations
+      # ------------------------------------------------------------
+      # Home Manager configurations
+      homeConfigurations = {
+        "tobi@frameling" = home-manager.lib.homeManagerConfiguration {
+          pkgs = pkgsFor "x86_64-linux";
+          modules = [
+            ./home/home.nix
+            ./desktop/desktop.nix
+          ];
+        };
+
+        "tobi@shopify-mbp" = home-manager.lib.homeManagerConfiguration {
+          pkgs = pkgsFor "aarch64-darwin";
+          modules = [ ./home/home.nix ];
+        };
+      };
+
+      # ------------------------------------------------------------
+      # Development shell (nix develop .)
+      # ------------------------------------------------------------
+      # Development shells for both systems
+      devShells = forEachSystem (system: {
+        default = (pkgsFor system).devshell.fromTOML ./devshell.toml;
+      });
     };
 
 
