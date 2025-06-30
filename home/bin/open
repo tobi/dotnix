@@ -1,5 +1,7 @@
 #!/bin/sh
 
+[[ -x /usr/bin/open ]] && exec /usr/bin/open $*
+
 # This script launches a .desktop application by searching through specified directories
 
 id="$(niri msg --json windows | jq -r "map(select((.app_id==\"$1\") or (.title|test(\"$1\")))); .id)[0]")"
