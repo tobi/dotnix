@@ -2,7 +2,13 @@
 
 # This script launches a .desktop application by searching through specified directories
 
-if [ -z "$1" ]; then
+id="$(niri msg --json windows | jq -r "map(select((.app_id==\"$1\") or (.title|test(\"$1\")))); .id)[0]")"
+
+if niri msg action focus-window --id "$id" >/dev/null 2>&1; then
+  exit 0 # focus succeeded
+fi
+
+if [ -z "$1" ]; then # if no argument is provided, launch the desktop file
   echo "Usage: $0 <desktop-file>"
   exit 1
 fi
@@ -31,5 +37,3 @@ for dir in $search_dirs; do
 done
 
 echo "Error: $1.desktop not found in any of the specified directories."
-exec xdg-open "$1"
-exit 1

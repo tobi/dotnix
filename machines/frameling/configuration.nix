@@ -156,9 +156,10 @@
     # FIDO2/WebAuthn support
     pcsclite
     libfido2
+
+    # Tailscale
+    tailscale
   ];
-
-
 
   # Display Manager
   services.greetd = {
@@ -199,6 +200,7 @@
       };
     };
     pipewire.wireplumber.enable = true;
+    tailscale.enable = true;
   };
 
   # Security

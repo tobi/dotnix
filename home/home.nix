@@ -125,9 +125,17 @@ in
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
-
     # Interactive shell setup
     initContent = ''
+      # ── Ctrl-← / Ctrl-→ word jumps ────────────────────────────
+      # Ghostty sends CSI 1;5D / 1;5C; map them to the usual widgets.
+      bindkey -M emacs '\e[1;5D' backward-word
+      bindkey -M emacs '\e[1;5C' forward-word
+      unset zle_bracketed_paste
+      zle -D bracketed-paste
+      bindkey -r '\e[200~'
+      bindkey -r '\e[201~'
+
       echo
       export PATH="$HOME/bin:$HOME/.local/bin:$HOME/dotnix/home/bin:${lib.optionalString isDarwin ":/opt/dev/bin"}:$PATH"
 
@@ -136,6 +144,15 @@ in
       # Load environment variables and show fortune
       echo && ${pkgs.fortune}/bin/fortune -s
     '';
+
+    history.size = 10000;
+    # initExtra = ''
+    #   # disable bracketed paste
+    #   bindkey -e
+    #   zle_bracketed_paste_plain() { zle .bracketed-paste }
+    #   # to turn off bracketed paste support
+    #   zle -N bracketed-paste
+    # '';
 
     shellAliases = {
       # Editor and tools

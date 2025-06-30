@@ -235,16 +235,16 @@ layout {
         // pixels and match the CSS box-shadow properties.
 
         // Softness controls the shadow blur radius.
-        softness 20
+        softness 10
 
         // Spread expands the shadow.
-        spread 6
+        spread 5
 
         // Offset moves the shadow relative to the window.
-        offset x=2 y=2
+        offset x=3 y=3
 
         // You can also change the shadow color and opacity.
-        color "#0007"
+        color "#000000"
     }
 
     // Struts shrink the area occupied by windows, similarly to layer-shell panels.
@@ -284,7 +284,6 @@ cursor {
 spawn-at-startup "waybar"
 spawn-at-startup "xwayland-satellite"
 spawn-at-startup "ghostty"
-// Set wallpaper using wbg
 spawn-at-startup "wbg" "/home/tobi/Pictures/wallpaper.jpg"
 
 // Uncomment this line to ask the clients to omit their client-side decorations if possible.
@@ -430,6 +429,9 @@ binds {
     XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-"; }
     XF86AudioMute        allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
     XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "set" "5%-"; }
+    XF86MonBrightnessUp   allow-when-locked=true { spawn "brightnessctl" "set" "5%+"; }
 
     // Open/close the Overview: a zoomed-out view of workspaces and windows.
     // You can also move the mouse into the top-left hot corner,
