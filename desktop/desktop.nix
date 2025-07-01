@@ -9,6 +9,7 @@
     gnome-keyring
     libsecret
     wev
+    unzip
     zsync
     dropbox-cli
     blueberry
@@ -16,6 +17,7 @@
     pamixer
     brightnessctl
     dex
+    wine
   ];
 
   programs.vscode.enable = true;

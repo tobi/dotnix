@@ -129,12 +129,8 @@ in
     initContent = ''
       # ── Ctrl-← / Ctrl-→ word jumps ────────────────────────────
       # Ghostty sends CSI 1;5D / 1;5C; map them to the usual widgets.
-      bindkey -M emacs '\e[1;5D' backward-word
-      bindkey -M emacs '\e[1;5C' forward-word
-      unset zle_bracketed_paste
-      zle -D bracketed-paste
-      bindkey -r '\e[200~'
-      bindkey -r '\e[201~'
+      bindkey -M emacs '^[[1;5D' backward-word
+      bindkey -M emacs '^[[1;5C' forward-word
 
       echo
       export PATH="$HOME/bin:$HOME/.local/bin:$HOME/dotnix/home/bin:${lib.optionalString isDarwin ":/opt/dev/bin"}:$PATH"
@@ -145,26 +141,12 @@ in
       echo && ${pkgs.fortune}/bin/fortune -s
     '';
 
-    history.size = 10000;
-    # initExtra = ''
-    #   # disable bracketed paste
-    #   bindkey -e
-    #   zle_bracketed_paste_plain() { zle .bracketed-paste }
-    #   # to turn off bracketed paste support
-    #   zle -N bracketed-paste
-    # '';
+    history.size = 50000;
 
     shellAliases = {
       # Editor and tools
       e = "nano";
       lg = "lazygit";
-      sudo = "sudo -Es";
-
-      # Enhanced commands
-      #cat = "bat -p";
-      #grep = "batgrep";
-      #diff = "batdiff";
-      #man = "batman";
 
       # File operations
       ls = "eza --group-directories-first";
@@ -185,6 +167,7 @@ in
 
       # System management
       reload = "nix develop ~/dotnix/flake.nix -c home-manager switch --flake ~/dotnix/home/flake.nix && source $HOME/.zshrc";
+      dev = "nix develop ~/dotnix/flake.nix";
     };
   };
 
@@ -248,6 +231,4 @@ in
 
   programs.btop.enable = true;
   programs.yazi.enable = true;
-
-  # xdg.configFile."ghostty/config".source = ./config/ghostty.config;
 }
