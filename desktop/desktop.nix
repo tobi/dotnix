@@ -18,6 +18,7 @@
     brightnessctl
     dex
     wine
+    gnupg
   ];
 
   programs.vscode.enable = true;
@@ -51,7 +52,6 @@
       };
     };
   };
-
 
   home.shellAliases = {
     switch = "sudo nixos-rebuild switch --flake ~/dotnix && source ~/.zshrc";

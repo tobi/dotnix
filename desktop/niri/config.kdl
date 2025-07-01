@@ -104,7 +104,7 @@ output "eDP-1" {
 }
 
 output "Apple Computer Inc StudioDisplay 0x47040065" /*apple display*/ {
-    scale 2
+    scale 1.8
     focus-at-startup
     background-color "#003300"
 }
@@ -142,7 +142,10 @@ layout {
     // preset-window-heights { }
 
     // You can change the default width of the new windows.
-    default-column-width { proportion 0.5; }
+    default-column-width {
+        // proportion 0.5;
+        fixed 1280;
+    }
     // If you leave the brackets empty, the windows themselves will decide their initial width.
     // default-column-width {}
 
@@ -284,7 +287,7 @@ cursor {
 spawn-at-startup "waybar"
 spawn-at-startup "xwayland-satellite"
 spawn-at-startup "ghostty"
-spawn-at-startup "wbg" "/home/tobi/Pictures/wallpaper.jpg"
+spawn-at-startup "wbg" "~/dotnix/desktop/wallpaper.jpg"
 
 // Uncomment this line to ask the clients to omit their client-side decorations if possible.
 // If the client will specifically ask for CSD, the request will be honored.
@@ -356,14 +359,16 @@ animations {
 // Find more information on the wiki:
 // https://github.com/YaLTeR/niri/wiki/Configuration:-Window-Rules
 
-// Work around WezTerm's initial configure bug
+// Work around ghostty's initial configure bug
 // by setting an empty default-column-width.
 window-rule {
     // This regular expression is intentionally made as specific as possible,
     // since this is the default config, and we want no false positives.
-    // You can get away with just app-id="wezterm" if you want.
-    match app-id=r#"^org\.wezfurlong\.wezterm$"#
-    default-column-width {}
+    // You can get away with just app-id="ghostty" if you want.
+    match app-id=r#"^com\.mitchellh\.ghostty$"#
+    default-column-width {
+        fixed 1000;
+    }
 }
 
 // Open the Firefox picture-in-picture player as floating by default.
@@ -585,9 +590,9 @@ binds {
     Mod+BracketRight { consume-or-expel-window-right; }
 
     // Consume one window from the right to the bottom of the focused column.
-    Mod+Comma  { consume-window-into-column; }
+    // Mod+Comma  { consume-window-into-column; }
     // Expel the bottom window from the focused column to the right.
-    Mod+Period { expel-window-from-column; }
+    // Mod+Period { expel-window-from-column; }
 
     Mod+R { switch-preset-column-width; }
     Mod+Shift+R { switch-preset-window-height; }
@@ -599,10 +604,9 @@ binds {
     // Makes the column "fill the rest of the space".
     Mod+Ctrl+F { expand-column-to-available-width; }
 
-    Mod+C { center-column; }
 
     // Center all fully visible columns on screen.
-    Mod+Ctrl+C { center-visible-columns; }
+    Super+Comma { center-visible-columns; }
 
     // Finer width adjustments.
     // This command can also:

@@ -209,6 +209,13 @@
     pam.services.greetd.enableGnomeKeyring = true;
   };
 
+  # Appimage support
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
+
+
   # XDG Portals
   xdg.portal = {
     enable = true;
