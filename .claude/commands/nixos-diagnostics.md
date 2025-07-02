@@ -33,38 +33,24 @@ Kernel: !`uname -a`
 </host>
 
 <hardware>
-CPU summary: !`grep 'model name' /proc/cpuinfo | uniq`
-Memory total: !`grep MemTotal /proc/meminfo`
-Block devices: !`lsblk`
-PCI devices: !`lspci`
-USB devices: !`lsusb`
-Short hardware summary: !`sudo lshw -short 2>/dev/null || echo 'lshw not available'`
+- CPU summary: !`grep 'model name' /proc/cpuinfo | uniq`
+- Memory total: !`grep MemTotal /proc/meminfo`
+- Block devices: !`lsblk`
+- Short hardware summary: !`sudo lshw -short 2>/dev/null || echo 'lshw not available'`
 </hardware>
 
 <nix_files>
+
 <tree>
 !`exa --tree ~/dotnix`
 </tree>
 
-<flake_nix file=~/dotnix/flake.nix>
-!`cat ~/dotnix/flake.nix`
-</flake_nix>
+- @flake.nix - root flake
+- @home/home.nix - home-manager flake
+- @desktop/desktop.nix - desktop flake
+- @machines/frameling/configuration.nix - frameling machine configuration
+- @machines/frameling/hardware-configuration.nix - frameling machine hardware configuration
 
-<home_manager_nix file=~/dotnix/home/home.nix>
-!`cat ~/dotnix/home/home.nix`
-</home_manager_nix>
-
-<desktop_nix file=~/dotnix/desktop/desktop.nix>
-!`cat ~/dotnix/desktop/desktop.nix`
-</desktop_nix>
-
-<configuration_nix file=~/dotnix/machines/frameling/configuration.nix>
-!`cat ~/dotnix/machines/frameling/configuration.nix`
-</configuration_nix>
-
-<hardware_configuration_nix file=~/dotnix/machines/frameling/hardware-configuration.nix>
-!`cat ~/dotnix/machines/frameling/hardware-configuration.nix`
-</hardware_configuration_nix>
 </nix_files>
 
 <flake_check>
@@ -107,16 +93,20 @@ nix flake check output: !`nix flake check --no-build 2>&1 | tail -n 250`
 <logs>
 Ignore everything that isn't from the current boot.
 
-<boot>
-!`journalctl -b 0 -p warning --no-pager | tail -n 250`
-</boot>
+<journalctl>
+!`journalctl -b 0 -p warning --no-pager -n2000`
+</journalctl>
+
+<kernel_logs>
+!`journalctl -k`
+</kernel_logs>
 
 <rebuild_logs>
 Most recent nixos-rebuild log (if available): !`find /var/log -type f -iname '*nixos-rebuild*' -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -1 | cut -d' ' -f2- | xargs -r tail -n 250`
 </rebuild_logs>
 
 <dmesg>
-!`dmesg --level=err | tail -n 250`
+!`dmesg  tail -n 250`
 </dmesg>
 
 </logs>

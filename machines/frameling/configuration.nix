@@ -50,7 +50,7 @@
 
       # USB/Bluetooth fixes
       "xhci_hcd.quirks=0x00000040"
-      
+
       # PCIe power management - allow but fix error reporting
       "pci=noaer"
 
@@ -66,6 +66,12 @@
       "snd_hda_intel.power_save=1"
       "snd_hda_intel.probe_mask=1"
     ];
+
+    kernel.sysctl = {
+      "kernel.dmesg_restrict" = 0;  # Allow non-root dmesg access
+      "vm.swappiness" = 10;         # Reduce swap usage
+    };
+
     extraModprobeConfig = ''
       options snd_hda_intel model=auto
     '';
@@ -77,7 +83,7 @@
   networking.networkmanager.enable = true;
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 ];  # SSH
+    allowedTCPPorts = [ 22 ]; # SSH
     allowedUDPPorts = [ ];
   };
 
@@ -105,11 +111,15 @@
   powerManagement = {
     enable = true;
     cpuFreqGovernor = "powersave";
+    powertop.enable = true;
   };
+
+  # Add ZRAM for better memory management
+  zramSwap.enable = true;
 
   # Backlight control
   hardware.acpilight.enable = true;
-  
+
   # Set default brightness to 60% on boot
   systemd.services.brightness-default = {
     description = "Set default brightness to 60%";
@@ -199,7 +209,7 @@
     libfido2
 
     # Network tools
-    bind.dnsutils  # dig, nslookup
+    bind.dnsutils # dig, nslookup
     nmap
     traceroute
     iperf3
@@ -260,6 +270,8 @@
       openFirewall = true;
     };
     chrony.enable = true;
+    upower.enable = true;
+    thermald.enable = true;
   };
 
   # Fix NTP startup dependencies
@@ -322,7 +334,7 @@
   ];
 
   # Groups
-  users.groups.plugdev = {};
+  users.groups.plugdev = { };
 
   # User Account
   users.users.tobi = {
