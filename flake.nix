@@ -35,9 +35,9 @@
           ];
         };
 
-        # New configuration for the live ISO
-        # RUN: nix build .#nixosConfigurations.iso.config.system.build.isoImage
-        "iso" = nixpkgs.lib.nixosSystem {
+        # New configuration for the USB stick
+        # RUN: nix build .#nixosConfigurations.usb-stick.config.system.build.isoImage
+        "usb-stick" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           # Pass home-manager to the module configuration
           specialArgs = { home-manager = inputs.home-manager; };

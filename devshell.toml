@@ -7,15 +7,17 @@ packages = [
   "home-manager",
   "curl",
   "wget",
-  # "gnumake", "stdenv.cc", "llvm", "zlib.dev", "openssl.dev", "libffi.dev", "pkg-config",
-  # "libffi.dev", "libyaml.dev", "autoconf", "automake", "libtool", "libuuid"
+#   "gnumake", "stdenv.cc", "llvm", "zlib.dev", "openssl.dev", "libffi.dev", "pkg-config",
+#   "libffi.dev", "libyaml.dev", "autoconf", "automake", "libtool", "libuuid"
 ]
 
 packagesFrom = [
-  "direnv",
+  # "direnv",
   "ruby_3_4",
   # "nodejs_22",
   # "python312",
+  # "rustup",
+  # "rust_15",
 ]
 
 [[commands]]

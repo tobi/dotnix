@@ -11,8 +11,16 @@
   ];
 
   # ISO image settings
-  isoImage.isoName = "nixos-hyprland-tobi.iso";
+  isoImage.isoName = "nixos-usb-stick-tobi.iso";
   isoImage.squashfsCompression = "zstd";
+  
+  # Include the dotnix directory in the ISO
+  isoImage.contents = [
+    {
+      source = ./../..;
+      target = "/dotnix";
+    }
+  ];
 
   # Allow proprietary software like NVIDIA drivers
   nixpkgs.config.allowUnfree = true;
@@ -164,10 +172,24 @@
 
 
   # Home Manager configuration with version check disabled
+  # Copy dotnix to user home directory on boot
+  systemd.services.copy-dotnix = {
+    description = "Copy dotnix to user home directory";
+    after = [ "home-manager-tobi.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "tobi";
+      Group = "users";
+      ExecStart = "${pkgs.bash}/bin/bash -c 'if [ ! -d /home/tobi/dotnix ]; then cp -r /dotnix /home/tobi/dotnix && chown -R tobi:users /home/tobi/dotnix; fi'";
+      RemainAfterExit = true;
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
+
   home-manager = {
     users.tobi = { ... }: {
       imports = [
-        ./desktop.nix
+        ../../desktop/desktop.nix
         ../../home/home.nix
       ];
       home.stateVersion = "25.05";
