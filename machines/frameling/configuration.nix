@@ -18,6 +18,12 @@
     lazy-trees = true;
   };
 
+  nix.gc = {
+    automatic = true;
+    options = "--delete-older-than 7d";
+    dates = "weekly";
+  };
+
   # Boot Configuration
   boot = {
     loader = {
@@ -36,12 +42,20 @@
       "amdgpu.gpu_recovery=1"
       "amdgpu.dc=1"
       "amdgpu.freesync_video=1"
-      "amdgpu.ppfeaturemask=0xffffffff"
+      "amdgpu.ppfeaturemask=0xfffffeff"
 
       # Power and thermal management
-      "mem_sleep_default=deep"
-      "processor.max_cstate=9"
-      "intel_idle.max_cstate=9"
+      "mem_sleep_default=s2idle"
+      "processor.max_cstate=2"
+
+      # USB/Bluetooth fixes
+      "xhci_hcd.quirks=0x00000040"
+      
+      # PCIe power management - allow but fix error reporting
+      "pci=noaer"
+
+      # ZSWAP compressed swap
+      "zswap.enabled=1"
 
       # Security features
       "mitigations=auto,nosmt"
@@ -61,6 +75,11 @@
 
   # Networking
   networking.networkmanager.enable = true;
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 22 ];  # SSH
+    allowedUDPPorts = [ ];
+  };
 
   # Hardware Configuration
   hardware = {
@@ -85,7 +104,22 @@
   # Power Management
   powerManagement = {
     enable = true;
-    cpuFreqGovernor = "schedutil";
+    cpuFreqGovernor = "powersave";
+  };
+
+  # Backlight control
+  hardware.acpilight.enable = true;
+  
+  # Set default brightness to 60% on boot
+  systemd.services.brightness-default = {
+    description = "Set default brightness to 60%";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.brightnessctl}/bin/brightnessctl set 60%";
+      RemainAfterExit = true;
+    };
   };
 
   # Programs
@@ -96,13 +130,6 @@
     zsh.enable = true;
 
     fuse.userAllowOther = true;
-    steam = {
-      enable = true;
-      remotePlay.openFirewall = true;
-      dedicatedServer.openFirewall = true;
-      localNetworkGameTransfers.openFirewall = true;
-      gamescopeSession.enable = true;
-    };
   };
 
   # System Packages
@@ -116,6 +143,7 @@
     # Terminals
     kitty
     ghostty
+    alacritty
 
     # Wayland tools
     fuzzel
@@ -128,16 +156,29 @@
     kanshi
     anyrun
     xwayland-satellite
+    pciutils
+    usbutils
 
     # Applications
     chromium
 
     # File management
+    nautilus
     gparted
     file-roller
 
     # System tools
+    vim
+    nano
+    tree
+    zip
+    p7zip
+    file
+    which
+    lsof
+    rsync
     htop
+    iotop
     neofetch
 
     # Audio
@@ -157,6 +198,12 @@
     pcsclite
     libfido2
 
+    # Network tools
+    bind.dnsutils  # dig, nslookup
+    nmap
+    traceroute
+    iperf3
+
     # Tailscale
     tailscale
   ];
@@ -169,6 +216,10 @@
         command = "niri-session";
         user = "tobi";
       };
+      # Environment variables can be set in the initial_session_environment
+      initial_session_environment = [
+        "NIRI_CONFIG=/home/tobi/dotnix/desktop/niri/config.kdl"
+      ];
     };
   };
 
@@ -185,6 +236,7 @@
     pulseaudio.enable = false;
     seatd.enable = true;
     pcscd.enable = true; # Smart card and FIDO2 support
+    openssh.enable = true;
     pipewire = {
       enable = true;
       alsa.enable = true;
@@ -201,6 +253,19 @@
     };
     pipewire.wireplumber.enable = true;
     tailscale.enable = true;
+    printing.enable = true;
+    avahi = {
+      enable = true;
+      nssmdns4 = true;
+      openFirewall = true;
+    };
+    chrony.enable = true;
+  };
+
+  # Fix NTP startup dependencies
+  systemd.services.chronyd = {
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
   };
 
   # Security
@@ -215,6 +280,13 @@
     binfmt = true;
   };
 
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+    localNetworkGameTransfers.openFirewall = true;
+    gamescopeSession.enable = true;
+  };
 
   # XDG Portals
   xdg.portal = {
@@ -249,12 +321,15 @@
     nerd-fonts.droid-sans-mono
   ];
 
+  # Groups
+  users.groups.plugdev = {};
+
   # User Account
   users.users.tobi = {
     isNormalUser = true;
     description = "Tobi";
     shell = pkgs.zsh;
-    extraGroups = [ "wheel" "networkmanager" "video" "render" "input" "gamemode" "bluetooth" ];
+    extraGroups = [ "wheel" "networkmanager" "video" "render" "input" "gamemode" "bluetooth" "plugdev" ];
     initialHashedPassword = "";
   };
 }

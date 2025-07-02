@@ -24,11 +24,11 @@
     {
       device = "/dev/disk/by-uuid/8059-DDE9";
       fsType = "vfat";
-      options = [ "fmask=0022" "dmask=0022" ];
+      options = [ "fmask=0077" "dmask=0077" "uid=0" "gid=0" ];
     };
 
   swapDevices = [
-    { device = "/swapfile"; }
+    { device = "/swapfile16"; }
   ];
 
   hardware.bluetooth.enable = true;

@@ -36,6 +36,7 @@ input {
         // natural-scroll
         // accel-speed 0.2
         accel-profile "flat"
+        scroll-factor 0.5
         // scroll-method "two-finger"
         // disabled-on-external-mouse
     }
@@ -46,16 +47,6 @@ input {
         // accel-speed 0.2
         accel-profile "flat"
         // scroll-method "no-scroll"
-    }
-
-    trackpoint {
-        // off
-        // natural-scroll
-        // accel-speed 0.2
-        // accel-profile "flat"
-        // scroll-method "on-button-down"
-        // scroll-button 273
-        // middle-emulation
     }
 
     // Uncomment this to make the mouse warp to the center of newly focused windows.
@@ -143,8 +134,8 @@ layout {
 
     // You can change the default width of the new windows.
     default-column-width {
-        // proportion 0.5;
-        fixed 1280;
+        proportion 0.5;
+        // fixed 800;
     }
     // If you leave the brackets empty, the windows themselves will decide their initial width.
     // default-column-width {}
@@ -238,10 +229,10 @@ layout {
         // pixels and match the CSS box-shadow properties.
 
         // Softness controls the shadow blur radius.
-        softness 10
+        softness 30
 
         // Spread expands the shadow.
-        spread 5
+        spread 3
 
         // Offset moves the shadow relative to the window.
         offset x=3 y=3
@@ -264,11 +255,11 @@ layout {
 }
 
 environment {
-    DISPLAY ":0"
-    QT_QPA_PLATFORM "wayland"
-    CHROMIUM_FLAGS "--enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3"
-    ELECTRON_OZONE_PLATFORM_HINT "auto"
-    GTK_THEME "Adwaita-dark"
+    // DISPLAY ":0"
+    // QT_QPA_PLATFORM "wayland"
+    // CHROMIUM_FLAGS "--enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3"
+    // ELECTRON_OZONE_PLATFORM_HINT "auto"
+    // GTK_THEME "Adwaita-dark"
 }
 
 cursor {
@@ -287,7 +278,7 @@ cursor {
 spawn-at-startup "waybar"
 spawn-at-startup "xwayland-satellite"
 spawn-at-startup "ghostty"
-spawn-at-startup "wbg" "~/dotnix/desktop/wallpaper.jpg"
+spawn-at-startup "wbg" "dotnix/desktop/wallpaper.jpg"
 
 // Uncomment this line to ask the clients to omit their client-side decorations if possible.
 // If the client will specifically ask for CSD, the request will be honored.
@@ -367,8 +358,14 @@ window-rule {
     // You can get away with just app-id="ghostty" if you want.
     match app-id=r#"^com\.mitchellh\.ghostty$"#
     default-column-width {
-        fixed 1000;
+        fixed 600;
     }
+}
+
+window-rule {
+    match app-id=r#"^xdg-desktop-portal-gtk$"#
+    match title="^Open"
+    open-floating true
 }
 
 // Open the Firefox picture-in-picture player as floating by default.
@@ -380,17 +377,6 @@ window-rule {
     open-floating true
 }
 
-// Example: block out two password managers from screen capture.
-// (This example rule is commented out with a "/-" in front.)
-/-window-rule {
-    match app-id=r#"^org\.keepassxc\.KeePassXC$"#
-    match app-id=r#"^org\.gnome\.World\.Secrets$"#
-
-    block-out-from "screen-capture"
-
-    // Use this instead if you want them visible on third-party screenshot tools.
-    // block-out-from "screencast"
-}
 
 // Example: enable rounded corners for all windows.
 // (This example rule is commented out with a "/-" in front.)
@@ -554,7 +540,7 @@ binds {
     // (empty) workspace.
     //
     // For example, with 2 workspaces + 1 empty, indices 3, 4, 5 and so on
-    // will all refer to the 3rd workspace.
+    // will all refer to Pthe 3rd workspace.
     Mod+1 { focus-workspace 1; }
     Mod+2 { focus-workspace 2; }
     Mod+3 { focus-workspace 3; }
@@ -574,11 +560,13 @@ binds {
     Mod+Ctrl+8 { move-column-to-workspace 8; }
     Mod+Ctrl+9 { move-column-to-workspace 9; }
 
-    Super+Return { spawn "~/dotnix/home/bin/open" "ghostty"; }
-    Super+C { spawn "~/dotnix/home/bin/open" "google-chrome"; }
-    Super+X { spawn "~/dotnix/home/bin/open" "cursor"; }
-    Super+A { spawn "~/dotnix/home/bin/open" "chatgpt"; }
     Alt+Space { spawn "fuzzel"; }
+    Super+Return { spawn "ghostty"; }
+    Super+Shift+Return { spawn "alacritty"; }
+
+    Super+X { spawn "~/dotnix/home/bin/open" "cursor"; }
+    Super+C { spawn "~/dotnix/home/bin/open" "google-chrome"; }
+    Super+A { spawn "~/dotnix/home/bin/open" "chatgpt"; }
 
     // Switches focus between the current and the previous workspace.
     Mod+Tab { focus-workspace-previous; }

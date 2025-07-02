@@ -78,12 +78,9 @@ in
     bat-extras.batman
     bat-extras.batdiff
     # bat-extras
+
   ] ++ lib.optionals isLinux [
-    # Linux-specific packages
-    # nvidia-docker  # NVIDIA container runtime
-    # qemu
-
-
+    sysz
   ] ++ lib.optionals isDarwin [
     # Darwin-specific packages (if any)
   ];
