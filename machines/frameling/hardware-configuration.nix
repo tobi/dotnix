@@ -31,8 +31,11 @@
     { device = "/swapfile16"; }
   ];
 
-  hardware.bluetooth.enable = true;
-  hardware.bluetooth.powerOnBoot = true;
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings.General.Experimental = true;
+  };
 
   # NVIDIA driver configuration for Wayland
   hardware.graphics = {

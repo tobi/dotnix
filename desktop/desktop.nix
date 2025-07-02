@@ -36,7 +36,6 @@
   };
 
   home.sessionVariables = {
-    PATH = "$PATH:~/.gem/ruby/3.4.0/bin:";
     BROWSER = "google-chrome";
     QT_QPA_PLATFORM = "wayland";
     ELECTRON_OZONE_PLATFORM_HINT = "auto";

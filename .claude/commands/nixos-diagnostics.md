@@ -33,10 +33,7 @@ Kernel: !`uname -a`
 </host>
 
 <hardware>
-- CPU summary: !`grep 'model name' /proc/cpuinfo | uniq`
-- Memory total: !`grep MemTotal /proc/meminfo`
-- Block devices: !`lsblk`
-- Short hardware summary: !`sudo lshw -short 2>/dev/null || echo 'lshw not available'`
+!`neofetch -l none --pipe`
 </hardware>
 
 <nix_files>
@@ -115,7 +112,6 @@ Most recent nixos-rebuild log (if available): !`find /var/log -type f -iname '*n
 <mcp-nixos>
 Use `mcp-nixos` to get more information about packages and services. If present, ask mcp-nixos for its tools.
 </mcp-nixos>
-
 
 
 You are an expert NixOS and Linux system diagnostician. Analyze the above system metadata and logs. Look for and enumerate all possible issues, explain likely causes, and suggest concrete, actionable improvements or best practices. If the configuration is healthy, note areas for potential optimization or modernization.

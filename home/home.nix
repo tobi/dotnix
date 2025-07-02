@@ -43,7 +43,7 @@ in
     jq
     age
     gh
-    cowsay
+    fastfetch
 
     # System tools
     htop
@@ -72,8 +72,6 @@ in
 
     # Nice-to-have
     gum
-    neofetch
-    fortune
     bat-extras.batgrep
     bat-extras.batman
     bat-extras.batdiff
@@ -134,8 +132,8 @@ in
 
       [ -f ~/.zshrc.local ] && echo "* Adding ~/.zshrc.local" && source ~/.zshrc.local
 
-      # Load environment variables and show fortune
-      echo && ${pkgs.fortune}/bin/fortune -s
+      # Load environment variables and show system info
+      echo && ${pkgs.fastfetch}/bin/fastfetch
     '';
 
     history.size = 50000;

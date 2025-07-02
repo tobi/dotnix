@@ -8,7 +8,7 @@
   # System Configuration
   networking.hostName = "frameling";
   time.timeZone = "America/Toronto";
-  system.stateVersion = "25.11";
+  system.stateVersion = "25.05";
 
   # Nix Settings
   nixpkgs.config.allowUnfree = true;
@@ -28,14 +28,18 @@
   boot = {
     loader = {
       systemd-boot.enable = true;
+      systemd-boot.consoleMode = "2";  # First non-standard mode - higher resolution
+      systemd-boot.configurationLimit = 10;
       efi.canTouchEfiVariables = true;
     };
     kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
+      # Set framebuffer to native resolution for better visibility
+      "video=eDP-1:2256x1504@60"
+      
       # AMD CPU optimizations
-      "amd_pstate=active"
+      "amd_pstate=guided"
       "amd_iommu=on"
-      "initcall_debug"
 
       # AMD GPU optimizations for Radeon 860M
       "amdgpu.dpm=1"
@@ -59,8 +63,6 @@
 
       # Security features
       "mitigations=auto,nosmt"
-      "spectre_v2=on"
-      "spec_store_bypass_disable=on"
 
       # Audio optimizations
       "snd_hda_intel.power_save=1"
@@ -79,6 +81,13 @@
     kernelModules = [ "uinput" ];
   };
 
+  # Console configuration for high DPI display
+  console = {
+    earlySetup = true;
+    font = "${pkgs.terminus_font}/share/consolefonts/ter-v32n.psf.gz";
+    packages = with pkgs; [ terminus_font ];
+  };
+
   # Networking
   networking.networkmanager.enable = true;
   networking.firewall = {
@@ -90,6 +99,7 @@
   # Hardware Configuration
   hardware = {
     enableAllFirmware = true;
+    firmware = [ pkgs.linux-firmware ];
     cpu.amd.updateMicrocode = true;
     amdgpu = {
       initrd.enable = true;
@@ -110,12 +120,15 @@
   # Power Management
   powerManagement = {
     enable = true;
-    cpuFreqGovernor = "powersave";
     powertop.enable = true;
   };
 
   # Add ZRAM for better memory management
-  zramSwap.enable = true;
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
+  };
 
   # Backlight control
   hardware.acpilight.enable = true;
@@ -138,6 +151,7 @@
     xwayland.enable = true;
     nix-ld.enable = true;
     zsh.enable = true;
+    dconf.enable = true;
 
     fuse.userAllowOther = true;
   };
@@ -214,6 +228,9 @@
     traceroute
     iperf3
 
+    # Package management
+    nix-index
+
     # Tailscale
     tailscale
   ];
@@ -272,6 +289,7 @@
     chrony.enable = true;
     upower.enable = true;
     thermald.enable = true;
+    fwupd.enable = true;
   };
 
   # Fix NTP startup dependencies
@@ -342,6 +360,8 @@
     description = "Tobi";
     shell = pkgs.zsh;
     extraGroups = [ "wheel" "networkmanager" "video" "render" "input" "gamemode" "bluetooth" "plugdev" ];
-    initialHashedPassword = "";
+    # Set password using: sudo passwd tobi
+    # Or generate hash with: mkpasswd -m sha-512
+    hashedPassword = null; # Will prompt to set password on first login
   };
 }
