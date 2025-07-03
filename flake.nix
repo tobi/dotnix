@@ -32,6 +32,16 @@
           modules = [
             ./machines/zerg-wsl2/configuration.nix
             determinate.nixosModules.default
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.backupFileExtension = "backup";
+
+              home-manager.users.tobi = {
+                imports = [ ./home/home.nix ];
+              };
+            }
           ];
         };
 
@@ -83,7 +93,7 @@
           ];
         };
 
-        "tobi@shopify-mbp" = home-manager.lib.homeManagerConfiguration {
+        "tobi" = home-manager.lib.homeManagerConfiguration {
           pkgs = pkgsFor "aarch64-darwin";
           modules = [ ./home/home.nix ];
         };

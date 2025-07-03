@@ -33,44 +33,66 @@
   # Enable zsh system-wide
   programs.zsh.enable = true;
 
+  # Fix missing systemd-oom user (from diagnostics)
+  users.users.systemd-oom = {
+    isSystemUser = true;
+    group = "systemd-oom";
+  };
+  users.groups.systemd-oom = {};
+
   # ───── WSL Configuration ────────────────────────────────────────────────
   wsl.enable = true;
   wsl.defaultUser = "tobi";
   wsl.startMenuLaunchers = true;
   
-  
-  # Set default directory to user's home
-  wsl.wslConf.user.default = "tobi";
-
-  # ───── NVIDIA GPU Support for WSL2 ─────────────────────────────────────
-  # Enable NVIDIA drivers and container toolkit
-  hardware = {
-    nvidia = {
-      modesetting.enable = true;
-      nvidiaSettings = false;  # Don't need GUI settings in WSL
-      open = false;            # Use proprietary drivers
-    };
-    nvidia-container-toolkit.enable = true;
+  # WSL configuration options
+  wsl.wslConf = {
+    automount.root = "/mnt";
+    network.generateHosts = false;
+    user.default = "tobi";
   };
 
-  # Set video drivers
-  services.xserver.videoDrivers = [ "nvidia" ];
+  # Set timezone to fix warnings
+  time.timeZone = "America/New_York";
 
-  # Add NVIDIA packages to system
+  # ───── NVIDIA GPU Support for WSL2 ─────────────────────────────────────
+  # WSL2 uses Windows NVIDIA drivers, so we don't need Linux drivers
+  # Just ensure we can access the GPU through WSL2's passthrough
+  
+  # Enable container toolkit for Docker GPU support
+  hardware.nvidia-container-toolkit = {
+    enable = true;
+    # WSL2 provides NVIDIA drivers, so suppress the assertion
+    suppressNvidiaDriverAssertion = true;
+  };
+
+  # Add basic packages - CUDA tools are provided by WSL2
   environment.systemPackages = with pkgs; [
     vscode 
     # cursor
-    # NVIDIA tools
-    nvidia-docker
-    linuxPackages.nvidia_x11  # NVIDIA kernel module
+    # Docker for containers (NVIDIA runtime provided by WSL2)
+    docker
+    
+    # Fix missing commands from diagnostics
+    tzdata      # Fix timezone warnings
+    pciutils    # lspci
+    usbutils    # lsusb
   ];
 
   # Environment variables for WSL2 NVIDIA support
-  environment.variables = {
+  environment.sessionVariables = {
     # Point to WSL2 NVIDIA libraries
     LD_LIBRARY_PATH = "/usr/lib/wsl/lib";
     # Ensure CUDA libraries are found
     CUDA_PATH = "/usr/lib/wsl";
+  };
+
+  # Add nvidia-smi alias for easy access
+  programs.bash.shellAliases = {
+    nvidia-smi = "/usr/lib/wsl/lib/nvidia-smi";
+  };
+  programs.zsh.shellAliases = {
+    nvidia-smi = "/usr/lib/wsl/lib/nvidia-smi";
   };
 
   # ───── Fallback libs for binary blobs ──────────────────────────────────
@@ -89,8 +111,7 @@
       xorg.libXrandr
       xorg.libXrender
       xorg.libXxf86vm
-      # NVIDIA specific libraries
-      linuxPackages.nvidia_x11
+      # WSL2 provides NVIDIA libraries at /usr/lib/wsl/lib
     ];
   };
 

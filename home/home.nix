@@ -161,8 +161,8 @@ in
       b = "bundle exec";
 
       # System management
-      reload = "nix develop ~/dotnix/flake.nix -c home-manager switch --flake ~/dotnix/home/flake.nix && source $HOME/.zshrc";
-      dev = "nix develop ~/dotnix/flake.nix";
+      reload = "home-manager switch --flake ~/dotnix#tobi && source $HOME/.zshrc";
+      dev = "nix develop ~/dotnix";
     };
   };
 

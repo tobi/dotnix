@@ -17,3 +17,5 @@
 
 # Age secrets
 *.age.tmp
+
+*.lock

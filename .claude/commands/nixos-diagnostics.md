@@ -45,8 +45,7 @@ Kernel: !`uname -a`
 - @flake.nix - root flake
 - @home/home.nix - home-manager flake
 - @desktop/desktop.nix - desktop flake
-- @machines/frameling/configuration.nix - frameling machine configuration
-- @machines/frameling/hardware-configuration.nix - frameling machine hardware configuration
+- @machines/!`hostname` - (if it exists) - has the nixos configuration. Usually there is a configuration.nix and a hardware-configuration.nix in there. You can ignore the other files in machines/ folder, unless otherwise prompted.
 
 </nix_files>
 
