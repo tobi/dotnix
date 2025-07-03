@@ -1,28 +1,43 @@
 {
   description = "Tobi's dotfiles/homelab";
 
-  outputs = { self, nixpkgs, determinate, home-manager, ... } @inputs:
+  outputs =
+    { self
+    , nixpkgs
+    , determinate
+    , home-manager
+    , ...
+    }@inputs:
     let
       # Support both Linux and Darwin
-      systems = [ "x86_64-linux" "aarch64-darwin" ];
+      systems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
 
       # Helper function to generate packages for each system
       forEachSystem = nixpkgs.lib.genAttrs systems;
 
       # Generate pkgs for each system
-      mkNixPkgs = system: import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-        overlays = [
-          inputs.devshell.overlays.default
-          inputs.niri.overlays.niri
-        ];
-      };
+      mkNixPkgs =
+        system:
+        import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+          overlays = [
+            inputs.devshell.overlays.default
+            inputs.niri.overlays.niri
+          ];
+        };
 
       # Import common lib functions
-      lib = import ./lib/common.nix { inherit nixpkgs inputs; };
+      lib = import ./lib/common.nix { inherit nixpkgs inputs config; };
     in
     {
+
+      config = {
+        user = "tobi";
+      };
 
       # ------------------------------------------------------------
       # NixOS configurations
@@ -32,9 +47,7 @@
           system = "x86_64-linux";
           modules = [
             ./machines/zerg-wsl2/configuration.nix
-            (lib.mkHomeManager {
-              modules = [ ./home/home.nix ];
-            })
+            (lib.mkHome [ ./home/home.nix ])
           ];
         };
 
@@ -42,10 +55,9 @@
         # RUN: nix build .#nixosConfigurations.usb-stick.config.system.build.isoImage
         "usb-stick" = lib.mkNixosSystem {
           system = "x86_64-linux";
-          # Pass home-manager to the module configuration
-          specialArgs = { home-manager = inputs.home-manager; };
           modules = [
             ./machines/usb-stick/configuration.nix
+            (lib.mkHome [ ./home/home.nix ])
           ];
         };
 
@@ -53,12 +65,10 @@
           system = "x86_64-linux";
           modules = [
             ./machines/frameling/configuration.nix
-            (lib.mkHomeManager {
-              modules = [
-                ./home/home.nix
-                ./desktop/desktop.nix
-              ];
-            })
+            (lib.mkHome [
+              ./home/home.nix
+              ./desktop/desktop.nix
+            ])
           ];
         };
       };
@@ -79,7 +89,10 @@
         # macOS configuration
         "tobi@darwin" = home-manager.lib.homeManagerConfiguration {
           pkgs = mkNixPkgs "aarch64-darwin";
-          modules = [ ./home/home.nix ];
+          modules = [
+            ./home/home.nix
+            ./desktop/desktop.nix
+          ];
         };
       };
 
@@ -91,7 +104,6 @@
         default = (mkNixPkgs system).devshell.fromTOML ./devshell.toml;
       });
     };
-
 
   inputs = {
     nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0";
