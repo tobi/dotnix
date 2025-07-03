@@ -64,6 +64,8 @@ in
     hyperfine
     tokei
     nixpkgs-fmt
+    nixfmt-rfc-style
+    nixfmt-tree
     comma
     duckdb
     ffmpeg
