@@ -6,7 +6,6 @@
     appimage-run
   ];
 
-
   home.file.".local/bin/cursor" = {
     source = ./cursor;
     executable = true;

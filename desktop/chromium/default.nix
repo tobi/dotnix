@@ -1,4 +1,8 @@
-{ config, lib, pkgs, ... }:
+{ config
+, lib
+, pkgs
+, ...
+}:
 
 {
   # Enable Chromium with Wayland support
@@ -27,7 +31,10 @@
     terminal = false;
     icon = "google-chrome";
     type = "Application";
-    categories = [ "Network" "WebBrowser" ];
+    categories = [
+      "Network"
+      "WebBrowser"
+    ];
     mimeType = [
       "text/html"
       "text/xml"

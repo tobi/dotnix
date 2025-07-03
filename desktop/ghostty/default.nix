@@ -1,4 +1,8 @@
-{ config, lib, pkgs, ... }:
+{ config
+, lib
+, pkgs
+, ...
+}:
 
 {
   home.packages = with pkgs; [
@@ -16,6 +20,9 @@
     terminal = false;
     type = "Application";
     icon = "terminal";
-    categories = [ "Utility" "TerminalEmulator" ];
+    categories = [
+      "Utility"
+      "TerminalEmulator"
+    ];
   };
 }

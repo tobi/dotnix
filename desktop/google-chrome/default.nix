@@ -1,4 +1,8 @@
-{ config, lib, pkgs, ... }:
+{ config
+, lib
+, pkgs
+, ...
+}:
 
 {
   # Enable Google Chrome with Wayland support
@@ -40,7 +44,10 @@
     terminal = false;
     icon = "google-chrome";
     type = "Application";
-    categories = [ "Network" "WebBrowser" ];
+    categories = [
+      "Network"
+      "WebBrowser"
+    ];
     mimeType = [
       "text/html"
       "text/xml"
