@@ -303,45 +303,54 @@ animations {
     // off
 
     // Slow down all animations by this factor. Values below 1 speed them up instead.
-    slowdown 1.0
+    slowdown 0.8
 
+    // Workspace switching with bouncy spring physics
     workspace-switch {
-        spring damping-ratio=1.0 stiffness=1000 epsilon=0.0001
+        spring damping-ratio=0.7 stiffness=1200 epsilon=0.0001
     }
 
+    // Window open with scale-up effect
     window-open {
-        duration-ms 200
-        curve "ease-out-quad"
+        duration-ms 350
+        curve "ease-out-expo"
     }
 
+    // Window close with scale-down effect
     window-close {
-        duration-ms 200
-        curve "ease-out-quad"
+        duration-ms 250
+        curve "ease-out-cubic"
     }
 
+    // Smooth horizontal view movement
     horizontal-view-movement {
-        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+        spring damping-ratio=0.8 stiffness=1000 epsilon=0.0001
     }
 
+    // Fluid window movement with slight bounce
     window-movement {
-        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+        spring damping-ratio=0.75 stiffness=900 epsilon=0.0001
     }
 
+    // Responsive window resizing
     window-resize {
-        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+        spring damping-ratio=0.8 stiffness=1100 epsilon=0.0001
     }
 
+    // Notification pop with bounce
     config-notification-open-close {
-        spring damping-ratio=0.6 stiffness=1000 epsilon=0.001
+        spring damping-ratio=0.5 stiffness=1200 epsilon=0.001
     }
 
+    // Screenshot UI with smooth fade
     screenshot-ui-open {
-        duration-ms 200
-        curve "ease-out-quad"
+        duration-ms 300
+        curve "ease-out-cubic"
     }
 
+    // Overview with elegant spring motion
     overview-open-close {
-        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+        spring damping-ratio=0.75 stiffness=1000 epsilon=0.0001
     }
 
 }
@@ -357,6 +366,13 @@ window-rule {
     // since this is the default config, and we want no false positives.
     // You can get away with just app-id="ghostty" if you want.
     match app-id=r#"^com\.mitchellh\.ghostty$"#
+    default-column-width {
+        fixed 600;
+    }
+}
+
+window-rule {
+    match app-id=r#"^Alacritty$"#
     default-column-width {
         fixed 600;
     }

@@ -1,0 +1,220 @@
+// Creative Animation Profiles for Niri
+// Copy any of these into your animations block in config.kdl
+
+// Profile 1: Bouncy & Playful
+// Features underdamped springs that create oscillation/bounce effects
+animations {
+    slowdown 0.7
+    
+    workspace-switch {
+        spring damping-ratio=0.5 stiffness=1500 epsilon=0.0001
+    }
+    
+    window-open {
+        spring damping-ratio=0.4 stiffness=2000 epsilon=0.0001
+    }
+    
+    window-close {
+        duration-ms 180
+        curve "ease-in-expo"
+    }
+    
+    horizontal-view-movement {
+        spring damping-ratio=0.6 stiffness=1200 epsilon=0.0001
+    }
+    
+    window-movement {
+        spring damping-ratio=0.55 stiffness=1000 epsilon=0.0001
+    }
+    
+    window-resize {
+        spring damping-ratio=0.7 stiffness=1300 epsilon=0.0001
+    }
+    
+    config-notification-open-close {
+        spring damping-ratio=0.3 stiffness=1800 epsilon=0.001
+    }
+    
+    overview-open-close {
+        spring damping-ratio=0.6 stiffness=1100 epsilon=0.0001
+    }
+}
+
+// Profile 2: Smooth & Professional
+// Features critical damping (1.0) for no overshoot, with high stiffness for speed
+animations {
+    slowdown 0.9
+    
+    workspace-switch {
+        spring damping-ratio=1.0 stiffness=1500 epsilon=0.0001
+    }
+    
+    window-open {
+        duration-ms 250
+        curve "ease-out-expo"
+    }
+    
+    window-close {
+        duration-ms 200
+        curve "ease-out-cubic"
+    }
+    
+    horizontal-view-movement {
+        spring damping-ratio=1.0 stiffness=1200 epsilon=0.0001
+    }
+    
+    window-movement {
+        spring damping-ratio=1.0 stiffness=1400 epsilon=0.0001
+    }
+    
+    window-resize {
+        spring damping-ratio=1.0 stiffness=1600 epsilon=0.0001
+    }
+    
+    config-notification-open-close {
+        spring damping-ratio=0.8 stiffness=1400 epsilon=0.001
+    }
+    
+    overview-open-close {
+        spring damping-ratio=1.0 stiffness=1300 epsilon=0.0001
+    }
+}
+
+// Profile 3: Ultra Responsive
+// Very fast animations with slight underdamping for responsiveness
+animations {
+    slowdown 0.5
+    
+    workspace-switch {
+        spring damping-ratio=0.8 stiffness=2000 epsilon=0.0001
+    }
+    
+    window-open {
+        duration-ms 150
+        curve "ease-out-expo"
+    }
+    
+    window-close {
+        duration-ms 120
+        curve "ease-out-expo"
+    }
+    
+    horizontal-view-movement {
+        spring damping-ratio=0.9 stiffness=1800 epsilon=0.0001
+    }
+    
+    window-movement {
+        spring damping-ratio=0.85 stiffness=1600 epsilon=0.0001
+    }
+    
+    window-resize {
+        spring damping-ratio=0.9 stiffness=2000 epsilon=0.0001
+    }
+    
+    config-notification-open-close {
+        spring damping-ratio=0.7 stiffness=2000 epsilon=0.001
+    }
+    
+    overview-open-close {
+        spring damping-ratio=0.85 stiffness=1800 epsilon=0.0001
+    }
+}
+
+// Profile 4: Elastic & Stretchy
+// Heavy underdamping for maximum bounce and elastic feel
+animations {
+    slowdown 1.0
+    
+    workspace-switch {
+        spring damping-ratio=0.3 stiffness=800 epsilon=0.0001
+    }
+    
+    window-open {
+        spring damping-ratio=0.25 stiffness=1200 epsilon=0.0001
+    }
+    
+    window-close {
+        spring damping-ratio=0.4 stiffness=1000 epsilon=0.0001
+    }
+    
+    horizontal-view-movement {
+        spring damping-ratio=0.4 stiffness=600 epsilon=0.0001
+    }
+    
+    window-movement {
+        spring damping-ratio=0.35 stiffness=700 epsilon=0.0001
+    }
+    
+    window-resize {
+        spring damping-ratio=0.5 stiffness=900 epsilon=0.0001
+    }
+    
+    config-notification-open-close {
+        spring damping-ratio=0.2 stiffness=1500 epsilon=0.001
+    }
+    
+    overview-open-close {
+        spring damping-ratio=0.4 stiffness=800 epsilon=0.0001
+    }
+}
+
+// Profile 5: Overdamped Zen
+// Slow, graceful movements with overdamping for a calm feel
+animations {
+    slowdown 1.5
+    
+    workspace-switch {
+        spring damping-ratio=1.5 stiffness=600 epsilon=0.0001
+    }
+    
+    window-open {
+        duration-ms 400
+        curve "ease-out-cubic"
+    }
+    
+    window-close {
+        duration-ms 350
+        curve "ease-out-cubic"
+    }
+    
+    horizontal-view-movement {
+        spring damping-ratio=1.3 stiffness=500 epsilon=0.0001
+    }
+    
+    window-movement {
+        spring damping-ratio=1.4 stiffness=550 epsilon=0.0001
+    }
+    
+    window-resize {
+        spring damping-ratio=1.2 stiffness=600 epsilon=0.0001
+    }
+    
+    config-notification-open-close {
+        spring damping-ratio=1.1 stiffness=700 epsilon=0.001
+    }
+    
+    overview-open-close {
+        spring damping-ratio=1.3 stiffness=550 epsilon=0.0001
+    }
+}
+
+// Understanding Spring Parameters:
+// - damping-ratio < 1.0: Underdamped (bounces/oscillates)
+// - damping-ratio = 1.0: Critical damping (fastest without overshoot)
+// - damping-ratio > 1.0: Overdamped (slower, no overshoot)
+// - stiffness: Higher values = faster animation
+// - epsilon: Precision threshold (smaller = more accurate)
+
+// Custom Shader Example (place in window-open or window-close):
+// custom-shader r"
+//     vec4 close_color(vec3 coords_geo, vec3 size_geo) {
+//         vec4 color = vec4(0.0);
+//         if (0.0 <= coords_geo.x && coords_geo.x <= 1.0 && 
+//             0.0 <= coords_geo.y && coords_geo.y <= 1.0) {
+//             vec4 from = vec4(1.0, 0.0, 0.0, 1.0);
+//             vec4 to = vec4(0.0, 1.0, 0.0, 1.0);
+//             color = mix(from, to, coords_geo.y);
+//         }
+//         return color * (1.0 - niri_clamped_progress);
+//     }
+// "
