@@ -10,7 +10,7 @@
       forEachSystem = nixpkgs.lib.genAttrs systems;
 
       # Generate pkgs for each system
-      pkgsFor = system: import nixpkgs {
+      mkNixPkgs = system: import nixpkgs {
         inherit system;
         config.allowUnfree = true;
         overlays = [
@@ -19,6 +19,8 @@
         ];
       };
 
+      # Import common lib functions
+      lib = import ./lib/common.nix { inherit nixpkgs inputs; };
     in
     {
 
@@ -26,28 +28,19 @@
       # NixOS configurations
       # ------------------------------------------------------------
       nixosConfigurations = {
-        "zerg-wsl2" = nixpkgs.lib.nixosSystem {
+        "zerg-wsl2" = lib.mkNixosSystem {
           system = "x86_64-linux";
-          specialArgs = { nixos-wsl = inputs.nixos-wsl; };
           modules = [
             ./machines/zerg-wsl2/configuration.nix
-            determinate.nixosModules.default
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.backupFileExtension = "backup";
-
-              home-manager.users.tobi = {
-                imports = [ ./home/home.nix ];
-              };
-            }
+            (lib.mkHomeManager {
+              modules = [ ./home/home.nix ];
+            })
           ];
         };
 
         # New configuration for the USB stick
         # RUN: nix build .#nixosConfigurations.usb-stick.config.system.build.isoImage
-        "usb-stick" = nixpkgs.lib.nixosSystem {
+        "usb-stick" = lib.mkNixosSystem {
           system = "x86_64-linux";
           # Pass home-manager to the module configuration
           specialArgs = { home-manager = inputs.home-manager; };
@@ -56,26 +49,16 @@
           ];
         };
 
-        "frameling" = nixpkgs.lib.nixosSystem {
+        "frameling" = lib.mkNixosSystem {
           system = "x86_64-linux";
-          specialArgs = { niri = inputs.niri; };
           modules = [
             ./machines/frameling/configuration.nix
-            determinate.nixosModules.default
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.backupFileExtension = "backup";
-
-              home-manager.users.tobi = {
-                imports = [
-                  ./home/home.nix
-                  ./desktop/desktop.nix
-                ];
-              };
-              home-manager.extraSpecialArgs = { niri = inputs.niri; };
-            }
+            (lib.mkHomeManager {
+              modules = [
+                ./home/home.nix
+                ./desktop/desktop.nix
+              ];
+            })
           ];
         };
       };
@@ -83,18 +66,19 @@
       # ------------------------------------------------------------
       # Home Manager configurations
       # ------------------------------------------------------------
-      # Home Manager configurations
       homeConfigurations = {
+        # Linux desktop configuration
         "tobi@frameling" = home-manager.lib.homeManagerConfiguration {
-          pkgs = pkgsFor "x86_64-linux";
+          pkgs = mkNixPkgs "x86_64-linux";
           modules = [
             ./home/home.nix
             ./desktop/desktop.nix
           ];
         };
 
-        "tobi" = home-manager.lib.homeManagerConfiguration {
-          pkgs = pkgsFor "aarch64-darwin";
+        # macOS configuration
+        "tobi@darwin" = home-manager.lib.homeManagerConfiguration {
+          pkgs = mkNixPkgs "aarch64-darwin";
           modules = [ ./home/home.nix ];
         };
       };
@@ -104,7 +88,7 @@
       # ------------------------------------------------------------
       # Development shells for both systems
       devShells = forEachSystem (system: {
-        default = (pkgsFor system).devshell.fromTOML ./devshell.toml;
+        default = (mkNixPkgs system).devshell.fromTOML ./devshell.toml;
       });
     };
 
