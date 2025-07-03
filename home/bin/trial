@@ -65,16 +65,19 @@ main() {
   # Use fzf to select or create new trial
   if [[ -n "$existing_trials" ]]; then
     # Show existing trials and allow creating new one
-    selected_trial=$(printf "%s\n%s" "$DEFAULT_NAME" "$(basename -a $existing_trials)" |
+    selected_trial=$(printf "%s (new)\n%s" "$DEFAULT_NAME" "$(basename -a $existing_trials)" |
       fzf --prompt="Select existing trial or create new: " \
         --header="↑↓ to navigate, Enter to select, Ctrl-C to cancel" \
-        --height=15 \
+        --no-preview \
         --reverse \
-        --query="$DEFAULT_NAME" || true)
+        --query="$PROJECT_NAME" || true)
   else
     # No existing trials, just use the default name
     selected_trial="$DEFAULT_NAME"
   fi
+
+  # Extract just the directory name (remove annotation if present)
+  selected_trial=$(echo "$selected_trial" | sed 's/ (new)$//')
 
   # Handle cancellation
   if [[ -z "$selected_trial" ]]; then

@@ -130,6 +130,15 @@ in
       echo
       export PATH="$HOME/bin:$HOME/.local/bin:$HOME/dotnix/home/bin:${lib.optionalString isDarwin ":/opt/dev/bin"}:$PATH"
 
+      # Trial function - creates trial directory and cd's into it
+      trial() {
+        local trial_dir
+        trial_dir=$($HOME/dotnix/home/bin/trial "$@")
+        if [[ -n "$trial_dir" && -d "$trial_dir" ]]; then
+          cd "$trial_dir"
+        fi
+      }
+
       [ -f ~/.zshrc.local ] && echo "* Adding ~/.zshrc.local" && source ~/.zshrc.local
 
       # Load environment variables and show system info
