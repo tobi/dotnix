@@ -13,7 +13,7 @@
   # ISO image settings
   isoImage.isoName = "nixos-usb-stick-tobi.iso";
   isoImage.squashfsCompression = "zstd";
-  
+
   # Include the dotnix directory in the ISO
   isoImage.contents = [
     {
@@ -71,7 +71,7 @@
   # Hyprland window manager and display setup (Wayland-only)
   programs.hyprland = {
     enable = true;
-    xwayland.enable = true;  # Keep for compatibility with some apps
+    xwayland.enable = true; # Keep for compatibility with some apps
   };
 
   # Auto-login to Hyprland using greetd (Wayland-native display manager)
@@ -103,7 +103,7 @@
   hardware.nvidia = {
     modesetting.enable = true;
     # Use the proprietary driver
-    open = false; 
+    open = false;
     # Install the stable NVIDIA driver package
     package = config.boot.kernelPackages.nvidiaPackages.stable;
     # Power management (helps with compatibility)
@@ -116,18 +116,18 @@
   # Add useful packages to the live environment
   environment.systemPackages = with pkgs; [
     git
-    kitty          # Wayland-native terminal
-    ghostty        # Wayland-native terminal
-    fuzzel         # Wayland launcher (better than wofi)
-    chromium       # Chromium-style browser
-    waybar         # Wayland status bar
-    swww           # Wayland wallpaper daemon
-    grim           # Wayland screenshot tool
-    slurp          # Screen area selection for Wayland
-    wl-clipboard   # Wayland clipboard utilities
-    wlr-randr      # Monitor configuration for wlroots
-    kanshi         # Dynamic display configuration
-    anyrun         # Application launcher
+    kitty # Wayland-native terminal
+    ghostty # Wayland-native terminal
+    fuzzel # Wayland launcher (better than wofi)
+    chromium # Chromium-style browser
+    waybar # Wayland status bar
+    swww # Wayland wallpaper daemon
+    grim # Wayland screenshot tool
+    slurp # Screen area selection for Wayland
+    wl-clipboard # Wayland clipboard utilities
+    wlr-randr # Monitor configuration for wlroots
+    kanshi # Dynamic display configuration
+    anyrun # Application launcher
     # anyrun-with-all-plugins # Application launcher with all plugins
     # File management
     gparted
@@ -142,7 +142,7 @@
 
   programs.zsh.enable = true; # Enable zsh
 
-  
+
 
   # Enable sound with Pipewire (fixed deprecated option)
   services.pulseaudio.enable = false;
@@ -201,8 +201,8 @@
   };
 
   hardware.enableAllFirmware = true;
-  
+
 
   # Set the NixOS release version
   system.stateVersion = "25.11";
-} 
+}

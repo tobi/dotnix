@@ -28,7 +28,7 @@
   boot = {
     loader = {
       systemd-boot.enable = true;
-      systemd-boot.consoleMode = "2";  # First non-standard mode - higher resolution
+      systemd-boot.consoleMode = "2"; # First non-standard mode - higher resolution
       systemd-boot.configurationLimit = 10;
       efi.canTouchEfiVariables = true;
     };
@@ -36,7 +36,7 @@
     kernelParams = [
       # Set framebuffer to native resolution for better visibility
       "video=eDP-1:2256x1504@60"
-      
+
       # AMD CPU optimizations
       "amd_pstate=guided"
       "amd_iommu=on"
@@ -70,8 +70,8 @@
     ];
 
     kernel.sysctl = {
-      "kernel.dmesg_restrict" = 0;  # Allow non-root dmesg access
-      "vm.swappiness" = 10;         # Reduce swap usage
+      "kernel.dmesg_restrict" = 0; # Allow non-root dmesg access
+      "vm.swappiness" = 10; # Reduce swap usage
     };
 
     extraModprobeConfig = ''

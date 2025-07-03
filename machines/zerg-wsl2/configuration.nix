@@ -17,7 +17,7 @@
   # ───── Core Nix settings ────────────────────────────────────────────────
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
-    auto-optimise-store   = true;          # deduplicate after builds
+    auto-optimise-store = true; # deduplicate after builds
   };
 
   # Allow proprietary editors (VS Code, Cursor)
@@ -38,13 +38,13 @@
     isSystemUser = true;
     group = "systemd-oom";
   };
-  users.groups.systemd-oom = {};
+  users.groups.systemd-oom = { };
 
   # ───── WSL Configuration ────────────────────────────────────────────────
   wsl.enable = true;
   wsl.defaultUser = "tobi";
   wsl.startMenuLaunchers = true;
-  
+
   # WSL configuration options
   wsl.wslConf = {
     automount.root = "/mnt";
@@ -58,7 +58,7 @@
   # ───── NVIDIA GPU Support for WSL2 ─────────────────────────────────────
   # WSL2 uses Windows NVIDIA drivers, so we don't need Linux drivers
   # Just ensure we can access the GPU through WSL2's passthrough
-  
+
   # Enable container toolkit for Docker GPU support
   hardware.nvidia-container-toolkit = {
     enable = true;
@@ -68,15 +68,15 @@
 
   # Add basic packages - CUDA tools are provided by WSL2
   environment.systemPackages = with pkgs; [
-    vscode 
+    vscode
     # cursor
     # Docker for containers (NVIDIA runtime provided by WSL2)
     docker
-    
+
     # Fix missing commands from diagnostics
-    tzdata      # Fix timezone warnings
-    pciutils    # lspci
-    usbutils    # lsusb
+    tzdata # Fix timezone warnings
+    pciutils # lspci
+    usbutils # lsusb
   ];
 
   # Environment variables for WSL2 NVIDIA support
