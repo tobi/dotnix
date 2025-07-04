@@ -25,7 +25,6 @@
           inherit system;
           config.allowUnfree = true;
           overlays = [
-            inputs.devshell.overlays.default
             inputs.niri.overlays.niri
           ];
         };
@@ -92,15 +91,21 @@
       # Development shell (nix develop .)
       # ------------------------------------------------------------
       # Development shells for both systems
-      devShells = forEachSystem (system: {
-        default = (mkNixPkgs system).devshell.fromTOML ./devshell.toml;
-      });
+      devShells = forEachSystem (system:
+        let devConfig = import ./devshell.nix { inherit nixpkgs system; };
+        in devConfig.devShells.${system}
+      );
+
+      # Packages for both systems
+      packages = forEachSystem (system:
+        let devConfig = import ./devshell.nix { inherit nixpkgs system; };
+        in devConfig.packages.${system}
+      );
     };
 
   inputs = {
     nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0";
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
-    devshell.url = "github:numtide/devshell";
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
