@@ -3,7 +3,6 @@ let
   username = "tobi";
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux = pkgs.stdenv.isLinux;
-  isWsl = builtins.pathExists "/proc/sys/fs/binfmt_misc/WSLInterop";
 in
 {
   # Basic home configuration
@@ -20,15 +19,8 @@ in
   # Global environment variables
   home.sessionVariables = {
     DOTFILES = "$HOME/dotnix";
-    # CPPFLAGS = "-I${pkgs.zlib.dev}/include -I${pkgs.openssl.dev}/include -I${pkgs.libffi.dev}/include";
-    # LDFLAGS = "-L${pkgs.zlib.out}/lib -L${pkgs.openssl.out}/lib -L${pkgs.libffi.out}/lib";
     MANPAGER = "sh -c 'col -bx | ${pkgs.bat}/bin/bat -l man -p'";
-
-  } // lib.optionalAttrs isDarwin {
-    # macOS specific environment variables
   };
-
-
 
   # Essential packages organized by category
   home.packages = with pkgs; [
@@ -77,12 +69,9 @@ in
     bat-extras.batgrep
     bat-extras.batman
     bat-extras.batdiff
-    # bat-extras
 
   ] ++ lib.optionals isLinux [
     sysz
-  ] ++ lib.optionals isDarwin [
-    # Darwin-specific packages (if any)
   ];
 
   # Git configuration
@@ -90,8 +79,8 @@ in
     enable = true;
     userName = "Tobi Lütke";
     userEmail = "tobi@lutke.com";
-    extraConfig.init.defaultBranch = "main";
   };
+
 
   # Editor setup
   programs.micro = {
@@ -101,16 +90,10 @@ in
     settings.tabstospaces = true;
   };
 
-  # Essential tools
-  programs.bat = {
-    enable = true;
-    config.tabs = "2";
-  };
-
   programs.fzf = {
     enable = true;
-    defaultCommand = "fd --type f";
-    defaultOptions = [ "--height 75%" "--border" "--preview 'bat --color=always --style=numbers --line-range=:500 {}'" ];
+    defaultCommand = "fd --type f --hidden --follow --exclude .git";
+    defaultOptions = [ "--height 75%" "--border" ];
     fileWidgetCommand = "fd --type f";
     changeDirWidgetCommand = "fd --type d";
     changeDirWidgetOptions = [ "--preview 'tree -C {} | head -200'" ];
@@ -121,6 +104,7 @@ in
     enable = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
+    history.size = 50000;
 
     # Interactive shell setup
     initContent = ''
@@ -143,11 +127,10 @@ in
 
       [ -f ~/.zshrc.local ] && echo "* Adding ~/.zshrc.local" && source ~/.zshrc.local
 
-      # Load environment variables and show system info
-      echo && ${pkgs.fastfetch}/bin/fastfetch
+      # Show system info on shell startup
+      echo && fastfetch
     '';
 
-    history.size = 50000;
 
     shellAliases = {
       # Editor and tools
@@ -155,11 +138,11 @@ in
       lg = "lazygit";
 
       # File operations
-      ls = "eza --group-directories-first";
-      ll = "eza -l --group-directories-first";
-      la = "eza -a --group-directories-first";
-      lla = "eza -la --group-directories-first";
-      tree = "eza --tree --group-directories-first";
+      ls = "eza";
+      ll = "eza -l";
+      la = "eza -a";
+      lla = "eza -la";
+      tree = "eza --tree";
       ".." = "cd ..";
 
       # Git shortcuts
@@ -174,47 +157,6 @@ in
       # System management
       reload = "home-manager switch --flake ~/dotnix#tobi && source $HOME/.zshrc";
       dev = "nix develop ~/dotnix";
-    };
-  };
-
-  # Simplified starship prompt with proper integration
-  programs.starship = {
-    enable = true;
-    enableZshIntegration = true;
-    enableBashIntegration = true;
-
-    settings = {
-      add_newline = true;
-      command_timeout = 200;
-      format = "[$username$hostname](light blue) $directory$character";
-      right_format = "$git_branch$git_status$cmd_duration$python$ruby";
-
-      username = {
-        show_always = true;
-        format = "[$user]($style)";
-        style_user = "blue";
-        style_root = "red bold";
-      };
-
-      hostname = {
-        ssh_only = true;
-        format = "$ssh_symbol$hostname";
-      };
-
-      directory = {
-        truncation_length = 2;
-        truncation_symbol = "…/";
-      };
-
-      character = {
-        success_symbol = "[❯](bold #A5D6A7)[❯](bold #FFF59D)[❯](bold #FFAB91)";
-        error_symbol = "[✗](bold red)";
-      };
-
-      # Disable unused modules
-      git_metrics.disabled = true;
-      # gcloud.disabled = true;
-      package.disabled = true;
     };
   };
 
@@ -235,6 +177,18 @@ in
     nix-direnv.enable = true;
   };
 
+  programs.eza = {
+    enable = true;
+    icons = "always";
+    extraOptions = [ "--group-directories-first" ];
+    # git = true;
+  };
+
   programs.btop.enable = true;
   programs.yazi.enable = true;
+
+  imports = [
+    ./modules/fastfetch.nix
+    ./modules/starship.nix
+  ];
 }
