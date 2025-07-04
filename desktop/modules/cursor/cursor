@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 cursor_app="$(find ~/Applications -maxdepth 1 -name 'Cursor*.AppImage' | sort | tail -n 1)"
 if [[ -f "$cursor_app" ]]; then
-    appimage-run "$cursor_app" "$@"
+    # If no arguments provided, just launch Cursor
+    if [[ $# -eq 0 ]]; then
+        appimage-run "$cursor_app"
+    else
+        # Otherwise, try to reuse existing window
+        appimage-run "$cursor_app" --reuse-window "$@"
+    fi
 else
     echo "Cursor AppImage not found."
     exit 1

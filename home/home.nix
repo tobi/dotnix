@@ -79,6 +79,17 @@ in
     enable = true;
     userName = "Tobi Lütke";
     userEmail = "tobi@lutke.com";
+    
+    # SSH commit signing
+    signing = {
+      key = "~/.ssh/id_ed25519.pub";
+      signByDefault = true;
+    };
+    
+    extraConfig = {
+      gpg.format = "ssh";
+      gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
+    };
   };
 
 

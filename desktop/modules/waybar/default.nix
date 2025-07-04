@@ -5,6 +5,7 @@
 }:
 let
   palette = config.colorScheme.palette;
+  terminal = "${config.programs.alacritty.package}/bin/alacritty";
 in
 {
   programs.waybar = {
@@ -64,28 +65,11 @@ in
       }
 
       #clock, #cpu, #memory, #disk, #temperature, #network, #battery,
-      #bluetooth, #wireplumber, #power-profiles-daemon {
-        background: #${palette.base01};
+      #bluetooth, #wireplumber, #power-profiles-daemon, #custom-dropbox, #custom-tailscale
+      {
         padding: 0px 10px;
         margin: 5px 0px;
         border-radius: 15px;
-        color: #${palette.base05};
-      }
-
-      #clock {
-        color: #${palette.base0D};
-      }
-
-      #cpu {
-        color: #${palette.base0A};
-      }
-
-      #battery {
-        color: #${palette.base0B};
-      }
-
-      #battery.charging {
-        color: #${palette.base0D};
       }
 
       #battery.warning:not(.charging) {
@@ -96,52 +80,64 @@ in
         color: #${palette.base08};
       }
 
-      #network {
-        color: #${palette.base0C};
-      }
-
-      #network.disconnected {
+      disconnected {
         color: #${palette.base08};
       }
 
-      #wireplumber {
-        color: #${palette.base0E};
-      }
-
-      #wireplumber.muted {
+      muted {
         color: #${palette.base03};
       }
 
-      #bluetooth {
-        color: #${palette.base0D};
-      }
-
-      #bluetooth.disabled {
+      disabled {
         color: #${palette.base03};
       }
 
-      #power-profiles-daemon {
-        color: #${palette.base0A};
+      .needs-login {
+        color: #${palette.base09};
+      }
+
+      .stopped {
+        color: #${palette.base08};
+      }
+
+      #custom-tailscale.unknown {
+        color: #${palette.base03};
+      }
+
+      /* Tooltip styling */
+      tooltip {
+        background: #${palette.base00};
+        color: #${palette.base05};
+        border: 1px solid #${palette.base01};
+        border-radius: 10px;
+        padding: 5px 10px;
+      }
+
+      tooltip label {
+        padding: 5px;
       }
     '';
     settings = [
       {
         layer = "top";
         position = "top";
-        spacing = 0;
-        height = 26;
+        spacing = 4;
+        height = 24;
         modules-left = [
           "niri/workspaces"
+          "power-profiles-daemon"
         ];
         modules-center = [
           "clock"
         ];
         modules-right = [
+          "custom/dropbox"
+          "custom/tailscale"
           "bluetooth"
           "network"
           "wireplumber"
+          "memory"
           "cpu"
-          "power-profiles-daemon"
           "battery"
         ];
         "niri/workspaces" = {
@@ -160,21 +156,31 @@ in
             "9" = "9";
             active = "󱓻";
           };
+          persistent-workspaces = {
+            "1" = [ ];
+            "2" = [ ];
+            "3" = [ ];
+            "4" = [ ];
+            "5" = [ ];
+          };
         };
         cpu = {
           interval = 5;
           format = "󰍛";
-          on-click = "ghostty -e btop";
+          format-alt = "󰍛 {usage}%";
+          on-click = "${terminal} -e btop";
+          tooltip = true;
+          tooltip-format = "CPU: {usage}%\nLoad: {load}";
         };
         clock = {
-          format = "{:%A %I:%M %p}";
+          format = "{:%A %H:%M}";
           format-alt = "{:%d %B W%V %Y}";
           tooltip = false;
         };
         network = {
-          format-icons = ["󰤯" "󰤟" "󰤢" "󰤥" "󰤨"];
+          format-icons = [ "󰤯" "󰤟" "󰤢" "󰤥" "󰤨" ];
           format = "{icon}";
-          format-wifi = "{icon}";
+          format-wifi = "{icon} ({frequency} GHz)";
           format-ethernet = "󰀂";
           format-disconnected = "󰖪";
           tooltip-format-wifi = "{essid} ({frequency} GHz)\n⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}";
@@ -182,14 +188,15 @@ in
           tooltip-format-disconnected = "Disconnected";
           interval = 3;
           nospacing = 1;
-          on-click = "ghostty -e nmcli";
+          on-click = "${terminal} -e 'mtr 1.1.1.1'";
+          on-click-right = "${terminal} -e nmtui";
         };
         battery = {
           interval = 5;
-          format = "{capacity}% {icon}";
-          format-discharging = "{icon}";
-          format-charging = "{icon}";
-          format-plugged = "";
+          format = "{icon} {capacity}%";
+          format-discharging = "{icon} {capacity}%";
+          format-charging = "{icon} {capacity}%";
+          format-plugged = "{icon}";
           format-icons = {
             charging = [
               "󰢜"
@@ -226,22 +233,29 @@ in
         };
         bluetooth = {
           format = "󰂯";
-          format-disabled = "󰂲";
-          format-connected = "";
+          format-connected = "󰂯";
           tooltip-format = "Devices connected: {num_connections}";
-          on-click = "GTK_THEME=Adwaita-dark blueberry";
         };
         wireplumber = {
-          format = "";
+          format = "󰕾 {volume}%";
           format-muted = "󰝟";
-          scroll-step = 5;
+          scroll-step = 3;
           on-click = "GTK_THEME=Adwaita-dark pavucontrol";
-          tooltip-format = "Playing at {volume}%";
+          tooltip-format = "Volume: {volume}%";
           on-click-right = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
-          max-volume = 150;
+          max-volume = 120;
+          ignored-sinks = [ "Easy Effects Sink" ];
+        };
+        memory = {
+          icon = "󰍛";
+          interval = 5;
+          format = "{icon} {percentage}%";
+          format-alt = " {used:0.1f}G/{total:0.1f}G";
+          tooltip = true;
+          tooltip-format = "Memory: {used:0.1f}GB / {total:0.1f}GB\nSwap: {swapUsed:0.1f}GB / {swapTotal:0.1f}GB";
         };
         power-profiles-daemon = {
-          format = "{icon}";
+          format = "{icon} {profile}";
           tooltip-format = "Power profile: {profile}";
           tooltip = true;
           format-icons = {
@@ -249,6 +263,23 @@ in
             balanced = "󰊚";
             performance = "󰡴";
           };
+        };
+        "custom/dropbox" = {
+          format = " {text}";
+          return-type = "json";
+          exec = "${./waybar-dropbox}";
+          on-click = "${terminal} -e yazi ~/Dropbox";
+          interval = 5;
+          tooltip = true;
+        };
+        "custom/tailscale" = {
+          format = "{icon}";
+          return-type = "json";
+          exec = "${./waybar-tailscale}";
+          on-click = "tailscale ip -4 | wl-copy";
+          on-click-right = "tailscale ip -6 | wl-copy";
+          interval = 10;
+          tooltip = true;
         };
       }
     ];
