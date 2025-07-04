@@ -166,9 +166,9 @@ in
         };
         cpu = {
           interval = 5;
-          format = "󰍛";
-          format-alt = "󰍛 {usage}%";
-          on-click = "${terminal} -e btop";
+          format = "󰍛 {usage}%";
+          format-alt = "󰍛";
+          on-click-right = "${terminal} -e btop";
           tooltip = true;
           tooltip-format = "CPU: {usage}%\nLoad: {load}";
         };
@@ -224,8 +224,8 @@ in
             ];
           };
           format-full = "Charged ";
-          tooltip-format-discharging = "{power:>1.0f}W↓ {capacity}%";
-          tooltip-format-charging = "{power:>1.0f}W↑ {capacity}%";
+          tooltip-format-discharging = "{power:>1.1f} watt↓ {capacity}%";
+          tooltip-format-charging = "{power:>1.1f} watt↑ {capacity}%";
           states = {
             warning = 20;
             critical = 10;
@@ -247,9 +247,8 @@ in
           ignored-sinks = [ "Easy Effects Sink" ];
         };
         memory = {
-          icon = "󰍛";
           interval = 5;
-          format = "{icon} {percentage}%";
+          format = " {percentage:>50.0f}%";
           format-alt = " {used:0.1f}G/{total:0.1f}G";
           tooltip = true;
           tooltip-format = "Memory: {used:0.1f}GB / {total:0.1f}GB\nSwap: {swapUsed:0.1f}GB / {swapTotal:0.1f}GB";
