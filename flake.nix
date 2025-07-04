@@ -7,7 +7,7 @@
     , determinate
     , home-manager
     , ...
-    }@inputs:
+    } @inputs:
     let
       # Support both Linux and Darwin
       systems = [
@@ -30,14 +30,17 @@
           ];
         };
 
+      config = {
+        user = "tobi";
+        full_name = "Tobi Lutke";
+        email_address = "tobi@lutke.com";
+        theme = "tokyo-night";
+      };
+
       # Import common lib functions
       lib = import ./lib/common.nix { inherit nixpkgs inputs config; };
     in
     {
-
-      config = {
-        user = "tobi";
-      };
 
       # ------------------------------------------------------------
       # NixOS configurations
@@ -76,25 +79,14 @@
       # ------------------------------------------------------------
       # Home Manager configurations
       # ------------------------------------------------------------
-      homeConfigurations = {
-        # Linux desktop configuration
-        "tobi@frameling" = home-manager.lib.homeManagerConfiguration {
-          pkgs = mkNixPkgs "x86_64-linux";
-          modules = [
-            ./home/home.nix
-            ./desktop/desktop.nix
-          ];
+      homeConfigurations = forEachSystem (system: {
+        "tobi" = home-manager.lib.homeManagerConfiguration {
+          pkgs = mkNixPkgs system;
+          extraSpecialArgs = { inherit config; };
+          modules = [ ./home/home.nix ];
         };
+      });
 
-        # macOS configuration
-        "tobi@darwin" = home-manager.lib.homeManagerConfiguration {
-          pkgs = mkNixPkgs "aarch64-darwin";
-          modules = [
-            ./home/home.nix
-            ./desktop/desktop.nix
-          ];
-        };
-      };
 
       # ------------------------------------------------------------
       # Development shell (nix develop .)
@@ -113,6 +105,7 @@
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     niri.url = "github:sodiboo/niri-flake";
+    nix-colors.url = "github:misterio77/nix-colors";
   };
 
 }
