@@ -24,14 +24,11 @@
     dex
     wine
     gnupg
-    # ruby_3_4
-    # nodejs_22
-    # python313
+    nil
   ];
 
   programs.vscode.enable = true;
   programs.fuzzel.enable = true;
-  programs.spotify-player.enable = true;
 
   # probably should go to home
   programs.gh = {
@@ -40,10 +37,10 @@
   };
 
   home.sessionVariables = {
-    BROWSER = "google-chrome";
-    QT_QPA_PLATFORM = "wayland";
-    ELECTRON_OZONE_PLATFORM_HINT = "auto";
-    CHROMIUM_FLAGS = "--enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3";
+    # BROWSER = "google-chrome";
+    #    QT_QPA_PLATFORM = "wayland";
+    #   ELECTRON_OZONE_PLATFORM_HINT = "auto";
+    #   CHROMIUM_FLAGS = "--enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3";
   };
 
   services.gnome-keyring.enable = true;
@@ -67,22 +64,30 @@
 
   dconf.settings = {
     "org/gnome/desktop/interface" = {
-      gtk-theme = "Adwaita-dark";
       color-scheme = "prefer-dark";
+    };
+  };
+
+  gtk = {
+    enable = true;
+    theme = {
+      name = "Adwaita-dark";
+      package = pkgs.gnome-themes-extra;
     };
   };
 
   services.ollama.enable = true;
 
   imports = [
-    ./waybar
-    ./ghostty
-    ./niri
-    ./chatgpt
-    ./chromium
-    ./google-chrome
-    ./Cursor
-    ./swaylock
-    ./Steam
+    ./modules/waybar
+    ./modules/ghostty
+    ./modules/alacritty.nix
+    ./modules/niri
+    ./modules/chatgpt.nix
+    ./modules/chromium.nix
+    ./modules/google-chrome.nix
+    ./modules/cursor
+    ./modules/swaylock.nix
+    ./modules/steam.nix
   ];
 }
