@@ -168,6 +168,10 @@ in
       # System management
       reload = "home-manager switch --flake ~/dotnix#tobi && source $HOME/.zshrc";
       dev = "nix develop ~/dotnix";
+    } // lib.optionalAttrs pkgs.stdenv.isLinux {
+      # Clipboard (macOS compatibility on Linux)
+      pbcopy = "wl-copy";
+      pbpaste = "wl-paste";
     };
   };
 
