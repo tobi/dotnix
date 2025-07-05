@@ -6,6 +6,9 @@
     , nixpkgs
     , determinate
     , home-manager
+    , nixos-wsl
+    , niri
+    , nix-colors
     , ...
     } @inputs:
     let
@@ -18,26 +21,18 @@
       # Helper function to generate packages for each system
       forEachSystem = nixpkgs.lib.genAttrs systems;
 
-      # Generate pkgs for each system
-      mkNixPkgs =
-        system:
+      # Theme configuration
+      theme = import ./config/themes.nix { inherit nix-colors; };
+
+      # Generate pkgs with overlays and config
+      mkPkgs = system:
         import nixpkgs {
           inherit system;
           config.allowUnfree = true;
           overlays = [
-            inputs.niri.overlays.niri
+            niri.overlays.niri
           ];
         };
-
-      config = {
-        user = "tobi";
-        full_name = "Tobi Lutke";
-        email_address = "tobi@lutke.com";
-        theme = "tokyo-night";
-      };
-
-      # Import common lib functions
-      lib = import ./lib/common.nix { inherit nixpkgs inputs config; };
     in
     {
 
@@ -45,32 +40,49 @@
       # NixOS configurations
       # ------------------------------------------------------------
       nixosConfigurations = {
-        "zerg-wsl2" = lib.mkNixosSystem {
+        "zerg-wsl2" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
+          pkgs = mkPkgs "x86_64-linux";
+          specialArgs = {
+            inherit inputs theme home-manager niri nix-colors;
+            modules-home = [
+              ./home/home.nix
+            ];
+          };
           modules = [
             ./machines/zerg-wsl2/configuration.nix
-            (lib.mkHome [ ./home/home.nix ])
           ];
         };
 
         # New configuration for the USB stick
         # RUN: nix build .#nixosConfigurations.usb-stick.config.system.build.isoImage
-        "usb-stick" = lib.mkNixosSystem {
+        "usb-stick" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
+          pkgs = mkPkgs "x86_64-linux";
+          specialArgs = {
+            inherit inputs theme home-manager niri nix-colors;
+            modules-home = [
+              ./home/home.nix
+              ./desktop/desktop.nix
+            ];
+          };
           modules = [
             ./machines/usb-stick/configuration.nix
-            (lib.mkHome [ ./home/home.nix ])
           ];
         };
 
-        "frameling" = lib.mkNixosSystem {
+        "frameling" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          modules = [
-            ./machines/frameling/configuration.nix
-            (lib.mkHome [
+          pkgs = mkPkgs "x86_64-linux";
+          specialArgs = {
+            inherit inputs theme home-manager niri nix-colors;
+            modules-home = [
               ./home/home.nix
               ./desktop/desktop.nix
-            ])
+            ];
+          };
+          modules = [
+            ./machines/frameling/configuration.nix
           ];
         };
       };
@@ -80,8 +92,7 @@
       # ------------------------------------------------------------
       homeConfigurations = forEachSystem (system: {
         "tobi" = home-manager.lib.homeManagerConfiguration {
-          pkgs = mkNixPkgs system;
-          extraSpecialArgs = { inherit config; };
+          inherit system;
           modules = [ ./home/home.nix ];
         };
       });
@@ -96,11 +107,6 @@
         in devConfig.devShells.${system}
       );
 
-      # Packages for both systems
-      packages = forEachSystem (system:
-        let devConfig = import ./devshell.nix { inherit nixpkgs system; };
-        in devConfig.packages.${system}
-      );
     };
 
   inputs = {

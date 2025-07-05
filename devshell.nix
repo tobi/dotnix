@@ -38,13 +38,24 @@ in
       ruby_3_4
       python313
       starship
+      zsh
     ];
 
     shellHook = ''
-      eval "$(starship init bash)"
+      # Initialize starship for the current shell
+      if [[ -n "$ZSH_VERSION" ]]; then
+        eval "$(starship init zsh)"
+      else
+        eval "$(starship init bash)"
+      fi
+      
       echo "Ruby version: $(ruby --version)"
       echo "Python version: $(python --version)"
       echo "🚀 Development shell activated, you can now compile things"
     '';
+    
+    # Prefer zsh as the shell
+    preferLocalBuild = true;
+    shell = "${pkgs.zsh}/bin/zsh";
   };
 }
