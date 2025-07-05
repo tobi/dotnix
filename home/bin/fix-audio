@@ -27,8 +27,6 @@ output_priorities = [
   'MacBook Pro Speakers'
 ]
 
-system('brew install switchaudio-osx') unless system('SwitchAudioSource -c')
-
 # brew install switchaudio-osx
 devices = `SwitchAudioSource -a -f json`.split("\n").map { |l| JSON.parse(l) }
 
@@ -40,12 +38,20 @@ def highest_priority_device(devices, prios)
   ordered.first
 end
 
+def switch_output(device)
+  system("SwitchAudioSource -s #{device.inspect} -t output")
+end
+
+def switch_input(device)
+  system("SwitchAudioSource -s #{device.inspect} -t input")
+end
+
 inputs, outputs = devices.partition { |d| d['type'] == 'input' }
 
 input = highest_priority_device(inputs, input_priorities)
-system("SwitchAudioSource -s #{input['name'].inspect} -t input")
+switch_input(input)
 
 output = highest_priority_device(outputs, output_priorities)
-system("SwitchAudioSource -s #{output['name'].inspect} -t output")
+switch_output(output)
 
 puts "Now: #{input['name']} // #{output['name']}"

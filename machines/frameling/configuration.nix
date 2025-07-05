@@ -110,6 +110,9 @@
       opencl.enable = true;
       amdvlk.enable = true;
     };
+
+    sensor.iio.enable = true;
+
     graphics = {
       enable = true;
       enable32Bit = true;
