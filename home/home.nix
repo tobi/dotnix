@@ -22,58 +22,6 @@ in
     MANPAGER = "sh -c 'col -bx | ${pkgs.bat}/bin/bat -l man -p'";
   };
 
-  # Essential packages organized by category
-  home.packages = with pkgs; [
-    # Core utilities
-    fd
-    bat
-    fzf
-    eza
-    ripgrep
-    wget
-    curl
-    jq
-    age
-    gh
-    fastfetch
-
-    # System tools
-    htop
-    sysz
-    mtr
-    fswatch
-    zstd
-
-    # Development
-    gnumake
-    sqlite
-    zlib.dev
-    stdenv.cc
-    openssl.dev
-    libffi.dev
-    pkg-config
-    lazygit
-    hyperfine
-    tokei
-    nixpkgs-fmt
-    nixfmt-rfc-style
-    nixfmt-tree
-    comma
-    duckdb
-    ffmpeg
-    pv
-    killall
-
-    # Nice-to-have
-    gum
-    bat-extras.batgrep
-    bat-extras.batman
-    bat-extras.batdiff
-
-  ] ++ lib.optionals isLinux [
-    sysz
-  ];
-
   # Git configuration
   programs.git = {
     enable = true;
@@ -92,8 +40,6 @@ in
     };
   };
 
-
-  # Editor setup
   programs.micro = {
     enable = true;
     settings.clipboard = "terminal";
@@ -196,7 +142,6 @@ in
     enable = true;
     icons = "always";
     extraOptions = [ "--group-directories-first" ];
-    # git = true;
   };
 
   programs.btop.enable = true;
@@ -206,4 +151,58 @@ in
     ./modules/fastfetch.nix
     ./modules/starship.nix
   ];
+
+
+  # Essential packages organized by category
+  home.packages = with pkgs; [
+    # Core utilities
+    fd
+    bat
+    fzf
+    eza
+    ripgrep
+    wget
+    curl
+    jq
+    age
+    gh
+    fastfetch
+
+    # System tools
+    htop
+    sysz
+    mtr
+    fswatch
+    zstd
+
+    # Development
+    gnumake
+    sqlite
+    zlib.dev
+    stdenv.cc
+    openssl.dev
+    libffi.dev
+    pkg-config
+    lazygit
+    hyperfine
+    tokei
+    nixpkgs-fmt
+    nixfmt-rfc-style
+    nixfmt-tree
+    comma
+    duckdb
+    ffmpeg
+    pv
+    killall
+
+    # Nice-to-have
+    gum
+    bat-extras.batgrep
+    bat-extras.batman
+    bat-extras.batdiff
+
+  ] ++ lib.optionals isLinux [
+    sysz
+  ];
+
 }
