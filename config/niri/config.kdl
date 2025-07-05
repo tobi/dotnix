@@ -277,7 +277,7 @@ cursor {
 // This line starts waybar, a commonly used bar for Wayland compositors.
 spawn-at-startup "waybar"
 spawn-at-startup "xwayland-satellite"
-spawn-at-startup "ghostty"
+spawn-at-startup "alacritty"
 spawn-at-startup "wbg" "dotnix/desktop/wallpaper.jpg"
 
 // Uncomment this line to ask the clients to omit their client-side decorations if possible.
@@ -286,6 +286,11 @@ spawn-at-startup "wbg" "dotnix/desktop/wallpaper.jpg"
 // This option will also fix border/focus ring drawing behind some semitransparent windows.
 // After enabling or disabling this, you need to restart the apps for this to take effect.
 prefer-no-csd
+
+// Disable the hotkey overlay at startup
+hotkey-overlay {
+    skip-at-startup
+}
 
 // You can change the path where screenshots are saved.
 // A ~ at the front will be expanded to the home directory.
