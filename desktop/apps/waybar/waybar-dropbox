@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Get Dropbox status and format for Waybar
+status=$(dropbox-cli status 2>/dev/null || echo "Not running")
+
+case "$status" in
+"Up to date")
+  echo '{"text": "", "tooltip": "Dropbox: Up to date", "class": "synced"}'
+  ;;
+"Syncing"*)
+  echo '{"text": "", "tooltip": "'"$status"'", "class": "syncing"}'
+  ;;
+"Not running")
+  echo '{"text": "", "tooltip": "Dropbox not running", "class": "stopped"}'
+  ;;
+*)
+  echo '{"text": "", "tooltip": "'"$status"'", "class": "unknown"}'
+  ;;
+esac

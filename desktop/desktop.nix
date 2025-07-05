@@ -1,10 +1,6 @@
-{ config
-, lib
-, pkgs
-, ...
-}:
-
+{ pkgs, theme, ... }:
 {
+
   home.packages = with pkgs; [
     wbg
     mako
@@ -36,13 +32,7 @@
     settings.git_protocol = "ssh";
   };
 
-  home.sessionVariables = {
-    # BROWSER = "google-chrome";
-    #    QT_QPA_PLATFORM = "wayland";
-    #   ELECTRON_OZONE_PLATFORM_HINT = "auto";
-    #   CHROMIUM_FLAGS = "--enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3";
-  };
-
+  services.ollama.enable = true;
   services.gnome-keyring.enable = true;
 
   # XDG configuration for proper application launching
@@ -64,30 +54,30 @@
 
   dconf.settings = {
     "org/gnome/desktop/interface" = {
-      color-scheme = "prefer-dark";
+      color-scheme = "prefer-${theme.variant}";
     };
   };
 
   gtk = {
     enable = true;
     theme = {
-      name = "Adwaita-dark";
+      name = "Adwaita-${theme.variant}";
       package = pkgs.gnome-themes-extra;
     };
   };
 
-  services.ollama.enable = true;
 
   imports = [
-    ./modules/waybar
-    ./modules/ghostty
-    ./modules/alacritty.nix
-    ./modules/niri
-    ./modules/chatgpt.nix
-    ./modules/chromium.nix
-    ./modules/google-chrome.nix
-    ./modules/cursor
-    ./modules/swaylock.nix
-    ./modules/steam.nix
+    ./apps/waybar
+    ./apps/ghostty
+    ./apps/alacritty.nix
+    ./apps/niri
+    ./apps/chatgpt.nix
+    ./apps/chromium.nix
+    ./apps/google-chrome.nix
+    ./apps/cursor
+    ./apps/swaylock.nix
+    ./apps/steam.nix
   ];
 }
+
