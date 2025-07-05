@@ -1,4 +1,4 @@
-{ config, pkgs, lib, home-manager, modulesPath, ... }:
+{ config, pkgs, lib, home-manager, modulesPath, inputs, ... }:
 
 {
   imports = [
@@ -6,8 +6,12 @@
     (modulesPath + "/installer/cd-dvd/installation-cd-base.nix")
     # Enable persistent storage overlay for USB drives
     (modulesPath + "/installer/cd-dvd/iso-image.nix")
-    # Import the Home Manager module to manage dotfiles
-    home-manager.nixosModules.home-manager
+
+    # user configuration
+    ../user.nix
+
+    # base it on determinate nixos
+    inputs.determinate.nixosModules.default
   ];
 
   # ISO image settings
@@ -23,7 +27,7 @@
   ];
 
   # Allow proprietary software like NVIDIA drivers
-  nixpkgs.config.allowUnfree = true;
+  # NOTE: allowUnfree is already set in lib/common.nix
 
   # Basic system settings
   networking.hostName = "nixos-live";
@@ -52,21 +56,6 @@
     # Blacklist problematic audio modules that can cause boot hangs
     "snd_pcsp"
   ];
-
-  # User account for auto-login
-  users.users.tobi = {
-    isNormalUser = true;
-    description = "Tobi";
-    shell = pkgs.zsh;
-    # Add user to necessary groups for hardware access and admin rights
-    extraGroups = [ "wheel" "networkmanager" "video" "render" "adbusers" ];
-    # Set an empty password for the live environment
-    initialHashedPassword = "";
-    # Add your public SSH key for convenience
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO+bCR59gv82AsYtmVxZM3Tu+AvIjmjbMI3mHiqo+DFJ"
-    ];
-  };
 
   # Hyprland window manager and display setup (Wayland-only)
   programs.hyprland = {
@@ -186,19 +175,7 @@
     wantedBy = [ "multi-user.target" ];
   };
 
-  home-manager = {
-    users.tobi = { ... }: {
-      imports = [
-        ../../desktop/desktop.nix
-        ../../home/home.nix
-      ];
-      home.stateVersion = "25.05";
-    };
-    extraSpecialArgs = { };
-    # Disable version mismatch warning
-    useGlobalPkgs = true;
-    useUserPackages = true;
-  };
+  # Home-manager configuration is now handled in flake.nix
 
   hardware.enableAllFirmware = true;
 

@@ -5,11 +5,17 @@
 # NixOS-WSL specific options are documented on the NixOS-WSL repository:
 # https://github.com/nix-community/NixOS-WSL
 
-{ config, lib, pkgs, nixos-wsl, ... }:
+{ config, lib, pkgs, inputs, ... }:
 {
   imports = [
     # include NixOS-WSL modules
-    nixos-wsl.nixosModules.wsl
+    inputs.nixos-wsl.nixosModules.wsl
+
+    # base it on determinate nixos
+    inputs.determinate.nixosModules.default
+
+    # user configuration
+    ../user.nix
   ];
 
   networking.hostName = "zerg-wsl2";
@@ -19,26 +25,6 @@
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true; # deduplicate after builds
   };
-
-  # Allow proprietary editors (VS Code, Cursor)
-  nixpkgs.config.allowUnfree = true;
-
-  # ───── User Configuration ──────────────────────────────────────────────
-  users.users.tobi = {
-    isNormalUser = true;
-    shell = pkgs.zsh;
-    extraGroups = [ "wheel" ]; # Enable 'sudo' for the user
-  };
-
-  # Enable zsh system-wide
-  programs.zsh.enable = true;
-
-  # Fix missing systemd-oom user (from diagnostics)
-  users.users.systemd-oom = {
-    isSystemUser = true;
-    group = "systemd-oom";
-  };
-  users.groups.systemd-oom = { };
 
   # ───── WSL Configuration ────────────────────────────────────────────────
   wsl.enable = true;

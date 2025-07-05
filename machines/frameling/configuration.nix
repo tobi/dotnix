@@ -1,17 +1,24 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 {
   imports = [
+    # hardware configuration
     ./hardware-configuration.nix
+
+    # user configuration
+    ../user.nix
+
+    # base it on determinate nixos
+    inputs.determinate.nixosModules.default
   ];
 
   # System Configuration
   networking.hostName = "frameling";
   time.timeZone = "America/Toronto";
-  system.stateVersion = "25.05";
+  system.stateVersion = "25.11";
 
   # Nix Settings
-  nixpkgs.config.allowUnfree = true;
+  # NOTE: allowUnfree is already set in lib/common.nix
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
@@ -34,9 +41,6 @@
     };
     kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
-      # Set framebuffer to native resolution for better visibility
-      "video=eDP-1:2256x1504@60"
-
       # AMD CPU optimizations
       "amd_pstate=guided"
       "amd_iommu=on"
@@ -84,16 +88,16 @@
   # Console configuration for high DPI display
   console = {
     earlySetup = true;
-    font = "${pkgs.terminus_font}/share/consolefonts/ter-v32n.psf.gz";
-    packages = with pkgs; [ terminus_font ];
   };
 
   # Networking
-  networking.networkmanager.enable = true;
-  networking.firewall = {
-    enable = true;
-    allowedTCPPorts = [ 22 ]; # SSH
-    allowedUDPPorts = [ ];
+  networking = {
+    networkmanager.enable = true;
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ 22 ]; # SSH
+      allowedUDPPorts = [ ];
+    };
   };
 
   # Hardware Configuration
@@ -240,14 +244,23 @@
     enable = true;
     settings = {
       default_session = {
-        command = "niri-session";
+        command = "niri --session --config /home/tobi/dotnix/config/niri/config.kdl";
         user = "tobi";
       };
-      # Environment variables can be set in the initial_session_environment
-      initial_session_environment = [
-        "NIRI_CONFIG=/home/tobi/dotnix/desktop/niri/config.kdl"
-      ];
     };
+  };
+
+  # Environment variables can be set in the initial_session_environment
+  environment.sessionVariables = {
+    DISPLAY = ":0";
+    # Force all apps to use Wayland
+    GDK_BACKEND = "wayland";
+    QT_QPA_PLATFORM = "wayland";
+    QT_STYLE_OVERRIDE = "kvantum";
+    SDL_VIDEODRIVER = "wayland";
+    MOZ_ENABLE_WAYLAND = "1";
+    ELECTRON_OZONE_PLATFORM_HINT = "wayland";
+    OZONE_PLATFORM = "wayland";
   };
 
   # Udev rules for FIDO2/WebAuthn devices
@@ -349,19 +362,9 @@
     noto-fonts-emoji
     nerd-fonts.fira-code
     nerd-fonts.droid-sans-mono
+    noto-fonts
+    noto-fonts-emoji
+    nerd-fonts.caskaydia-mono
+
   ];
-
-  # Groups
-  users.groups.plugdev = { };
-
-  # User Account
-  users.users.tobi = {
-    isNormalUser = true;
-    description = "Tobi";
-    shell = pkgs.zsh;
-    extraGroups = [ "wheel" "networkmanager" "video" "render" "input" "gamemode" "bluetooth" "plugdev" ];
-    # Set password using: sudo passwd tobi
-    # Or generate hash with: mkpasswd -m sha-512
-    hashedPassword = null; # Will prompt to set password on first login
-  };
 }
