@@ -6,7 +6,6 @@
     , nixpkgs
     , determinate
     , home-manager
-    , nixos-wsl
     , niri
     , nix-colors
     , ...
@@ -85,6 +84,10 @@
             ./machines/frameling/configuration.nix
           ];
         };
+
+
+        # frameling setup with the omarchy-nix flake (hyperland)
+        "frameling-oma" = (import ./machines/frameling/frameling-oma.nix) { inherit inputs; };
       };
 
       # ------------------------------------------------------------
@@ -117,6 +120,15 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     niri.url = "github:sodiboo/niri-flake";
     nix-colors.url = "github:misterio77/nix-colors";
+
+
+    omarchy-nix = {
+      url = "github:henrysipp/omarchy-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
+
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
 }
