@@ -37,23 +37,10 @@
     settings.General.Experimental = true;
   };
 
-  # NVIDIA driver configuration for Wayland
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
   };
-
-  # hardware.nvidia = {
-  #   modesetting.enable = true;
-  #   # Use the proprietary driver
-  #   open = false;
-  #   # Install the stable NVIDIA driver package
-  #   package = config.boot.kernelPackages.nvidiaPackages.stable;
-  #   # Power management (helps with compatibility)
-  #   powerManagement.enable = true;
-  #   # Force composition pipeline to avoid issues
-  #   forceFullCompositionPipeline = true;
-  # };
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
