@@ -1,4 +1,4 @@
-{ config, lib, pkgs, inputs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   imports = [
@@ -10,15 +10,20 @@
 
     # base it on determinate nixos
     inputs.determinate.nixosModules.default
+
+    # use nixos-hardware package to get everything
+    # dialed in for the framework laptop instead of doing it outselves.
+    #
+    inputs.nixos-hardware.nixosModules.framework-amd-ai-300-series
   ];
 
   # System Configuration
   networking.hostName = "frameling";
   time.timeZone = "America/Toronto";
+
   system.stateVersion = "25.11";
 
   # Nix Settings
-  # NOTE: allowUnfree is already set in lib/common.nix
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
@@ -39,55 +44,14 @@
       systemd-boot.configurationLimit = 10;
       efi.canTouchEfiVariables = true;
     };
+
+    # we need latest kernel to deal with power issues
     kernelPackages = pkgs.linuxPackages_latest;
-    kernelParams = [
-      # AMD CPU optimizations
-      "amd_pstate=guided"
-      "amd_iommu=on"
-
-      # AMD GPU optimizations for Radeon 860M
-      "amdgpu.dpm=1"
-      "amdgpu.gpu_recovery=1"
-      "amdgpu.dc=1"
-      "amdgpu.freesync_video=1"
-      "amdgpu.ppfeaturemask=0xfffffeff"
-
-      # Power and thermal management
-      "mem_sleep_default=s2idle"
-      "processor.max_cstate=2"
-
-      # USB/Bluetooth fixes
-      "xhci_hcd.quirks=0x00000040"
-
-      # PCIe power management - allow but fix error reporting
-      "pci=noaer"
-
-      # ZSWAP compressed swap
-      "zswap.enabled=1"
-
-      # Security features
-      "mitigations=auto,nosmt"
-
-      # Audio optimizations
-      "snd_hda_intel.power_save=1"
-      "snd_hda_intel.probe_mask=1"
-    ];
 
     kernel.sysctl = {
       "kernel.dmesg_restrict" = 0; # Allow non-root dmesg access
       "vm.swappiness" = 10; # Reduce swap usage
     };
-
-    extraModprobeConfig = ''
-      options snd_hda_intel model=auto
-    '';
-    extraModulePackages = [ ];
-    kernelModules = [ "uinput" ];
-  };
-
-  # Console configuration for high DPI display
-  console = {
-    earlySetup = true;
   };
 
   # Networking
@@ -99,57 +63,11 @@
       allowedUDPPorts = [ ];
     };
   };
-
-  # Hardware Configuration
-  hardware = {
-    enableAllFirmware = true;
-    firmware = [ pkgs.linux-firmware ];
-    cpu.amd.updateMicrocode = true;
-    amdgpu = {
-      initrd.enable = true;
-      opencl.enable = true;
-      amdvlk.enable = true;
-    };
-
-    sensor.iio.enable = true;
-
-    graphics = {
-      enable = true;
-      enable32Bit = true;
-      extraPackages = with pkgs; [
-        amdvlk
-        driversi686Linux.amdvlk
-        rocmPackages.clr.icd
-      ];
-    };
-  };
-
-  # Power Management
-  powerManagement = {
-    enable = true;
-    powertop.enable = true;
-  };
-
   # Add ZRAM for better memory management
   zramSwap = {
     enable = true;
     algorithm = "zstd";
-    memoryPercent = 50;
-  };
-
-  # Backlight control
-  hardware.acpilight.enable = true;
-
-  # Set default brightness to 60% on boot
-  systemd.services.brightness-default = {
-    description = "Set default brightness to 60%";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "graphical-session.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.brightnessctl}/bin/brightnessctl set 60%";
-      RemainAfterExit = true;
-    };
+    memoryPercent = 40;
   };
 
   # Programs
@@ -157,11 +75,111 @@
     niri.enable = true;
     xwayland.enable = true;
     nix-ld.enable = true;
-    zsh.enable = true;
     dconf.enable = true;
-
     fuse.userAllowOther = true;
   };
+
+  # Display Manager
+  services.greetd = {
+    enable = true;
+    settings = {
+      default_session = {
+        command = "niri --session --config /home/tobi/dotnix/config/niri/config.kdl";
+        user = "tobi";
+      };
+    };
+  };
+
+  # Environment variables can be set in the initial_session_environment
+  environment.sessionVariables = {
+    DISPLAY = ":0";
+    # Force all apps to use Wayland
+    GDK_BACKEND = "wayland";
+    QT_QPA_PLATFORM = "wayland";
+    QT_STYLE_OVERRIDE = "kvantum";
+    SDL_VIDEODRIVER = "wayland";
+    MOZ_ENABLE_WAYLAND = "1";
+    ELECTRON_OZONE_PLATFORM_HINT = "wayland";
+    OZONE_PLATFORM = "wayland";
+  };
+
+  # Udev rules for FIDO2/WebAuthn devices
+  services.udev.packages = [ pkgs.libfido2 ];
+
+  # Services
+  services = {
+    flatpak.enable = true;
+    blueman.enable = true;
+    dbus.enable = true;
+    gnome.gnome-keyring.enable = true;
+    power-profiles-daemon.enable = true;
+    pulseaudio.enable = false;
+    seatd.enable = true;
+    openssh.enable = true;
+    pipewire = {
+      enable = true;
+      alsa.enable = true;
+      pulse.enable = true;
+      jack.enable = true;
+      wireplumber.enable = true;
+    };
+    tailscale.enable = true;
+    printing.enable = true;
+    chrony.enable = true;
+    upower.enable = true;
+    thermald.enable = true;
+    fwupd.enable = true;
+  };
+
+  # Fix NTP startup dependencies
+  systemd.services.chronyd = {
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
+  };
+
+  # Security
+  security = {
+    rtkit.enable = true;
+    pam.services.greetd.enableGnomeKeyring = true;
+  };
+
+  # Appimage support
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
+
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+    localNetworkGameTransfers.openFirewall = true;
+    gamescopeSession.enable = true;
+  };
+
+  # XDG Portals
+  xdg.portal = {
+    enable = true;
+    wlr.enable = true;
+    xdgOpenUsePortal = true;
+
+    extraPortals = [
+      pkgs.xdg-desktop-portal-wlr
+      pkgs.xdg-desktop-portal-gtk
+    ];
+    config = {
+      common = {
+        default = [ "wlr" ];
+      };
+      niri = {
+        default = [ "wlr" "gtk" ];
+        "org.freedesktop.impl.portal.Camera" = [ "gtk" ];
+        "org.freedesktop.impl.portal.Screenshot" = [ "wlr" ];
+        "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ];
+      };
+    };
+  };
+
 
   # System Packages
   environment.systemPackages = with pkgs; [
@@ -242,120 +260,6 @@
     tailscale
   ];
 
-  # Display Manager
-  services.greetd = {
-    enable = true;
-    settings = {
-      default_session = {
-        command = "niri --session --config /home/tobi/dotnix/config/niri/config.kdl";
-        user = "tobi";
-      };
-    };
-  };
-
-  # Environment variables can be set in the initial_session_environment
-  environment.sessionVariables = {
-    DISPLAY = ":0";
-    # Force all apps to use Wayland
-    GDK_BACKEND = "wayland";
-    QT_QPA_PLATFORM = "wayland";
-    QT_STYLE_OVERRIDE = "kvantum";
-    SDL_VIDEODRIVER = "wayland";
-    MOZ_ENABLE_WAYLAND = "1";
-    ELECTRON_OZONE_PLATFORM_HINT = "wayland";
-    OZONE_PLATFORM = "wayland";
-  };
-
-  # Udev rules for FIDO2/WebAuthn devices
-  services.udev.packages = [ pkgs.libfido2 ];
-
-  # Services
-  services = {
-    flatpak.enable = true;
-    blueman.enable = true;
-    dbus.enable = true;
-    gnome.gnome-keyring.enable = true;
-    power-profiles-daemon.enable = true;
-    pulseaudio.enable = false;
-    seatd.enable = true;
-    pcscd.enable = true; # Smart card and FIDO2 support
-    openssh.enable = true;
-    pipewire = {
-      enable = true;
-      alsa.enable = true;
-      pulse.enable = true;
-      jack.enable = true;
-      extraConfig.pipewire."92-low-latency" = {
-        context.properties = {
-          default.clock.rate = 48000;
-          default.clock.quantum = 32;
-          default.clock.min-quantum = 32;
-          default.clock.max-quantum = 32;
-        };
-      };
-    };
-    pipewire.wireplumber.enable = true;
-    tailscale.enable = true;
-    printing.enable = true;
-    avahi = {
-      enable = true;
-      nssmdns4 = true;
-      openFirewall = true;
-    };
-    chrony.enable = true;
-    upower.enable = true;
-    thermald.enable = true;
-    fwupd.enable = true;
-  };
-
-  # Fix NTP startup dependencies
-  systemd.services.chronyd = {
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
-  };
-
-  # Security
-  security = {
-    rtkit.enable = true;
-    pam.services.greetd.enableGnomeKeyring = true;
-  };
-
-  # Appimage support
-  programs.appimage = {
-    enable = true;
-    binfmt = true;
-  };
-
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
-    localNetworkGameTransfers.openFirewall = true;
-    gamescopeSession.enable = true;
-  };
-
-  # XDG Portals
-  xdg.portal = {
-    enable = true;
-    wlr.enable = true;
-    xdgOpenUsePortal = true;
-
-    extraPortals = [
-      pkgs.xdg-desktop-portal-wlr
-      pkgs.xdg-desktop-portal-gtk
-    ];
-    config = {
-      common = {
-        default = [ "wlr" ];
-      };
-      niri = {
-        default = [ "wlr" "gtk" ];
-        "org.freedesktop.impl.portal.Camera" = [ "gtk" ];
-        "org.freedesktop.impl.portal.Screenshot" = [ "wlr" ];
-        "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ];
-      };
-    };
-  };
 
   # Fonts
   fonts.packages = with pkgs; [
@@ -368,6 +272,5 @@
     noto-fonts
     noto-fonts-emoji
     nerd-fonts.caskaydia-mono
-
   ];
 }

@@ -85,7 +85,7 @@ in
       [ -f ~/.zshrc.local ] && echo "* Adding ~/.zshrc.local" && source ~/.zshrc.local
 
       # Show system info on shell startup
-      clear && fastfetch
+      echo && fastfetch
     '';
 
 
