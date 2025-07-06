@@ -14,7 +14,7 @@ in
     settings = {
       # Window settings
       window = {
-        opacity = 1;
+        opacity = 1.0;
         padding = {
           x = 10;
           y = 10;
