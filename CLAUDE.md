@@ -61,6 +61,38 @@ The `modules-home` attribute in specialArgs defines which home-manager modules t
 - Desktop apps receive `theme` parameter for styling
 - Based on nix-colors for consistency
 
+## 🎨 Code Style Guidelines
+
+### File Organization
+- **Imports first**: All imports should be at the top of the file
+- **Configuration body**: Main configuration logic in the middle
+- **Packages last**: Package lists should be at the end of files
+- **Minimal comments**: Remove verbose example comments, keep only essential ones
+
+### Flake Structure
+- **Simple inputs**: Pass inputs directly from flake to modules via specialArgs
+- **No abstractions**: Keep flake.nix explicit and readable
+- **Direct nixosSystem calls**: No wrapper functions or lib helpers
+- **Clear separation**: Each machine gets its own clear configuration block
+
+### Module Patterns
+```nix
+{ pkgs, theme, ... }:  # Destructure only what's needed
+{
+  # Configuration settings
+  programs.foo = {
+    enable = true;
+    settings = { ... };
+  };
+  
+  # Package installations at the end
+  home.packages = with pkgs; [
+    package1
+    package2
+  ];
+}
+```
+
 ## 🚨 Important Rules
 
 ### What NOT to do:
@@ -68,6 +100,7 @@ The `modules-home` attribute in specialArgs defines which home-manager modules t
 - ❌ Don't use mkNixosSystem or similar abstractions
 - ❌ Don't put home-manager config inline in flake.nix
 - ❌ Don't duplicate user configuration across machines
+- ❌ Don't leave commented-out code or verbose example comments
 
 ### What TO do:
 - ✅ Use direct `nixpkgs.lib.nixosSystem` calls
@@ -75,6 +108,7 @@ The `modules-home` attribute in specialArgs defines which home-manager modules t
 - ✅ Keep machine configs focused on hardware/system settings
 - ✅ Use centralized user.nix for user management
 - ✅ Organize desktop apps in desktop/apps/
+- ✅ Keep configurations clean and minimal
 
 ## 🔍 Common Tasks
 

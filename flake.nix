@@ -1,10 +1,9 @@
 {
-  description = "Tobi's dotfiles/homelab";
+  description = "Tobi's nixworld";
 
   outputs =
     { self
     , nixpkgs
-    , determinate
     , home-manager
     , niri
     , nix-colors
@@ -29,7 +28,7 @@
           inherit system;
           config.allowUnfree = true;
           overlays = [
-            niri.overlays.niri
+            inputs.niri.overlays.niri
           ];
         };
     in
@@ -43,7 +42,7 @@
           system = "x86_64-linux";
           pkgs = mkPkgs "x86_64-linux";
           specialArgs = {
-            inherit inputs theme home-manager niri nix-colors;
+            inherit inputs theme home-manager nix-colors niri;
             modules-home = [
               ./home/home.nix
             ];
@@ -59,7 +58,7 @@
           system = "x86_64-linux";
           pkgs = mkPkgs "x86_64-linux";
           specialArgs = {
-            inherit inputs theme home-manager niri nix-colors;
+            inherit inputs theme home-manager nix-colors niri;
             modules-home = [
               ./home/home.nix
               ./desktop/desktop.nix
@@ -74,7 +73,7 @@
           system = "x86_64-linux";
           pkgs = mkPkgs "x86_64-linux";
           specialArgs = {
-            inherit inputs theme home-manager niri nix-colors;
+            inherit inputs theme home-manager nix-colors niri;
             modules-home = [
               ./home/home.nix
               ./desktop/desktop.nix
@@ -84,10 +83,6 @@
             ./machines/frameling/configuration.nix
           ];
         };
-
-
-        # frameling setup with the omarchy-nix flake (hyperland)
-        "frameling-oma" = (import ./machines/frameling/frameling-oma.nix) { inherit inputs; };
       };
 
       # ------------------------------------------------------------
@@ -120,14 +115,6 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     niri.url = "github:sodiboo/niri-flake";
     nix-colors.url = "github:misterio77/nix-colors";
-
-
-    omarchy-nix = {
-      url = "github:henrysipp/omarchy-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
-
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
