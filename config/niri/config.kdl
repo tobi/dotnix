@@ -24,6 +24,13 @@ input {
     focus-follows-mouse max-scroll-amount="0%"
 }
 
+// Overview configuration
+overview {
+    workspace-shadow {
+        off
+    }
+}
+
 // Output configuration
 output "eDP-1" {
     scale 1.5
@@ -34,13 +41,14 @@ output "eDP-1" {
 output "Apple Computer Inc StudioDisplay 0x47040065" {
     scale 1.8
     focus-at-startup
-    background-color "#003300"
 }
 
 layout {
-    gaps 20
+    gaps 15
 
     center-focused-column "never"
+
+    background-color "transparent"
 
     preset-column-widths {
         proportion 0.33333
@@ -53,7 +61,8 @@ layout {
     }
 
     focus-ring {
-        width 3
+        // off
+        width 2
 
         inactive-color "#505050"
 
@@ -63,7 +72,7 @@ layout {
 
     border {
         off
-        width 4
+        width 3
         active-color "#ffc87f"
         inactive-color "#505050"
         urgent-color "#9b0000"
@@ -77,7 +86,10 @@ layout {
         color "#000000"
     }
 
-    struts { }
+    struts {
+        left 24
+        right 24
+     }
 }
 
 environment { }
@@ -103,7 +115,7 @@ hotkey-overlay {
 screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 
 animations {
-    slowdown 0.8
+    slowdown 2.0
 
     workspace-switch {
         spring damping-ratio=0.7 stiffness=1200 epsilon=0.0001
@@ -148,23 +160,27 @@ animations {
 
 // Window rules
 window-rule {
-    match app-id=r#"^com\.mitchellh\.ghostty$"#
-    default-column-width {
-        fixed 600;
-    }
-}
-
-window-rule {
-    match app-id=r#"^Alacritty$"#
-    default-column-width {
-        fixed 600;
-    }
-}
-
-window-rule {
     match app-id=r#"^xdg-desktop-portal-gtk$"#
     match title="^Open"
     open-floating true
+    max-width 1000
+    max-height 1000
+}
+
+window-rule {
+    match title="^Alacritty$"
+    opacity 0.8
+}
+
+window-rule {
+    match title="^Alacritty$" is-active=true
+    draw-border-with-background false
+    opacity 0.9
+}
+
+window-rule {
+    match app-id="^steam$"
+    open-on-workspace "Steam"
 }
 
 window-rule {
@@ -172,11 +188,23 @@ window-rule {
     open-floating true
 }
 
-
 window-rule {
     geometry-corner-radius 14
     clip-to-geometry true
 }
+
+// Make the wallpaper stationary, rather than moving with workspaces.
+layer-rule {
+    // This is for swaybg; change for other wallpaper tools.
+    // Find the right namespace by running niri msg layers.
+    match namespace="^wallpaper$"
+    place-within-backdrop true
+}
+
+// Set transparent workspace background color.
+// layout {
+//     background-color "transparent"
+// }
 
 switch-events {
     lid-close { spawn "notify-send" "The laptop lid is closed!"; }
