@@ -54,6 +54,28 @@
     };
   };
 
+  # Environment variables for proper GUI app support
+  environment.sessionVariables = {
+    # Ensure GUI apps work with Wayland (with X11 fallback)
+    GDK_BACKEND = "wayland,x11";
+    QT_QPA_PLATFORM = "wayland;xcb";
+    QT_STYLE_OVERRIDE = "kvantum";
+
+    # Wayland-specific settings
+    NIXOS_OZONE_WL = "1";
+    MOZ_ENABLE_WAYLAND = "1";
+    SDL_VIDEODRIVER = "wayland";
+    WAYLAND_DISPLAY = "wayland-1";
+    OZONE_PLATFORM = "wayland";
+    ELECTRON_OZONE_PLATFORM_HINT = "wayland";
+  };
+
+  # Security wrapper for GUI ap
+  security.polkit.enable = true;
+  security.sudo.extraConfig = ''
+    Defaults env_keep += "WAYLAND_DISPLAY XDG_RUNTIME_DIR XDG_SESSION_TYPE GDK_BACKEND QT_QPA_PLATFORM"
+  '';
+
   # Networking
   networking = {
     networkmanager.enable = true;
@@ -90,18 +112,6 @@
     };
   };
 
-  # Environment variables can be set in the initial_session_environment
-  environment.sessionVariables = {
-    DISPLAY = ":0";
-    # Force all apps to use Wayland
-    GDK_BACKEND = "wayland";
-    QT_QPA_PLATFORM = "wayland";
-    QT_STYLE_OVERRIDE = "kvantum";
-    SDL_VIDEODRIVER = "wayland";
-    MOZ_ENABLE_WAYLAND = "1";
-    ELECTRON_OZONE_PLATFORM_HINT = "wayland";
-    OZONE_PLATFORM = "wayland";
-  };
 
   # Udev rules for FIDO2/WebAuthn devices
   services.udev.packages = [ pkgs.libfido2 ];
@@ -169,7 +179,7 @@
     ];
     config = {
       common = {
-        default = [ "wlr" ];
+        default = [ "wlr" "gtk" ];
       };
       niri = {
         default = [ "wlr" "gtk" ];
@@ -264,6 +274,8 @@
   # Fonts
   fonts.packages = with pkgs; [
     inter
+    maple-mono
+    maple-mono-nerd
     noto-fonts
     noto-fonts-cjk-sans
     noto-fonts-emoji
