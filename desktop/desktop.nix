@@ -21,6 +21,7 @@
     wine
     gnupg
     nil
+    xdg-desktop-portal-gtk
   ];
 
   programs.vscode.enable = true;
@@ -63,6 +64,12 @@
     theme = {
       name = "Adwaita-${theme.variant}";
       package = pkgs.gnome-themes-extra;
+    };
+    gtk3.extraConfig = {
+      gtk-application-prefer-dark-theme = theme.variant == "dark";
+    };
+    gtk4.extraConfig = {
+      gtk-application-prefer-dark-theme = theme.variant == "dark";
     };
   };
 
