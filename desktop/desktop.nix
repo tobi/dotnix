@@ -73,7 +73,6 @@
     };
   };
 
-
   imports = [
     ./apps/waybar
     ./apps/ghostty
@@ -85,6 +84,7 @@
     ./apps/cursor
     ./apps/swaylock.nix
     ./apps/steam.nix
+    ./apps/mako.nix
   ];
 }
 
