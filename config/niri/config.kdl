@@ -178,10 +178,6 @@ window-rule {
     opacity 0.9
 }
 
-window-rule {
-    match app-id="^steam$"
-    open-on-workspace "Steam"
-}
 
 window-rule {
     match app-id=r#"firefox$"# title="^Picture-in-Picture$"
@@ -189,27 +185,36 @@ window-rule {
 }
 
 window-rule {
+    match app-id="^steam$" title="^notificationtoasts_"
+    open-floating true
+    default-floating-position x=5 y=0 relative-to="bottom-right"
+    open-on-workspace "active"
+}
+
+window-rule {
+    match app-id="^steam$"
+    open-on-workspace "Steam"
+}
+
+
+window-rule {
     geometry-corner-radius 14
     clip-to-geometry true
 }
 
-// Make the wallpaper stationary, rather than moving with workspaces.
 layer-rule {
-    // This is for swaybg; change for other wallpaper tools.
-    // Find the right namespace by running niri msg layers.
     match namespace="^wallpaper$"
     place-within-backdrop true
 }
-
-// Set transparent workspace background color.
-// layout {
-//     background-color "transparent"
-// }
 
 switch-events {
     lid-close { spawn "notify-send" "The laptop lid is closed!"; }
     lid-open { spawn "notify-send" "The laptop lid is open!"; }
 }
+
+workspace "Default"
+workspace "Dev"
+workspace "Steam"
 
 binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
@@ -301,18 +306,18 @@ binds {
     Mod+Ctrl+Shift+WheelScrollUp   { move-column-left; }
 
     // Workspace switching by index
-    Mod+1 { focus-workspace 1; }
-    Mod+2 { focus-workspace 2; }
-    Mod+3 { focus-workspace 3; }
+    Mod+1 { focus-workspace "Default"; }
+    Mod+2 { focus-workspace "Dev"; }
+    Mod+3 { focus-workspace "Steam"; }
     Mod+4 { focus-workspace 4; }
     Mod+5 { focus-workspace 5; }
     Mod+6 { focus-workspace 6; }
     Mod+7 { focus-workspace 7; }
     Mod+8 { focus-workspace 8; }
     Mod+9 { focus-workspace 9; }
-    Mod+Ctrl+1 { move-column-to-workspace 1; }
-    Mod+Ctrl+2 { move-column-to-workspace 2; }
-    Mod+Ctrl+3 { move-column-to-workspace 3; }
+    Mod+Ctrl+1 { move-column-to-workspace "Default"; }
+    Mod+Ctrl+2 { move-column-to-workspace "Dev"; }
+    Mod+Ctrl+3 { move-column-to-workspace "Steam"; }
     Mod+Ctrl+4 { move-column-to-workspace 4; }
     Mod+Ctrl+5 { move-column-to-workspace 5; }
     Mod+Ctrl+6 { move-column-to-workspace 6; }
