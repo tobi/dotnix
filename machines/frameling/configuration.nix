@@ -274,15 +274,13 @@
   # Fonts
   fonts.packages = with pkgs; [
     inter
-    maple-mono
-    maple-mono-nerd
     noto-fonts
-    noto-fonts-cjk-sans
     noto-fonts-emoji
+    noto-fonts-cjk-sans
+
     nerd-fonts.fira-code
     nerd-fonts.droid-sans-mono
-    noto-fonts
-    noto-fonts-emoji
     nerd-fonts.caskaydia-mono
+    nerd-fonts.symbols-only
   ];
 }
