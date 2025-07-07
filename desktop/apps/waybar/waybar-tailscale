@@ -48,4 +48,4 @@ case "$backend_state" in
   ;;
 esac
 
-echo "{\"text\": \"$icon\", \"tooltip\": \"$tooltip\", \"class\": \"$class\"}"
+echo "{\"icon\": \"$icon\", \"text\": \"$icon\", \"tooltip\": \"$tooltip\", \"class\": \"$class\"}"

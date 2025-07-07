@@ -1,10 +1,11 @@
 { config
 , theme
+, pkgs
 , ...
 }:
 let
   palette = theme.palette;
-  terminal = "${config.programs.alacritty.package}/bin/alacritty";
+  terminal = "${pkgs.alacritty}/bin/alacritty";
 in
 {
   programs.waybar = {
@@ -23,6 +24,8 @@ in
         color: #${palette.base05};
         transition-property: background-color;
         transition-duration: 0.5s;
+        transition-property: height;
+        transition-duration: 0.5s;
       }
 
       window#waybar.hidden {
@@ -31,7 +34,7 @@ in
 
       #workspaces {
         background: #${palette.base01};
-        margin: 5px;
+        margin: 0px 5px;
         padding: 0px 1px;
         border-radius: 15px;
         border: 0px;
@@ -41,7 +44,7 @@ in
 
       #workspaces button {
         padding: 0px 5px;
-        margin: 4px 3px;
+        margin: 0px 3px;
         border-radius: 15px;
         border: 0px;
         color: #${palette.base05};
@@ -63,31 +66,47 @@ in
         border-radius: 15px;
       }
 
-      #clock, #cpu, #memory, #disk, #temperature, #network, #battery,
-      #bluetooth, #wireplumber, #power-profiles-daemon, #custom-dropbox, #custom-tailscale
-      {
-        padding: 0px 10px;
-        margin: 5px 0px;
+      .modules-left, .modules-center, .modules-right {
+        background: #${palette.base01};
+        margin: 0px 5px;
+        padding: 0px 1px;
         border-radius: 15px;
+        border: 0px;
+      }
+
+
+      #clock, #cpu, #memory, #disk, #temperature, #network, #battery,
+      #bluetooth, #wireplumber, #power-profiles-daemon, #custom-dropbox, #custom-tailscale, #mpris
+      {
+        margin: 0px 5px;
+        min-width: 15px;
+      }
+
+      #tray {
+        /* margin-left: 40px; */
+      }
+
+      #cpu, #memory, #battery, #wireplumber{
+        min-width: 45px;
       }
 
       #battery.warning:not(.charging) {
-        color: #${palette.base09};
+        color: yellow;
       }
 
       #battery.critical:not(.charging) {
+        color: red;
+      }
+
+      .disconnected {
         color: #${palette.base08};
       }
 
-      disconnected {
-        color: #${palette.base08};
-      }
-
-      muted {
+      .muted {
         color: #${palette.base03};
       }
 
-      disabled {
+      .disabled {
         color: #${palette.base03};
       }
 
@@ -100,6 +119,22 @@ in
       }
 
       #custom-tailscale.unknown {
+        color: #${palette.base03};
+      }
+
+      #mpris{
+        padding: 0 20px;
+      }
+
+      #mpris.playing {
+        color: #${palette.base0B};
+      }
+
+      #mpris.paused {
+        color: #${palette.base0A};
+      }
+
+      #mpris.stopped {
         color: #${palette.base03};
       }
 
@@ -120,24 +155,26 @@ in
       {
         layer = "top";
         position = "top";
-        spacing = 4;
-        height = 24;
+        spacing = 0;
+        height = 28;
         modules-left = [
           "niri/workspaces"
           "power-profiles-daemon"
+          "mpris"
         ];
         modules-center = [
           "clock"
         ];
         modules-right = [
-          "custom/dropbox"
           "custom/tailscale"
-          "bluetooth"
-          "network"
           "wireplumber"
-          "memory"
+          "bluetooth"
           "cpu"
+          "memory"
           "battery"
+          "network"
+          "custom/dropbox"
+          "tray"
         ];
         "niri/workspaces" = {
           on-click = "activate";
@@ -156,30 +193,45 @@ in
             active = "󱓻";
           };
           persistent-workspaces = {
-            "1" = [ ];
-            "2" = [ ];
-            "3" = [ ];
+            "1" = [ "Default" ];
+            "2" = [ "Dev" ];
+            "3" = [ "Steam" ];
             "4" = [ ];
             "5" = [ ];
           };
         };
-        cpu = {
-          interval = 5;
-          format = "󰍛 {usage}%";
-          format-alt = "󰍛";
-          on-click-right = "${terminal} -e btop";
-          tooltip = true;
-          tooltip-format = "CPU: {usage}%\nLoad: {load}";
+
+        mpris = {
+          interval = 1;
+          format = "{player_icon} {status_icon} {dynamic}";
+          format-paused = "{player_icon} {status_icon} <i>{dynamic}</i>";
+          format-stopped = "";
+          tooltip-format = "{player_icon} {status_icon}\n{dynamic}\nLength: {length}";
+          player-icons = {
+            default = "♪";
+            spotify_player = "󰓇";
+          };
+          status-icons = {
+            paused = "󰏤";
+            playing = "󰐊";
+            stopped = "󰙦";
+          };
+          dynamic-len = 30;
+          dynamic-order = [ "title" "artist" ];
+          dynamic-separator = " - ";
+          on-click = "playerctl play-pause";
+          on-click-right = "playerctl next";
+          on-click-middle = "playerctl previous";
         };
         clock = {
-          format = "{:%A %H:%M}";
+          format = "{:%A %d %B %h:%M}";
           format-alt = "{:%d %B W%V %Y}";
           tooltip = false;
         };
         network = {
           format-icons = [ "󰤯" "󰤟" "󰤢" "󰤥" "󰤨" ];
           format = "{icon}";
-          format-wifi = "{icon} ({frequency} GHz)";
+          format-wifi = "{icon}";
           format-ethernet = "󰀂";
           format-disconnected = "󰖪";
           tooltip-format-wifi = "{essid} ({frequency} GHz)\n⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}";
@@ -246,11 +298,17 @@ in
           ignored-sinks = [ "Easy Effects Sink" ];
         };
         memory = {
-          interval = 5;
-          format = " {percentage:>50.0f}%";
-          format-alt = " {used:0.1f}G/{total:0.1f}G";
+          interval = 4;
+          format = "M{percentage:>02}%";
           tooltip = true;
           tooltip-format = "Memory: {used:0.1f}GB / {total:0.1f}GB\nSwap: {swapUsed:0.1f}GB / {swapTotal:0.1f}GB";
+        };
+        cpu = {
+          interval = 2;
+          format = "C{usage:>02}%";
+          on-click-right = "${terminal} -e btop";
+          tooltip = true;
+          tooltip-format = "CPU: {usage}%\nLoad: {load}";
         };
         power-profiles-daemon = {
           format = "{icon} {profile}";
@@ -271,13 +329,19 @@ in
           tooltip = true;
         };
         "custom/tailscale" = {
-          format = "{icon}";
+          format = "󰛴 {text}";
           return-type = "json";
           exec = "${./waybar-tailscale}";
           on-click = "tailscale ip -4 | wl-copy";
           on-click-right = "tailscale ip -6 | wl-copy";
-          interval = 10;
+          tooltip-format = "{tooltip}";
+          interval = 5;
           tooltip = true;
+        };
+
+        "tray" = {
+          icon-size = 14;
+          spacing = 5;
         };
       }
     ];
