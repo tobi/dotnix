@@ -7,4 +7,5 @@ in
 {
   inherit name variant;
   palette = colorScheme.palette;
+  systemFont = "Inter";
 }

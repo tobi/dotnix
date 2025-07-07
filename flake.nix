@@ -5,7 +5,6 @@
     { self
     , nixpkgs
     , home-manager
-    , niri
     , nix-colors
     , ...
     } @inputs:
@@ -42,13 +41,10 @@
           system = "x86_64-linux";
           pkgs = mkPkgs "x86_64-linux";
           specialArgs = {
-            inherit inputs theme home-manager nix-colors niri;
-            modules-home = [
-              ./home/home.nix
-            ];
+            inherit inputs theme home-manager;
           };
           modules = [
-            ./machines/zerg-wsl2/configuration.nix
+            ./modules/machines/zerg-wsl2/configuration.nix
           ];
         };
 
@@ -58,14 +54,10 @@
           system = "x86_64-linux";
           pkgs = mkPkgs "x86_64-linux";
           specialArgs = {
-            inherit inputs theme home-manager nix-colors niri;
-            modules-home = [
-              ./home/home.nix
-              ./desktop/desktop.nix
-            ];
+            inherit inputs theme home-manager;
           };
           modules = [
-            ./machines/usb-stick/configuration.nix
+            ./modules/machines/usb-stick/configuration.nix
           ];
         };
 
@@ -73,14 +65,10 @@
           system = "x86_64-linux";
           pkgs = mkPkgs "x86_64-linux";
           specialArgs = {
-            inherit inputs theme home-manager nix-colors niri;
-            modules-home = [
-              ./home/home.nix
-              ./desktop/desktop.nix
-            ];
+            inherit inputs theme home-manager;
           };
           modules = [
-            ./machines/frameling/configuration.nix
+            ./modules/machines/frameling/configuration.nix
           ];
         };
       };
@@ -88,22 +76,24 @@
       # ------------------------------------------------------------
       # Home Manager configurations
       # ------------------------------------------------------------
-      homeConfigurations = forEachSystem (system: {
-        "tobi" = home-manager.lib.homeManagerConfiguration {
-          inherit system;
-          modules = [ ./home/home.nix ];
-        };
-      });
+      homeConfigurations = forEachSystem
+        (system: {
+          "tobi" = home-manager.lib.homeManagerConfiguration {
+            inherit system;
+            modules = [ ./modules/home-manager/home.nix ];
+          };
+        });
 
 
       # ------------------------------------------------------------
       # Development shell (nix develop .)
       # ------------------------------------------------------------
       # Development shells for both systems
-      devShells = forEachSystem (system:
-        let devConfig = import ./devshell.nix { inherit nixpkgs system; };
-        in devConfig.devShells.${system}
-      );
+      devShells = forEachSystem
+        (system:
+          let devConfig = import ./devshell.nix { inherit nixpkgs system; };
+          in devConfig.devShells.${system}
+        );
 
     };
 
