@@ -7,32 +7,35 @@ A clean, modular NixOS configuration system with cross-platform home-manager dot
 ### Directory Structure
 
 ```
-├── config/              # Global configuration files
-│   ├── niri/           # Window manager configuration
-│   └── themes.nix      # Centralized theming system
-├── desktop/            # Desktop-specific configurations
-│   ├── apps/          # Individual application modules
-│   └── desktop.nix    # Main desktop configuration
-├── home/              # Cross-platform home-manager dotfiles
-│   ├── bin/           # Personal scripts and utilities
-│   ├── modules/       # Home-manager module definitions
-│   └── home.nix       # Core home configuration
-├── machines/          # Machine-specific configurations
-│   ├── frameling/     # Desktop workstation
-│   ├── usb-stick/     # Live USB configuration
-│   ├── zerg-wsl2/     # WSL2 configuration
-│   └── user.nix       # Centralized user management
-├── devshell.nix       # Development environment
-└── flake.nix          # Main flake configuration
+├── bin/                        # Utility scripts (fix-audio, mdget, etc.)
+├── config/                     # Global configuration files
+│   ├── niri/                  # Window manager configuration
+│   ├── secrets/               # Age encrypted secrets
+│   └── themes.nix             # Centralized theming system
+├── modules/                    # All modular configurations
+│   ├── home-manager/          # Home-manager modules
+│   │   ├── apps/             # Individual application modules
+│   │   ├── desktop.nix       # Desktop environment imports
+│   │   └── home.nix          # Core home configuration
+│   ├── machines/              # Machine-specific configurations
+│   │   ├── frameling/        # Desktop workstation
+│   │   ├── usb-stick/        # Live USB configuration
+│   │   └── zerg-wsl2/        # WSL2 configuration
+│   └── nixos/                 # NixOS system modules
+│       ├── dot.nix           # dotnix options definition
+│       ├── niri.nix          # Niri window manager config
+│       └── user.nix          # Centralized user management
+├── devshell.nix               # Development environment
+└── flake.nix                  # Main flake configuration
 ```
 
 ### Key Features
 
-- **Modular Design**: Apps organized in `desktop/apps/` for easy management
+- **Modular Design**: All modules organized under `modules/` directory
 - **Centralized Theming**: Single theme configuration in `config/themes.nix`
 - **Cross-Platform**: Home-manager configs work on both NixOS and macOS
 - **Clean Architecture**: No helper functions, direct nixpkgs.lib.nixosSystem usage
-- **Flexible User Management**: Machine-specific user config via `machines/user.nix`
+- **Flexible Configuration**: Use `dotnix` options to enable/disable features
 
 ## 🚀 Quick Start
 
@@ -74,45 +77,41 @@ A clean, modular NixOS configuration system with cross-platform home-manager dot
 
 ### Adding a New Machine
 
-1. Create machine directory: `machines/your-machine/`
+1. Create machine directory: `modules/machines/your-machine/`
 2. Add `configuration.nix` and `hardware-configuration.nix`
-3. Update `flake.nix` with new nixosConfiguration:
+3. Import `../../nixos/user.nix` in your configuration.nix
+4. Set `dotnix.desktop.enable = true` if you want a desktop environment
+5. Update `flake.nix` with new nixosConfiguration:
 
 ```nix
 "your-machine" = nixpkgs.lib.nixosSystem {
   system = "x86_64-linux";
   pkgs = mkPkgs "x86_64-linux";
   specialArgs = {
-    inherit inputs theme home-manager niri nix-colors;
-    modules-home = [
-      ./home/home.nix
-      # Add ./desktop/desktop.nix for desktop environments
-    ];
+    inherit inputs theme home-manager;
   };
   modules = [
-    ./machines/your-machine/configuration.nix
-    determinate.nixosModules.default
+    ./modules/machines/your-machine/configuration.nix
   ];
 };
 ```
 
 ## 🏠 Home Configuration
 
-The `home/` directory contains cross-platform dotfiles managed by home-manager:
+The `modules/home-manager/` directory contains cross-platform dotfiles:
 
 - **`home.nix`**: Core configuration (shell, git, editor, packages)
-- **`modules/`**: Modular configurations (starship, fastfetch, etc.)
-- **`bin/`**: Personal scripts and utilities
+- **`desktop.nix`**: Desktop environment configuration
+- **`apps/`**: Individual application modules (alacritty, ghostty, etc.)
 
-### Home Modules Pattern
+### Configuration Pattern
 
-Home modules are specified via the `modules-home` pattern in flake.nix:
+Home modules are automatically loaded based on `dotnix` options:
 
 ```nix
-modules-home = [
-  ./home/home.nix           # Core configuration
-  ./desktop/desktop.nix     # Desktop apps (optional)
-];
+# In your machine configuration:
+dotnix.desktop.enable = true;  # Loads desktop environment
+dotnix.home.enable = true;     # Loads base home configuration (default)
 ```
 
 ## 🎨 Theming
@@ -122,6 +121,7 @@ The theming system is centralized in `config/themes.nix`:
 - Based on nix-colors for consistent color schemes
 - Currently uses Tokyo Night Dark theme
 - Easy to switch themes by modifying the `name` variable
+- Provides `palette`, `variant`, and `systemFont` attributes
 
 ## 🛠️ Development
 
@@ -140,8 +140,8 @@ nixos-rebuild build-vm --flake .#frameling
 
 ### Adding Applications
 
-1. Create module in `desktop/apps/your-app.nix`
-2. Import in `desktop/desktop.nix`
+1. Create module in `modules/home-manager/apps/your-app.nix`
+2. Import in `modules/home-manager/desktop.nix`
 3. Applications automatically receive `theme` parameter for styling
 
 ## 📦 Build Outputs
@@ -159,7 +159,8 @@ nixos-rebuild build-vm --flake .#frameling
 
 ## 📝 Notes
 
-- This configuration uses the `modules-home` pattern for clean home-manager integration
-- User configuration is centralized in `machines/user.nix`
-- Desktop applications are organized in `desktop/apps/` for modularity
+- This configuration uses NixOS module options for clean conditional loading
+- User configuration is centralized in `modules/nixos/user.nix`
+- All modules are organized under `modules/` for clear separation
+- Utility scripts are available in the top-level `bin/` directory
 - All configurations use the simplified flake architecture without helper functions

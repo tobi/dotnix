@@ -14,50 +14,55 @@ This is a **clean, modern NixOS flake configuration** with the following key pri
 
 ### Directory Structure
 ```
-├── config/              # Global configuration files
-│   ├── niri/config.kdl # Window manager config (referenced globally)
-│   └── themes.nix      # Centralized theme system
-├── desktop/            # Desktop environment
-│   ├── apps/          # Individual app modules (alacritty, niri, etc.)
-│   └── desktop.nix    # Main desktop imports
-├── home/              # Cross-platform dotfiles
-│   └── home.nix       # Core home-manager config
-├── machines/          # Machine-specific configurations
-│   ├── frameling/     # Desktop workstation
-│   ├── zerg-wsl2/     # WSL2 development
-│   ├── usb-stick/     # Live USB/installer
-│   └── user.nix       # Centralized user management
-└── flake.nix          # Main flake (no lib/common.nix!)
+├── bin/                        # Utility scripts (fix-audio, mdget, etc.)
+├── config/                     # Global configuration files
+│   ├── niri/config.kdl        # Window manager config (referenced globally)
+│   ├── secrets/               # Age encrypted secrets
+│   └── themes.nix             # Centralized theme system
+├── modules/                    # All modular configurations
+│   ├── home-manager/          # Home-manager modules
+│   │   ├── apps/             # Individual app modules (alacritty, niri, etc.)
+│   │   ├── desktop.nix       # Desktop environment imports
+│   │   └── home.nix          # Core home configuration
+│   ├── machines/              # Machine-specific configurations
+│   │   ├── frameling/        # Desktop workstation
+│   │   ├── zerg-wsl2/        # WSL2 development
+│   │   └── usb-stick/        # Live USB/installer
+│   └── nixos/                 # NixOS system modules
+│       ├── dot.nix           # dotnix options definition
+│       ├── niri.nix          # Niri window manager config
+│       └── user.nix          # Centralized user management
+└── flake.nix                  # Main flake (no lib/common.nix!)
 ```
 
 ## 🔧 Key Patterns
 
-### modules-home Pattern
-The `modules-home` attribute in specialArgs defines which home-manager modules to load:
+### dotnix Options Pattern
+Instead of the complex `modules-home` pattern, we now use NixOS module options:
 
 ```nix
 "frameling" = nixpkgs.lib.nixosSystem {
   specialArgs = {
-    inherit inputs theme home-manager niri nix-colors;
-    modules-home = [
-      ./home/home.nix           # Always included
-      ./desktop/desktop.nix     # Desktop environments only
-    ];
+    inherit inputs theme home-manager;
   };
   modules = [
-    ./machines/frameling/configuration.nix
-    determinate.nixosModules.default
+    ./modules/machines/frameling/configuration.nix
   ];
 };
 ```
 
+The configuration enables desktop features via:
+```nix
+dotnix.desktop.enable = true;  # Enables desktop environment
+```
+
 ### User Management
-- `machines/user.nix` handles user creation + home-manager setup
-- Imported by each machine's configuration.nix
-- Machine-specific user settings (groups, SSH keys) added in machine configs
+- `modules/nixos/user.nix` handles user creation + home-manager setup
+- Automatically imports appropriate modules based on `dotnix` options
+- Machine configurations only need to import `../../nixos/user.nix`
 
 ### Theme System
-- `config/themes.nix` exports theme with `palette` and `variant` attributes
+- `config/themes.nix` exports theme with `palette`, `variant`, and `systemFont` attributes
 - Desktop apps receive `theme` parameter for styling
 - Based on nix-colors for consistency
 
@@ -104,29 +109,30 @@ The `modules-home` attribute in specialArgs defines which home-manager modules t
 
 ### What TO do:
 - ✅ Use direct `nixpkgs.lib.nixosSystem` calls
-- ✅ Pass modules-home via specialArgs
+- ✅ Use dotnix options for conditional module loading
 - ✅ Keep machine configs focused on hardware/system settings
-- ✅ Use centralized user.nix for user management
-- ✅ Organize desktop apps in desktop/apps/
+- ✅ Use centralized modules/nixos/user.nix for user management
+- ✅ Organize desktop apps in modules/home-manager/apps/
 - ✅ Keep configurations clean and minimal
 
 ## 🔍 Common Tasks
 
 ### Adding a New Application
-1. Create `desktop/apps/your-app.nix`
-2. Add import to `desktop/desktop.nix`
+1. Create `modules/home-manager/apps/your-app.nix`
+2. Add import to `modules/home-manager/desktop.nix`
 3. Use `theme` parameter for styling: `{ pkgs, theme, ... }`
 
 ### Adding a New Machine
-1. Create `machines/your-machine/configuration.nix`
-2. Import `../user.nix` in the configuration
+1. Create `modules/machines/your-machine/configuration.nix`
+2. Import `../../nixos/user.nix` in the configuration
 3. Add machine to flake.nix nixosConfigurations
-4. Set appropriate `modules-home` list
+4. Set `dotnix.desktop.enable = true` if it needs a desktop environment
 
 ### Modifying Themes
 - Edit `config/themes.nix` to change the theme name
 - Theme automatically propagates to all desktop apps
 - Apps access colors via `theme.palette.base0X`
+- System font available via `theme.systemFont`
 
 ## 🛠️ Development Commands
 
@@ -151,29 +157,34 @@ nix build .#nixosConfigurations.usb-stick.config.system.build.isoImage
 
 ### flake.nix
 - Contains all nixosConfigurations directly (no lib imports)
-- Each machine specifies its own modules-home list
+- Simplified specialArgs without modules-home pattern
 - Theme configuration loaded once and passed to all machines
 
-### machines/user.nix
+### modules/nixos/user.nix
 - Handles all user creation and home-manager setup
-- Reads modules-home from specialArgs
-- Conditionally loads niri modules for desktop environments
+- Conditionally imports modules based on dotnix options
+- Manages desktop-specific environment variables and security settings
 
-### desktop/desktop.nix
-- Just imports from desktop/apps/
+### modules/nixos/dot.nix
+- Defines dotnix.home.enable and dotnix.desktop.enable options
+- Central place for configuration feature flags
+
+### modules/home-manager/desktop.nix
+- Just imports from apps/ subdirectory
 - No complex logic - pure import aggregation
 
 ### config/themes.nix
-- Returns theme object with palette and variant
+- Returns theme object with palette, variant, and systemFont
 - Based on nix-colors color schemes
 - Easy to modify by changing the `name` variable
 
 ## 🔄 Migration Notes
 
-This configuration recently underwent major simplification:
+This configuration recently underwent major restructuring:
 - Removed lib/common.nix and all helper functions
-- Moved from desktop/modules/ to desktop/apps/
-- Implemented modules-home pattern
-- Centralized user management in machines/user.nix
+- Reorganized all modules under modules/ directory
+- Replaced modules-home pattern with dotnix options
+- Moved utility scripts to top-level bin/ directory
+- Centralized NixOS modules in modules/nixos/
 
-The architecture is now much cleaner and more explicit.
+The architecture is now more modular and follows NixOS conventions.
