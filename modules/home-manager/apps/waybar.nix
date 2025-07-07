@@ -323,7 +323,7 @@ in
         "custom/dropbox" = {
           format = " {text}";
           return-type = "json";
-          exec = "${./waybar-dropbox}";
+          exec = "${./waybar/waybar-dropbox}";
           on-click = "${terminal} -e yazi ~/Dropbox";
           interval = 5;
           tooltip = true;
@@ -331,7 +331,7 @@ in
         "custom/tailscale" = {
           format = "󰛴 {text}";
           return-type = "json";
-          exec = "${./waybar-tailscale}";
+          exec = "${./waybar/waybar-tailscale}";
           on-click = "tailscale ip -4 | wl-copy";
           on-click-right = "tailscale ip -6 | wl-copy";
           tooltip-format = "{tooltip}";

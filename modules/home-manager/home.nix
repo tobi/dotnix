@@ -71,12 +71,12 @@ in
       bindkey -M emacs '^[[1;5C' forward-word
 
       echo
-      export PATH="$HOME/bin:$HOME/.local/bin:$HOME/dotnix/home/bin:${lib.optionalString isDarwin ":/opt/dev/bin"}:$PATH"
+      export PATH="$HOME/bin:$HOME/.local/bin:$HOME/dotnix/bin:${lib.optionalString isDarwin ":/opt/dev/bin"}:$PATH"
 
       # Trial function - creates trial directory and cd's into it
       trial() {
         local trial_dir
-        trial_dir=$($HOME/dotnix/home/bin/trial "$@")
+        trial_dir=$($HOME/dotnix/bin/trial "$@")
         if [[ -n "$trial_dir" && -d "$trial_dir" ]]; then
           cd "$trial_dir"
         fi
@@ -148,10 +148,8 @@ in
   programs.yazi.enable = true;
 
   imports = [
-    ./modules/fastfetch.nix
-    ./modules/starship.nix
+    ./apps/starship.nix
   ];
-
 
   # Essential packages organized by category
   home.packages = with pkgs; [

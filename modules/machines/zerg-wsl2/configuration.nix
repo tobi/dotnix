@@ -15,7 +15,7 @@
     inputs.determinate.nixosModules.default
 
     # user configuration
-    ../user.nix
+    ../../nixos/user.nix
   ];
 
   networking.hostName = "zerg-wsl2";

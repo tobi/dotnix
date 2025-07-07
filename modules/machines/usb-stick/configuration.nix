@@ -8,7 +8,7 @@
     (modulesPath + "/installer/cd-dvd/iso-image.nix")
 
     # user configuration
-    ../user.nix
+    ../../nixos/user.nix
 
     # base it on determinate nixos
     inputs.determinate.nixosModules.default

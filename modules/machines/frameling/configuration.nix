@@ -6,7 +6,8 @@
     ./hardware-configuration.nix
 
     # user configuration
-    ../user.nix
+    ../../nixos/user.nix
+    ../../nixos/niri.nix
 
     # base it on determinate nixos
     inputs.determinate.nixosModules.default
@@ -19,9 +20,10 @@
 
   # System Configuration
   networking.hostName = "frameling";
-  time.timeZone = "America/Toronto";
 
   system.stateVersion = "25.11";
+
+  time.timeZone = "America/Toronto";
 
   # Nix Settings
   nix.settings = {
@@ -54,27 +56,6 @@
     };
   };
 
-  # Environment variables for proper GUI app support
-  environment.sessionVariables = {
-    # Ensure GUI apps work with Wayland (with X11 fallback)
-    GDK_BACKEND = "wayland,x11";
-    QT_QPA_PLATFORM = "wayland;xcb";
-    QT_STYLE_OVERRIDE = "kvantum";
-
-    # Wayland-specific settings
-    NIXOS_OZONE_WL = "1";
-    MOZ_ENABLE_WAYLAND = "1";
-    SDL_VIDEODRIVER = "wayland";
-    WAYLAND_DISPLAY = "wayland-1";
-    OZONE_PLATFORM = "wayland";
-    ELECTRON_OZONE_PLATFORM_HINT = "wayland";
-  };
-
-  # Security wrapper for GUI ap
-  security.polkit.enable = true;
-  security.sudo.extraConfig = ''
-    Defaults env_keep += "WAYLAND_DISPLAY XDG_RUNTIME_DIR XDG_SESSION_TYPE GDK_BACKEND QT_QPA_PLATFORM"
-  '';
 
   # Networking
   networking = {
@@ -94,24 +75,12 @@
 
   # Programs
   programs = {
-    niri.enable = true;
-    xwayland.enable = true;
     nix-ld.enable = true;
-    dconf.enable = true;
     fuse.userAllowOther = true;
   };
 
-  # Display Manager
-  services.greetd = {
-    enable = true;
-    settings = {
-      default_session = {
-        command = "niri --session --config /home/tobi/dotnix/config/niri/config.kdl";
-        user = "tobi";
-      };
-    };
-  };
-
+  # enable niri
+  dotnix.desktop.enable = true;
 
   # Udev rules for FIDO2/WebAuthn devices
   services.udev.packages = [ pkgs.libfido2 ];
@@ -120,19 +89,8 @@
   services = {
     flatpak.enable = true;
     blueman.enable = true;
-    dbus.enable = true;
-    gnome.gnome-keyring.enable = true;
-    power-profiles-daemon.enable = true;
-    pulseaudio.enable = false;
     seatd.enable = true;
     openssh.enable = true;
-    pipewire = {
-      enable = true;
-      alsa.enable = true;
-      pulse.enable = true;
-      jack.enable = true;
-      wireplumber.enable = true;
-    };
     tailscale.enable = true;
     printing.enable = true;
     chrony.enable = true;
@@ -165,14 +123,14 @@
     dedicatedServer.openFirewall = true;
     localNetworkGameTransfers.openFirewall = true;
     gamescopeSession.enable = true;
-    
+
     # Fix font rendering issues
     extraCompatPackages = with pkgs; [
       liberation_ttf
       wqy_zenhei
       vistafonts
     ];
-    
+
     # Add 32-bit libraries including video codecs
     extraPackages = with pkgs; [
       libgdiplus
@@ -260,7 +218,6 @@
     rsync
     htop
     iotop
-    neofetch
 
     # Audio
     pavucontrol

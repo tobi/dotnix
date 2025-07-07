@@ -1,4 +1,4 @@
-{ pkgs, theme, ... }:
+{ pkgs, ... }:
 {
 
   home.packages = with pkgs; [
@@ -26,9 +26,6 @@
     spotify-player
   ];
 
-  programs.vscode.enable = true;
-  programs.fuzzel.enable = true;
-
   # probably should go to home
   programs.gh = {
     enable = true;
@@ -55,38 +52,20 @@
     switch = "sudo nixos-rebuild switch --flake ~/dotnix && source ~/.zshrc";
   };
 
-  dconf.settings = {
-    "org/gnome/desktop/interface" = {
-      color-scheme = "prefer-${theme.variant}";
-    };
-  };
-
-  gtk = {
-    enable = true;
-    theme = {
-      name = "Adwaita-${theme.variant}";
-      package = pkgs.gnome-themes-extra;
-    };
-    gtk3.extraConfig = {
-      gtk-application-prefer-dark-theme = theme.variant == "dark";
-    };
-    gtk4.extraConfig = {
-      gtk-application-prefer-dark-theme = theme.variant == "dark";
-    };
-  };
-
   imports = [
-    ./apps/waybar
-    ./apps/ghostty
+    ./apps/waybar.nix
+    ./apps/ghostty.nix
     ./apps/alacritty.nix
-    ./apps/niri
+    ./apps/niri.nix
     ./apps/chatgpt.nix
     ./apps/chromium.nix
     ./apps/google-chrome.nix
-    ./apps/cursor
+    ./apps/cursor.nix
     ./apps/swaylock.nix
     ./apps/steam.nix
     ./apps/mako.nix
+    ./apps/gtk.nix
+    ./apps/fuzzel.nix
   ];
 }
 
