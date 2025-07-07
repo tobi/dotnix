@@ -1,0 +1,41 @@
+#!/bin/sh
+
+[[ -x /usr/bin/open ]] && exec /usr/bin/open $*
+
+# This script launches a .desktop application by searching through specified directories
+
+id="$(niri msg --json windows | jq -r "map(select((.app_id==\"$1\") or (.title|test(\"$1\")))); .id)[0]")"
+
+if niri msg action focus-window --id "$id" >/dev/null 2>&1; then
+  exit 0 # focus succeeded
+fi
+
+if [ -z "$1" ]; then # if no argument is provided, launch the desktop file
+  echo "Usage: $0 <desktop-file>"
+  exit 1
+fi
+
+# Convert input to lowercase
+input=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+
+# Directories to search for .desktop files
+search_dirs="
+  $HOME/.local/state/nix/profiles/home-manager/home-path/share/applications
+  $HOME/.nix-profile/share/applications
+  /usr/share/applications
+"
+
+# Search for the .desktop file
+for dir in $search_dirs; do
+  for file in "$dir"/*; do
+    # Convert filename to lowercase
+    filename=$(basename "$file" | tr '[:upper:]' '[:lower:]')
+    if [ "$filename" = "$input.desktop" ] || [ "$filename" = "$input" ]; then
+      echo "Opening xdg-open $file"
+      dex "$file"
+      exit 0
+    fi
+  done
+done
+
+echo "Error: $1.desktop not found in any of the specified directories."
