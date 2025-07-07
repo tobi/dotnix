@@ -85,7 +85,7 @@ in
       [ -f ~/.zshrc.local ] && echo "* Adding ~/.zshrc.local" && source ~/.zshrc.local
 
       # Show system info on shell startup
-      echo && fastfetch
+      echo && nitch
     '';
 
 
@@ -174,6 +174,7 @@ in
     mtr
     fswatch
     zstd
+    nitch
 
     # Development
     gnumake

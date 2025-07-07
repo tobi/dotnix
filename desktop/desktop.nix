@@ -3,7 +3,7 @@
 
   home.packages = with pkgs; [
     wbg
-    mako
+    libnotify
     rustdesk
     gcr
     gnome-themes-extra
@@ -22,6 +22,8 @@
     gnupg
     nil
     xdg-desktop-portal-gtk
+    playerctl
+    spotify-player
   ];
 
   programs.vscode.enable = true;

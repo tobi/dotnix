@@ -33,7 +33,7 @@
   networking.hostName = "nixos-live";
   networking.networkmanager.enable = true;
   # Disable wireless to avoid conflicts with NetworkManager
-  # networking.wireless.enable = lib.mkForce false;
+  networking.wireless.enable = lib.mkForce false;
   time.timeZone = "America/New_York";
 
   # Boot configuration to handle hardware issues

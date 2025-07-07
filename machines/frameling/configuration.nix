@@ -165,6 +165,28 @@
     dedicatedServer.openFirewall = true;
     localNetworkGameTransfers.openFirewall = true;
     gamescopeSession.enable = true;
+    
+    # Fix font rendering issues
+    extraCompatPackages = with pkgs; [
+      liberation_ttf
+      wqy_zenhei
+      vistafonts
+    ];
+    
+    # Add 32-bit libraries including video codecs
+    extraPackages = with pkgs; [
+      libgdiplus
+      ffmpeg
+      libva
+      libvdpau
+      gst_all_1.gstreamer
+      gst_all_1.gst-plugins-base
+      gst_all_1.gst-plugins-good
+      gst_all_1.gst-plugins-bad
+      gst_all_1.gst-plugins-ugly
+      gst_all_1.gst-libav
+      gst_all_1.gst-vaapi
+    ];
   };
 
   # XDG Portals
