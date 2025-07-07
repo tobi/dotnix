@@ -7,6 +7,7 @@
 {
   home.packages = with pkgs; [
     swaylock
+    sway-audio-idle-inhibit
   ];
   programs.swaylock = {
     enable = true;
@@ -59,18 +60,20 @@
   services.swayidle = {
     enable = true;
     timeouts = [
-
       {
-        timeout = 120; # 2 minutes
+        timeout = 120; # 2 minutes - turn off screens
         command = "${pkgs.niri}/bin/niri msg action power-off-monitors";
       }
       {
-        timeout = 180; # 3 minutes
-        command = "${pkgs.swaylock}/bin/swaylock";
+        timeout = 300; # 5 minutes - lock screen and then suspend
+        command = "${pkgs.swaylock}/bin/swaylock && systemctl suspend";
       }
+    ];
+    # Resume commands - turn monitors back on when activity is detected
+    events = [
       {
-        timeout = 600; # 10 minutes
-        command = "systemctl suspend";
+        event = "after-resume";
+        command = "${pkgs.niri}/bin/niri msg action power-on-monitors";
       }
     ];
   };

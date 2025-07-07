@@ -1,4 +1,10 @@
 { config, palette, ... }: {
+  # Environment variables
+  environment = {
+    NIXOS_OZONE_WL = "1";
+    DISPLAY = ":0";
+  };
+
   # Input device configuration
   input = {
     keyboard = {

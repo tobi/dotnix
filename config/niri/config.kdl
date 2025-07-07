@@ -105,6 +105,8 @@ spawn-at-startup "waybar"
 spawn-at-startup "xwayland-satellite"
 spawn-at-startup "alacritty"
 spawn-at-startup "wbg" "dotnix/desktop/wallpaper.jpg"
+spawn-at-startup "sway-audio-idle-inhibit"
+spawn-at-startup "swaylock"
 
 prefer-no-csd
 
@@ -202,14 +204,25 @@ window-rule {
     clip-to-geometry true
 }
 
+
 layer-rule {
     match namespace="^wallpaper$"
     place-within-backdrop true
 }
 
+// layer-rule {
+//     match namespace="^overlay$"
+//         window-open {
+//             duration-ms 350
+//             curve "ease-out-expo"
+//         }
+
+
+// }
+
 switch-events {
-    lid-close { spawn "notify-send" "The laptop lid is closed!"; }
-    lid-open { spawn "notify-send" "The laptop lid is open!"; }
+    //lid-close { spawn "notify-send" "The laptop lid is closed!"; }
+    //lid-open { spawn "notify-send" "The laptop lid is open!"; }
 }
 
 workspace "Default"
@@ -344,7 +357,6 @@ binds {
     Mod+Ctrl+R { reset-window-height; }
     Mod+F { maximize-column; }
     Mod+Shift+F { fullscreen-window; }
-
     Mod+Ctrl+F { expand-column-to-available-width; }
 
 
