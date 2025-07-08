@@ -78,7 +78,7 @@
       # ------------------------------------------------------------
       homeConfigurations = forEachSystem
         (system: {
-          "tobi" = home-manager.lib.homeManagerConfiguration {
+          default = home-manager.lib.homeManagerConfiguration {
             inherit system;
             modules = [ ./modules/home-manager/home.nix ];
           };
@@ -98,18 +98,19 @@
     };
 
   inputs = {
-    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0";
-    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
-    nixos-wsl.url = "github:nix-community/NixOS-WSL";
-    home-manager.url = "github:nix-community/home-manager/release-25.05";
-    niri.url = "github:sodiboo/niri-flake";
-    nix-colors.url = "github:misterio77/nix-colors";
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    nixos-grub-themes.url = "github:jeslie0/nixos-grub-themes";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    nixos-wsl.url = "github:nix-community/NixOS-WSL";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
+
+    home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    nixos-grub-themes.inputs.nixpkgs.follows = "nixpkgs";
+
+    niri.url = "github:sodiboo/niri-flake";
+    niri.inputs.nixpkgs.follows = "nixpkgs";
+
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    nix-colors.url = "github:misterio77/nix-colors";
   };
 
 }

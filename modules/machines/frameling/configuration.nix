@@ -1,7 +1,5 @@
-{ pkgs, inputs, ... }:
-let
-  grub-theme = (pkgs.callPackage ../../nixos/tokyo-night-grub.nix { });
-in
+{ pkgs, inputs, config, ... }:
+
 {
   imports = [
     # hardware configuration
@@ -10,9 +8,6 @@ in
     # user configuration
     ../../nixos/user.nix
     ../../nixos/niri.nix
-
-    # base it on determinate nixos
-    inputs.determinate.nixosModules.default
 
     # use nixos-hardware package to get everything
     # dialed in for the framework laptop instead of doing it outselves.
@@ -31,7 +26,6 @@ in
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
-    lazy-trees = true;
   };
 
   nix.gc = {
@@ -43,21 +37,29 @@ in
   # Boot Configuration
   boot = {
     loader = {
+      systemd-boot.enable = true;
+      # systemd-boot.consoleMode = "max";
+      systemd-boot.configurationLimit = 6;
       efi.canTouchEfiVariables = true;
-      grub = {
-        enable = true;
-        device = "nodev";
-        efiSupport = true;
-        useOSProber = true;
-        enableCryptodisk = true;
-        configurationLimit = 3;
-        theme = grub-theme.tokyo-night;
-      };
     };
 
-    # consoleLogLevel = 3;
-    # initrd.verbose = false;
-    # kernelParams = [ "quiet" "splash" ];
+    # Quiet boot configuration
+    consoleLogLevel = 3;
+
+    # Plymouth for graphical boot
+    plymouth = {
+      enable = true;
+      theme = "cuts";
+      themePackages = with pkgs; [
+        # Use adi1090x themes which includes many options
+        (adi1090x-plymouth-themes.override {
+          selected_themes = [ "cuts" "hexagon_dots" ];
+        })
+      ];
+      # extraConfig = ''
+      #   # DeviceScale=1.5
+      # '';
+    };
 
     # we need latest kernel to deal with power issues
     kernelPackages = pkgs.linuxPackages_latest;
@@ -65,8 +67,28 @@ in
     kernel.sysctl = {
       "kernel.dmesg_restrict" = 0; # Allow non-root dmesg access
     };
+    kernelParams = [
+      "quiet"
+      "splash"
+      "boot.shell_on_fail"
+      "rd.systemd.show_status=auto"
+      "rd.udev.log_level=3"
+      "vt.global_cursor_default=0"
+    ];
+
+
+    # Configure initrd for smoother LUKS prompt
+    initrd = {
+      verbose = true;
+      systemd.enable = true; # Use systemd in initrd for better Plymouth integration
+    };
   };
 
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings.General.Experimental = true;
+  };
 
   # Networking
   networking = {

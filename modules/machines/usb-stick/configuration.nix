@@ -9,9 +9,6 @@
 
     # user configuration
     ../../nixos/user.nix
-
-    # base it on determinate nixos
-    inputs.determinate.nixosModules.default
   ];
 
   # ISO image settings

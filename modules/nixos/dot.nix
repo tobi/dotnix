@@ -15,6 +15,12 @@
         default = false;
         description = "Enable dotnix desktop configuration";
       };
+
+      assertions = [
+        (lib.hm.assertions.assertPlatform "dotnix.desktop only works on NixOS" pkgs lib.platforms.nixos)
+        (lib.hm.assertions.assertPlatform "dotnix.desktop only works on Linux" pkgs lib.platforms.linux)
+      ];
     };
   };
+
 }

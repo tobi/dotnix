@@ -11,9 +11,6 @@
     # include NixOS-WSL modules
     inputs.nixos-wsl.nixosModules.wsl
 
-    # base it on determinate nixos
-    inputs.determinate.nixosModules.default
-
     # user configuration
     ../../nixos/user.nix
   ];

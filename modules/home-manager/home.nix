@@ -108,12 +108,12 @@ in
       gd = "git diff";
       gdc = "git diff --cached";
 
+      # System management
+      reload = lib.mkDefault "home-manager switch --flake ~/dotnix#tobi && source $HOME/.zshrc";
+
       # Development
       b = "bundle exec";
 
-      # System management
-      reload = "home-manager switch --flake ~/dotnix#tobi && source $HOME/.zshrc";
-      dev = "nix develop ~/dotnix";
     } // lib.optionalAttrs pkgs.stdenv.isLinux {
       # Clipboard (macOS compatibility on Linux)
       pbcopy = "wl-copy";
