@@ -48,92 +48,81 @@ in
       # Colors - Base16 themed
       colors = {
         primary = {
-          background = "#${palette.base00}";
-          foreground = "#${palette.base05}";
+          background = "#${theme.background}";
+          foreground = "#${theme.foreground}";
         };
 
         cursor = {
-          text = "#${palette.base00}";
-          cursor = "#${palette.base05}";
+          text = "#${theme.background}";
+          cursor = "#${theme.foreground}";
         };
 
         vi_mode_cursor = {
-          text = "#${palette.base00}";
-          cursor = "#${palette.base05}";
+          text = "#${theme.background}";
+          cursor = "#${theme.foreground}";
         };
 
         search = {
           matches = {
-            foreground = "#${palette.base00}";
-            background = "#${palette.base0A}";
+            foreground = "#${theme.background}";
+            background = "#${theme.yellow}";
           };
           focused_match = {
-            foreground = "#${palette.base00}";
-            background = "#${palette.base09}";
+            foreground = "#${theme.background}";
+            background = "#${theme.orange}";
           };
         };
 
         footer_bar = {
-          foreground = "#${palette.base05}";
-          background = "#${palette.base00}";
+          foreground = "#${theme.foreground}";
+          background = "#${theme.background}";
         };
 
         hints = {
           start = {
-            foreground = "#${palette.base00}";
-            background = "#${palette.base0A}";
+            foreground = "#${theme.background}";
+            background = "#${theme.yellow}";
           };
           end = {
-            foreground = "#${palette.base00}";
-            background = "#${palette.base09}";
+            foreground = "#${theme.background}";
+            background = "#${theme.orange}";
           };
         };
 
         selection = {
-          text = "#${palette.base00}";
-          background = "#${palette.base02}";
+          text = "#${theme.background}";
+          background = "#${theme.selectionBg}";
         };
 
         normal = {
-          black = "#${palette.base00}";
-          red = "#${palette.base08}";
-          green = "#${palette.base0B}";
-          yellow = "#${palette.base0A}";
-          blue = "#${palette.base0D}";
-          magenta = "#${palette.base0E}";
-          cyan = "#${palette.base0C}";
-          white = "#${palette.base05}";
+          black = "#${theme.ansi.black}";
+          red = "#${theme.ansi.red}";
+          green = "#${theme.ansi.green}";
+          yellow = "#${theme.ansi.yellow}";
+          blue = "#${theme.ansi.blue}";
+          magenta = "#${theme.ansi.magenta}";
+          cyan = "#${theme.ansi.cyan}";
+          white = "#${theme.ansi.white}";
         };
 
         bright = {
-          black = "#${palette.base03}";
-          red = "#${palette.base08}";
-          green = "#${palette.base0B}";
-          yellow = "#${palette.base0A}";
-          blue = "#${palette.base0D}";
-          magenta = "#${palette.base0E}";
-          cyan = "#${palette.base0C}";
-          white = "#${palette.base07}";
-        };
-
-        dim = {
-          black = "#${palette.base01}";
-          red = "#${palette.base08}";
-          green = "#${palette.base0B}";
-          yellow = "#${palette.base0A}";
-          blue = "#${palette.base0D}";
-          magenta = "#${palette.base0E}";
-          cyan = "#${palette.base0C}";
-          white = "#${palette.base06}";
+          black = "#${theme.ansi.brightBlack}";
+          red = "#${theme.ansi.brightRed}";
+          green = "#${theme.ansi.brightGreen}";
+          yellow = "#${theme.ansi.brightYellow}";
+          blue = "#${theme.ansi.brightBlue}";
+          magenta = "#${theme.ansi.brightMagenta}";
+          cyan = "#${theme.ansi.brightCyan}";
+          white = "#${theme.ansi.brightWhite}";
         };
 
         indexed_colors = [
-          { index = 16; color = "#${palette.base09}"; }
-          { index = 17; color = "#${palette.base0F}"; }
-          { index = 18; color = "#${palette.base01}"; }
-          { index = 19; color = "#${palette.base02}"; }
-          { index = 20; color = "#${palette.base04}"; }
-          { index = 21; color = "#${palette.base06}"; }
+          # { index = 16; color = "#${theme.orange}"; }
+          # { index = 17; color = "#${theme.brown}"; }
+          # { index = 18; color = "#${theme.backgroundAlt}"; }
+          # { index = 19; color = "#${theme.selectionBg}"; }
+          # { index = 20; color = "#${theme.foregroundAlt}"; }
+          # { index = 21; color = "#${theme.foregroundBright}"; }
         ];
       };
 

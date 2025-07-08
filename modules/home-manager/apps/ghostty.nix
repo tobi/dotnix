@@ -20,10 +20,10 @@ in
       font-size = 12;
 
       theme = "dotnix";
-      
+
       # GTK theme settings to avoid warnings
       gtk-theme-variant = theme.variant;
-      
+
       # Keep shell integration but disable problematic features
       shell-integration = "detect";
       shell-integration-features = "no-cursor,no-sudo";
