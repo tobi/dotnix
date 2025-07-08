@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, theme, ... }:
 {
 
   home.packages = with pkgs; [
@@ -50,7 +50,11 @@
 
   home.shellAliases = {
     switch = "sudo nixos-rebuild switch --flake ~/dotnix && source ~/.zshrc";
+    reload = "switch";
   };
+
+  # Symlink current theme wallpaper to ~/.config/wallpaper.jpg
+  home.file.".config/wallpaper.jpg".source = theme.wallpaper;
 
   imports = [
     ./apps/waybar.nix
