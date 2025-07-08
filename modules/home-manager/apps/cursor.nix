@@ -7,7 +7,7 @@
   ];
 
   home.file.".local/bin/cursor" = {
-    source = ./cursor;
+    source = ./cursor/cursor;
     executable = true;
   };
 
@@ -16,9 +16,12 @@
     name = "Cursor";
     comment = "Launch the latest Cursor AppImage";
     exec = "${pkgs.stdenv.shell} ${./cursor}";
-    icon = "cursor";
+    icon = "Cursor";
     terminal = false;
-    type = "Application";
-    categories = [ "Utility" ];
+    type = " Application ";
+    categories = [
+      "Utility"
+    ];
   };
 }
+

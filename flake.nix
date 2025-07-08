@@ -102,10 +102,14 @@
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
     niri.url = "github:sodiboo/niri-flake";
     nix-colors.url = "github:misterio77/nix-colors";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    nixos-grub-themes.url = "github:jeslie0/nixos-grub-themes";
+
+    nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    nixos-grub-themes.inputs.nixpkgs.follows = "nixpkgs";
   };
 
 }

@@ -9,25 +9,15 @@
       (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "thunderbolt" "usb_storage" "uas" "sd_mod" ];
+  boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "thunderbolt" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
 
-  boot.initrd.luks.devices."cryptroot".device = "/dev/disk/by-uuid/95d1bea6-669c-4317-a952-9d6a09ba0272";
-
   fileSystems."/" =
     {
-      device = "/dev/disk/by-uuid/8fa74c8c-9891-4a7e-9b48-b5dfa6016a32";
-      fsType = "btrfs";
-      options = [ "subvol=local" "noatime" ];
-    };
-
-  fileSystems."/home" =
-    {
-      device = "/dev/disk/by-uuid/8fa74c8c-9891-4a7e-9b48-b5dfa6016a32";
-      fsType = "btrfs";
-      options = [ "subvol=safe" "compress=zstd" "noatime" ];
+      device = "/dev/disk/by-uuid/2284f472-82f2-42d7-8038-920cda0d7564";
+      fsType = "ext4";
     };
 
   fileSystems."/boot" =
@@ -37,14 +27,28 @@
       options = [ "fmask=0077" "dmask=0077" "uid=0" "gid=0" ];
     };
 
+  swapDevices = [
+    { device = "/swapfile16"; }
+  ];
 
-  swapDevices = [ ];
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings.General.Experimental = true;
+  };
+
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
   # still possible to use this option, but it's recommended to use it in conjunction
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
   networking.useDHCP = lib.mkDefault true;
+  # networking.interfaces.enp195s0f0u2.useDHCP = lib.mkDefault true;
+  # networking.interfaces.enp195s0f3u1u3.useDHCP = lib.mkDefault true;
   # networking.interfaces.wlp192s0.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

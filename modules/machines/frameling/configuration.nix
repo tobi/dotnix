@@ -1,5 +1,7 @@
 { pkgs, inputs, ... }:
-
+let
+  grub-theme = (pkgs.callPackage ../../nixos/tokyo-night-grub.nix { });
+in
 {
   imports = [
     # hardware configuration
@@ -41,18 +43,27 @@
   # Boot Configuration
   boot = {
     loader = {
-      systemd-boot.enable = true;
-      systemd-boot.consoleMode = "2"; # First non-standard mode - higher resolution
-      systemd-boot.configurationLimit = 10;
       efi.canTouchEfiVariables = true;
+      grub = {
+        enable = true;
+        device = "nodev";
+        efiSupport = true;
+        useOSProber = true;
+        enableCryptodisk = true;
+        configurationLimit = 3;
+        theme = grub-theme.tokyo-night;
+      };
     };
+
+    # consoleLogLevel = 3;
+    # initrd.verbose = false;
+    # kernelParams = [ "quiet" "splash" ];
 
     # we need latest kernel to deal with power issues
     kernelPackages = pkgs.linuxPackages_latest;
 
     kernel.sysctl = {
       "kernel.dmesg_restrict" = 0; # Allow non-root dmesg access
-      "vm.swappiness" = 10; # Reduce swap usage
     };
   };
 
@@ -66,6 +77,7 @@
       allowedUDPPorts = [ ];
     };
   };
+
   # Add ZRAM for better memory management
   zramSwap = {
     enable = true;
@@ -81,6 +93,9 @@
 
   # enable niri
   dotnix.desktop.enable = true;
+
+  # Create plugdev group for U2F/FIDO2 devices
+  users.groups.plugdev = { };
 
   # Udev rules for FIDO2/WebAuthn devices
   services.udev.packages = [ pkgs.libfido2 ];

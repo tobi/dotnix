@@ -342,9 +342,9 @@ binds {
     Super+Shift+Return { spawn "ghostty"; }
     Super+Return { spawn "alacritty"; }
 
-    Super+X { spawn "~/dotnix/home/bin/open" "cursor"; }
-    Super+C { spawn "~/dotnix/home/bin/open" "google-chrome"; }
-    Super+A { spawn "~/dotnix/home/bin/open" "chatgpt"; }
+    Super+X { spawn "~/dotnix/bin/open" "cursor"; }
+    Super+C { spawn "~/dotnix/bin/open" "google-chrome"; }
+    Super+A { spawn "~/dotnix/bin/open" "chatgpt"; }
 
     Mod+Tab { focus-workspace-previous; }
 
