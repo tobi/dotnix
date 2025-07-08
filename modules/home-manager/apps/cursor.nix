@@ -18,7 +18,7 @@
     exec = "${pkgs.stdenv.shell} ${./cursor}";
     icon = "Cursor";
     terminal = false;
-    type = " Application ";
+    type = "Application";
     categories = [
       "Utility"
     ];
