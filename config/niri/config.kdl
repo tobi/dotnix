@@ -101,12 +101,12 @@ cursor {
     hide-when-typing
 }
 
+spawn-at-startup "swaylock"
 spawn-at-startup "waybar"
 spawn-at-startup "xwayland-satellite"
-spawn-at-startup "alacritty"
-spawn-at-startup "wbg" "dotnix/desktop/wallpaper.jpg"
+spawn-at-startup "wbg" ".config/wallpaper.jpg"
 spawn-at-startup "sway-audio-idle-inhibit"
-spawn-at-startup "swaylock"
+spawn-at-startup "alacritty"
 
 prefer-no-csd
 

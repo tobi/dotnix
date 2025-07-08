@@ -4,7 +4,7 @@
 status=$(tailscale status --json 2>/dev/null)
 
 if [ $? -ne 0 ] || [ -z "$status" ]; then
-  echo '{"text": "󰖪", "tooltip": "Tailscale not running", "class": "stopped"}'
+  echo '{"text": "󰖪", "tooltip": "Tailscale not running", "class": "disconnected"}'
   exit 0
 fi
 
@@ -29,7 +29,7 @@ case "$backend_state" in
 "Stopped")
   icon="󰅛"
   tooltip="Tailscale: Stopped"
-  class="stopped"
+  class="disconnected"
   ;;
 "Starting")
   icon="󰔟"
@@ -48,4 +48,4 @@ case "$backend_state" in
   ;;
 esac
 
-echo "{\"icon\": \"$icon\", \"text\": \"$icon\", \"tooltip\": \"$tooltip\", \"class\": \"$class\"}"
+echo "{\"text\": \"$icon\", \"tooltip\": \"$tooltip\", \"class\": \"$class\"}"

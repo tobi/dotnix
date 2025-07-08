@@ -94,12 +94,9 @@ in
         color: yellow;
       }
 
-      #battery.critical:not(.charging) {
+      #battery.critical:not(.charging). .disconneted {
         color: red;
-      }
-
-      .disconnected {
-        color: #${palette.base08};
+        animation: pulse 10s ease-in-out infinite;
       }
 
       .muted {
@@ -166,15 +163,15 @@ in
           "clock"
         ];
         modules-right = [
-          "custom/tailscale"
           "wireplumber"
-          "bluetooth"
           "cpu"
           "memory"
-          "battery"
           "network"
+          "bluetooth"
+          "custom/tailscale"
           "custom/dropbox"
           "tray"
+          "battery"
         ];
         "niri/workspaces" = {
           on-click = "activate";
@@ -224,7 +221,7 @@ in
           on-click-middle = "playerctl previous";
         };
         clock = {
-          format = "{:%A %d %B %h:%M}";
+          format = "{:%A %d %B - %I:%M%p}";
           format-alt = "{:%d %B W%V %Y}";
           tooltip = false;
         };
@@ -278,8 +275,8 @@ in
           tooltip-format-discharging = "{power:>1.1f} watt↓ {capacity}%";
           tooltip-format-charging = "{power:>1.1f} watt↑ {capacity}%";
           states = {
-            warning = 20;
-            critical = 10;
+            warning = 25;
+            critical = 15;
           };
         };
         bluetooth = {
@@ -329,12 +326,11 @@ in
           tooltip = true;
         };
         "custom/tailscale" = {
-          format = "󰛴 {text}";
+          format = "{text}";
           return-type = "json";
           exec = "${./waybar/waybar-tailscale}";
           on-click = "tailscale ip -4 | wl-copy";
           on-click-right = "tailscale ip -6 | wl-copy";
-          tooltip-format = "{tooltip}";
           interval = 5;
           tooltip = true;
         };
