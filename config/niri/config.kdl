@@ -4,7 +4,6 @@ input {
         xkb {
             options "caps:super"
         }
-
         repeat-delay 400
         repeat-rate 40
         numlock
@@ -210,19 +209,9 @@ layer-rule {
     place-within-backdrop true
 }
 
-// layer-rule {
-//     match namespace="^overlay$"
-//         window-open {
-//             duration-ms 350
-//             curve "ease-out-expo"
-//         }
-
-
-// }
-
 switch-events {
-    //lid-close { spawn "notify-send" "The laptop lid is closed!"; }
-    //lid-open { spawn "notify-send" "The laptop lid is open!"; }
+    lid-close { spawn "swaylock "; }
+    lid-open { spawn "swaylock"; }
 }
 
 workspace "Default"
@@ -267,7 +256,6 @@ binds {
     Mod+Ctrl+K     { move-window-up; }
     Mod+Ctrl+L     { move-column-right; }
 
-
     Mod+Home { focus-column-first; }
     Mod+End  { focus-column-last; }
     Mod+Ctrl+Home { move-column-to-first; }
@@ -279,7 +267,6 @@ binds {
     Mod+Shift+Ctrl+BracketLeft  { move-column-to-monitor-left; }
     Mod+Shift+Ctrl+BracketRight { move-column-to-monitor-right; }
 
-
     Mod+Page_Down      { focus-workspace-down; }
     Mod+Page_Up        { focus-workspace-up; }
     Mod+Shift+Down     { focus-workspace-down; }
@@ -288,7 +275,6 @@ binds {
     Mod+Shift+Ctrl+Down     { move-workspace-down; }
     Mod+Shift+Ctrl+Up       { move-workspace-up; }
 
-
     Mod+U              { focus-workspace-down; }
     Mod+I              { focus-workspace-up; }
     Mod+Ctrl+Page_Down { move-column-to-workspace-down; }
@@ -296,12 +282,10 @@ binds {
     Mod+Ctrl+U         { move-column-to-workspace-down; }
     Mod+Ctrl+I         { move-column-to-workspace-up; }
 
-
     Mod+Shift+Page_Down { move-workspace-down; }
     Mod+Shift+Page_Up   { move-workspace-up; }
     Mod+Shift+U         { move-workspace-down; }
     Mod+Shift+I         { move-workspace-up; }
-
 
     Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
     Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
@@ -351,14 +335,12 @@ binds {
     Mod+BracketLeft  { consume-or-expel-window-left; }
     Mod+BracketRight { consume-or-expel-window-right; }
 
-
     Mod+R { switch-preset-column-width; }
     Mod+Shift+R { switch-preset-window-height; }
     Mod+Ctrl+R { reset-window-height; }
     Mod+F { maximize-column; }
     Mod+Shift+F { fullscreen-window; }
     Mod+Ctrl+F { expand-column-to-available-width; }
-
 
     Super+Comma { center-visible-columns; }
 
@@ -370,7 +352,6 @@ binds {
 
     Mod+V       { toggle-window-floating; }
     Mod+Shift+V { switch-focus-between-floating-and-tiling; }
-
 
     F12 { screenshot; }
     Mod+F12 { screenshot-screen; }
