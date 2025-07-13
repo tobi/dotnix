@@ -85,7 +85,7 @@ in
       [ -f ~/.zshrc.local ] && echo "* Adding ~/.zshrc.local" && source ~/.zshrc.local
 
       # Show system info on shell startup
-      echo && nitch
+      echo && ${lib.optionalString isLinux "nitch"}
     '';
 
 
@@ -110,9 +110,6 @@ in
 
       # System management
       reload = lib.mkDefault "home-manager switch --flake ~/dotnix#tobi && source $HOME/.zshrc";
-
-      # Development
-      b = "bundle exec";
 
     } // lib.optionalAttrs pkgs.stdenv.isLinux {
       # Clipboard (macOS compatibility on Linux)
@@ -172,7 +169,6 @@ in
     mtr
     fswatch
     zstd
-    nitch
 
     # Development
     gnumake
@@ -202,6 +198,7 @@ in
 
   ] ++ lib.optionals isLinux [
     sysz
+    nitch
   ];
 
 }

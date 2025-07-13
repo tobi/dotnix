@@ -76,13 +76,12 @@
       # ------------------------------------------------------------
       # Home Manager configurations
       # ------------------------------------------------------------
-      homeConfigurations = forEachSystem
-        (system: {
-          default = home-manager.lib.homeManagerConfiguration {
-            inherit system;
-            modules = [ ./modules/home-manager/home.nix ];
-          };
-        });
+      homeConfigurations = {
+        "tobi" = home-manager.lib.homeManagerConfiguration {
+          pkgs = mkPkgs "aarch64-darwin";
+          modules = [ ./modules/home-manager/home.nix ];
+        };
+      };
 
 
       # ------------------------------------------------------------
