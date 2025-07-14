@@ -9,8 +9,8 @@
   gtk = {
     enable = true;
     font = {
-      name = "Inter";
-      size = 12;
+      name = theme.systemFont;
+      size = 10;
     };
     theme = {
       name = "Adwaita-${theme.variant}";

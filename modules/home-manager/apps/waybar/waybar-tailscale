@@ -13,11 +13,10 @@ backend_state=$(echo "$status" | jq -r '.BackendState // "Unknown"')
 tailscale_ips=$(echo "$status" | jq -r '.TailscaleIPs[]?' | head -1)
 exit_node=$(echo "$status" | jq -r '.ExitNodeStatus.Online // false')
 peer_count=$(echo "$status" | jq '[.Peer[] | select(.Online == true)] | length')
-
 case "$backend_state" in
 "Running")
   if [ "$exit_node" = "true" ]; then
-    icon="󰛴"
+    icon="󰛴 (exit: $exit_node)"
     tooltip="Tailscale: Connected via exit node\nIP: $tailscale_ips\nOnline peers: $peer_count"
     class="exit-node"
   else

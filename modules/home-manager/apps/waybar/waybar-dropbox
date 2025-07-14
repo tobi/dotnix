@@ -11,7 +11,7 @@ case "$status" in
   echo '{"text": "", "tooltip": "'"$status"'", "class": "syncing"}'
   ;;
 "Not running")
-  echo '{"text": "", "tooltip": "Dropbox not running", "class": "stopped"}'
+  echo '{"text": "", "tooltip": "Dropbox not running", "class": "muted"}'
   ;;
 *)
   echo '{"text": "", "tooltip": "'"$status"'", "class": "unknown"}'

@@ -157,6 +157,7 @@ in
         modules-left = [
           "niri/workspaces"
           "power-profiles-daemon"
+          "custom/terminals"
           "mpris"
         ];
         modules-center = [
@@ -335,9 +336,12 @@ in
           tooltip = true;
         };
 
-        "tray" = {
-          icon-size = 14;
-          spacing = 5;
+        "custom/terminals" = {
+          format = "{text}";
+          return-type = "json";
+          exec = "${./waybar/waybar-count-terms}";
+          interval = 5;
+          tooltip = true;
         };
       }
     ];

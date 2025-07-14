@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Count alacritty terminals on tty1 and format for Waybar
+count=$(ps x | grep alacritty | grep tty1 | wc -l)
+
+case "$count" in
+0)
+  echo '{"text": "󰆍 0", "tooltip": "No terminals running", "class": "no-terms"}'
+  ;;
+1)
+  echo '{"text": "󰆍 1", "tooltip": "1 terminal running", "class": "one-term"}'
+  ;;
+*)
+  echo '{"text": "󰆍 '"$count"'", "tooltip": "'"$count"' terminals running", "class": "multi-terms"}'
+  ;;
+esac

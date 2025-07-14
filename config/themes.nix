@@ -1,6 +1,6 @@
 { nix-colors, ... }:
 let
-  name = "everforest";
+  name = "catppuccin-mocha";
   variant = "dark";
   colorScheme = nix-colors.colorSchemes.${name};
 

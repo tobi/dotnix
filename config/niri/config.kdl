@@ -210,8 +210,8 @@ layer-rule {
 }
 
 switch-events {
-    lid-close { spawn "swaylock "; }
-    lid-open { spawn "swaylock"; }
+    lid-close { spawn "swaylock --grace 0"; }
+    lid-open { spawn "swaylock --grace 0"; }
 }
 
 workspace "Default"
