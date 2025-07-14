@@ -51,11 +51,14 @@
     WAYLAND_DISPLAY = "wayland-1";
     OZONE_PLATFORM = "wayland";
     ELECTRON_OZONE_PLATFORM_HINT = "wayland";
+    
+    # XWayland for Steam and other X11 apps
+    DISPLAY = ":0";
   };
 
   # Security wrapper for GUI apps
   security.polkit.enable = true;
   security.sudo.extraConfig = ''
-    Defaults env_keep += "WAYLAND_DISPLAY XDG_RUNTIME_DIR XDG_SESSION_TYPE GDK_BACKEND QT_QPA_PLATFORM"
+    Defaults env_keep += "DISPLAY WAYLAND_DISPLAY XDG_RUNTIME_DIR XDG_SESSION_TYPE GDK_BACKEND QT_QPA_PLATFORM"
   '';
 }

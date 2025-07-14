@@ -15,8 +15,6 @@
     inputs.nixos-hardware.nixosModules.framework-amd-ai-300-series
   ];
 
-  # System Configuration
-  networking.hostName = "frameling";
 
   system.stateVersion = "25.11";
 
@@ -128,12 +126,15 @@
     blueman.enable = true;
     seatd.enable = true;
     openssh.enable = true;
-    tailscale.enable = true;
     printing.enable = true;
     chrony.enable = true;
     upower.enable = true;
     thermald.enable = true;
     fwupd.enable = true;
+
+    # Tailscale, this is needed for exit notes to to work
+    tailscale.enable = true;
+    tailscale.useRoutingFeatures = "client";
   };
 
   # Fix NTP startup dependencies
@@ -154,6 +155,7 @@
     binfmt = true;
   };
 
+  # Steam
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
@@ -215,6 +217,7 @@
     zsh
     bash
     fuse
+    xdg-user-dirs  # Fix Steam xdg-user-dir warnings
 
     # Terminals
     kitty
