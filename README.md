@@ -1,8 +1,26 @@
 # NixOS Dotfiles & Machine Configuration
 
-A clean, modular NixOS configuration system with cross-platform home-manager dotfiles.
+A clean, modern NixOS flake configuration with cross-platform home-manager dotfiles, designed for simplicity and modularity.
 
 ## 🏗️ Architecture
+
+This configuration follows a **clean architecture** with explicit patterns and no helper functions. Built around three core principles:
+
+1. **Explicit over implicit**: All configuration is visible in flake.nix
+2. **Modular organization**: Clean separation between system, home, and machine configs
+3. **Centralized theming**: Single source of truth for colors and fonts
+
+### How It Works
+
+The system uses **dotnix options** to conditionally load modules:
+
+```nix
+# In your machine configuration:
+dotnix.desktop.enable = true;  # Loads desktop environment
+dotnix.home.enable = true;     # Loads base home configuration (default)
+```
+
+This triggers the centralized user management system (`modules/nixos/user.nix`) to automatically import the appropriate home-manager modules based on what features are enabled.
 
 ### Directory Structure
 
@@ -31,11 +49,12 @@ A clean, modular NixOS configuration system with cross-platform home-manager dot
 
 ### Key Features
 
+- **No Helper Functions**: Direct use of `nixpkgs.lib.nixosSystem` for clarity
 - **Modular Design**: All modules organized under `modules/` directory
+- **Centralized User Management**: Single `modules/nixos/user.nix` handles all user setup
+- **dotnix Options Pattern**: Clean conditional loading instead of complex abstractions
 - **Centralized Theming**: Single theme configuration in `config/themes.nix`
 - **Cross-Platform**: Home-manager configs work on both NixOS and macOS
-- **Clean Architecture**: No helper functions, direct nixpkgs.lib.nixosSystem usage
-- **Flexible Configuration**: Use `dotnix` options to enable/disable features
 
 ## 🚀 Quick Start
 
@@ -98,21 +117,27 @@ A clean, modular NixOS configuration system with cross-platform home-manager dot
 
 ## 🏠 Home Configuration
 
-The `modules/home-manager/` directory contains cross-platform dotfiles:
+The `modules/home-manager/` directory contains cross-platform dotfiles that work on both NixOS and macOS:
 
 - **`home.nix`**: Core configuration (shell, git, editor, packages)
-- **`desktop.nix`**: Desktop environment configuration
+- **`desktop.nix`**: Desktop environment configuration (pure import aggregation)
 - **`apps/`**: Individual application modules (alacritty, ghostty, etc.)
 
-### Configuration Pattern
+### How User Management Works
 
-Home modules are automatically loaded based on `dotnix` options:
+Instead of complex abstractions, this system uses a centralized approach:
+
+1. **`modules/nixos/user.nix`**: Handles user creation + home-manager setup
+2. **Automatic imports**: Based on `dotnix` options, imports appropriate modules
+3. **Simple pattern**: Machine configs only need `import ../../nixos/user.nix`
 
 ```nix
 # In your machine configuration:
 dotnix.desktop.enable = true;  # Loads desktop environment
 dotnix.home.enable = true;     # Loads base home configuration (default)
 ```
+
+This automatically loads the right modules without duplication across machines.
 
 ## 🎨 Theming
 
@@ -122,6 +147,8 @@ The theming system is centralized in `config/themes.nix`:
 - Currently uses Tokyo Night Dark theme
 - Easy to switch themes by modifying the `name` variable
 - Provides `palette`, `variant`, and `systemFont` attributes
+- Desktop apps automatically receive `theme` parameter for styling
+- Theme propagates to all modules without manual configuration
 
 ## 🛠️ Development
 
@@ -144,6 +171,13 @@ nixos-rebuild build-vm --flake .#frameling
 2. Import in `modules/home-manager/desktop.nix`
 3. Applications automatically receive `theme` parameter for styling
 
+### Code Style Guidelines
+
+- **Imports first**: All imports at the top of files
+- **Configuration body**: Main logic in the middle
+- **Packages last**: Package lists at the end
+- **Minimal comments**: Remove verbose examples, keep essentials only
+
 ## 📦 Build Outputs
 
 - **NixOS ISO**: `nix build .#nixosConfigurations.usb-stick.config.system.build.isoImage`
@@ -157,10 +191,22 @@ nixos-rebuild build-vm --flake .#frameling
 - **Home-manager conflicts**: Ensure no duplicate module imports
 - **Theme issues**: Verify theme configuration in `config/themes.nix`
 
-## 📝 Notes
+## 📝 Design Philosophy
 
-- This configuration uses NixOS module options for clean conditional loading
-- User configuration is centralized in `modules/nixos/user.nix`
-- All modules are organized under `modules/` for clear separation
-- Utility scripts are available in the top-level `bin/` directory
-- All configurations use the simplified flake architecture without helper functions
+This configuration recently underwent major restructuring to achieve:
+
+### What We Avoid
+- ❌ Helper functions in lib/ directories
+- ❌ Complex `mkNixosSystem` or similar abstractions
+- ❌ Inline home-manager config in flake.nix
+- ❌ Duplicated user configuration across machines
+- ❌ Commented-out code or verbose examples
+
+### What We Use Instead
+- ✅ Direct `nixpkgs.lib.nixosSystem` calls for clarity
+- ✅ dotnix options for conditional module loading
+- ✅ Centralized `modules/nixos/user.nix` for user management
+- ✅ Clean module organization under `modules/` directory
+- ✅ Simple, explicit configuration patterns
+
+This creates a maintainable, understandable system that follows NixOS conventions without unnecessary complexity.
