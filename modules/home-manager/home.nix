@@ -161,14 +161,19 @@ in
     jq
     age
     gh
-    fastfetch
+    fswatch
+    zstd
 
     # System tools
     htop
     sysz
     mtr
-    fswatch
-    zstd
+    dust
+    yazi
+    mprocs
+    mask
+    pv
+    killall
 
     # Development
     gnumake
@@ -187,8 +192,7 @@ in
     comma
     duckdb
     ffmpeg
-    pv
-    killall
+
 
     # Nice-to-have
     gum
