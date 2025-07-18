@@ -21,7 +21,10 @@
       # Theme configuration
       theme = import ./config/themes.nix { inherit nix-colors; };
 
-      # Generate pkgs with overlays and config
+      # Import utilities
+      utils = import ./utils.nix { inherit nixpkgs; };
+
+      # Generate pkgs for home-manager (Darwin)
       mkPkgs = system:
         import nixpkgs {
           inherit system;
@@ -36,52 +39,8 @@
       # ------------------------------------------------------------
       # NixOS configurations
       # ------------------------------------------------------------
-      nixosConfigurations = {
-        "zerg-wsl2" = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          pkgs = mkPkgs "x86_64-linux";
-          specialArgs = {
-            inherit inputs theme home-manager;
-          };
-          modules = [
-            ./modules/machines/zerg-wsl2/configuration.nix
-          ];
-        };
-
-        # New configuration for the USB stick
-        # RUN: nix build .#nixosConfigurations.usb-stick.config.system.build.isoImage
-        "usb-stick" = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          pkgs = mkPkgs "x86_64-linux";
-          specialArgs = {
-            inherit inputs theme home-manager;
-          };
-          modules = [
-            ./modules/machines/usb-stick/configuration.nix
-          ];
-        };
-
-        "frameling" = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          pkgs = mkPkgs "x86_64-linux";
-          specialArgs = {
-            inherit inputs theme home-manager;
-          };
-          modules = [
-            ./modules/machines/frameling/configuration.nix
-          ];
-        };
-
-        "beeling" = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          pkgs = mkPkgs "x86_64-linux";
-          specialArgs = {
-            inherit inputs theme home-manager;
-          };
-          modules = [
-            ./modules/machines/beeling/configuration.nix
-          ];
-        };
+      nixosConfigurations = utils.mkMachines {
+        inherit inputs theme;
       };
 
       # ------------------------------------------------------------
