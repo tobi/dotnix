@@ -23,7 +23,7 @@
   time.timeZone = "America/Toronto";
 
   # Networking
-  networking.hostName = "beeling";
+  networking.hostName = "beetralisk";
 
   # Nix Settings
   nix.settings = {
