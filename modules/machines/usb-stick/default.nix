@@ -19,7 +19,7 @@
     enable = true;
     settings = {
       default_session = {
-        command = "Hyprland";
+        command = "niri-session";
         user = "tobi";
       };
     };
