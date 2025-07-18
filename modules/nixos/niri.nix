@@ -1,5 +1,9 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 {
+  imports = [
+    inputs.niri.nixosModules.niri
+  ];
+
   programs = {
     niri.enable = true;
     xwayland.enable = true;
@@ -32,5 +36,5 @@
     };
   };
 
-  dotnix.desktop.enable = true;
+  dotnix.desktop.enable = lib.mkDefault true;
 }

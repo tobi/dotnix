@@ -1,17 +1,6 @@
 { config, pkgs, lib, home-manager, modulesPath, inputs, ... }:
 
 {
-  imports = [
-    (modulesPath + "/installer/cd-dvd/installation-cd-base.nix")
-    (modulesPath + "/installer/cd-dvd/iso-image.nix")
-    inputs.nixos-hardware.nixosModules.common-pc
-    inputs.nixos-hardware.nixosModules.common-pc-ssd
-    inputs.nixos-hardware.nixosModules.common-cpu-intel
-    inputs.nixos-hardware.nixosModules.common-cpu-amd
-    inputs.nixos-hardware.nixosModules.common-gpu-intel
-    inputs.nixos-hardware.nixosModules.common-gpu-amd
-    ../../nixos/user.nix
-  ];
 
   # ISO image settings
   isoImage.isoName = "nixos-usb-stick-tobi.iso";

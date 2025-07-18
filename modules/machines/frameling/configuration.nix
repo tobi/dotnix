@@ -1,21 +1,6 @@
 { pkgs, inputs, config, ... }:
 
 {
-  imports = [
-    # hardware configuration
-    ./hardware-configuration.nix
-
-    # user configuration
-    ../../nixos/user.nix
-    ../../nixos/niri.nix
-
-    # use nixos-hardware package to get everything
-    # dialed in for the framework laptop instead of doing it outselves.
-    #
-    inputs.nixos-hardware.nixosModules.framework-amd-ai-300-series
-  ];
-
-
   system.stateVersion = "25.11";
 
   time.timeZone = "America/Toronto";
@@ -106,13 +91,11 @@
   };
 
   # Programs
-  programs = {
-    nix-ld.enable = true;
-    fuse.userAllowOther = true;
-  };
+  programs.nix-ld.enable = true;
+  programs.fuse.userAllowOther = true;
+  programs.appimage.enable = true;
+  programs.appimage.binfmt = true;
 
-  # enable niri
-  dotnix.desktop.enable = true;
 
   # Create plugdev group for U2F/FIDO2 devices
   users.groups.plugdev = { };
@@ -147,12 +130,6 @@
   security = {
     rtkit.enable = true;
     pam.services.greetd.enableGnomeKeyring = true;
-  };
-
-  # Appimage support
-  programs.appimage = {
-    enable = true;
-    binfmt = true;
   };
 
   # Steam
@@ -216,8 +193,7 @@
     git
     zsh
     bash
-    fuse
-    xdg-user-dirs  # Fix Steam xdg-user-dir warnings
+    xdg-user-dirs
 
     # Terminals
     kitty
@@ -281,9 +257,6 @@
     nmap
     traceroute
     iperf3
-
-    # Package management
-    nix-index
 
     # Tailscale
     tailscale

@@ -7,13 +7,6 @@
 
 { config, lib, pkgs, inputs, ... }:
 {
-  imports = [
-    # include NixOS-WSL modules
-    inputs.nixos-wsl.nixosModules.wsl
-
-    # user configuration
-    ../../nixos/user.nix
-  ];
 
   networking.hostName = "zerg-wsl2";
 

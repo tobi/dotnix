@@ -1,22 +1,6 @@
 { pkgs, inputs, config, ... }:
 
 {
-  imports = [
-    # hardware configuration
-    ./hardware-configuration.nix
-
-    # user configuration
-    ../../nixos/user.nix
-    ../../nixos/niri.nix
-
-    # use nixos-hardware package to get everything
-    # dialed in for AMD systems instead of doing it ourselves.
-    #
-    inputs.nixos-hardware.nixosModules.common-cpu-amd
-    inputs.nixos-hardware.nixosModules.common-cpu-amd-pstate
-    inputs.nixos-hardware.nixosModules.common-gpu-amd
-    inputs.nixos-hardware.nixosModules.common-pc-ssd
-  ];
 
   system.stateVersion = "25.11";
 
@@ -122,8 +106,6 @@
     fuse.userAllowOther = true;
   };
 
-  # enable niri
-  dotnix.desktop.enable = true;
 
   # Create plugdev group for U2F/FIDO2 devices
   users.groups.plugdev = { };

@@ -9,6 +9,7 @@
         description = "Enable dotnix home configuration";
       };
     };
+
     desktop = {
       enable = lib.mkOption {
         type = lib.types.bool;

@@ -2,17 +2,24 @@
 { inputs, pkgs, theme, home-manager, config, lib, modulesPath, ... }:
 
 {
-  system = "x86_64-linux";
-
   imports = [
     ./configuration.nix
     (modulesPath + "/installer/cd-dvd/installation-cd-base.nix")
     (modulesPath + "/installer/cd-dvd/iso-image.nix")
-    home-manager.nixosModules.home-manager
+    ../../nixos/user.nix
+    inputs.nixos-hardware.nixosModules.common-pc
+    inputs.nixos-hardware.nixosModules.common-pc-ssd
+    inputs.nixos-hardware.nixosModules.common-cpu-intel
+    inputs.nixos-hardware.nixosModules.common-cpu-amd
+    inputs.nixos-hardware.nixosModules.common-gpu-intel
+    inputs.nixos-hardware.nixosModules.common-gpu-amd
   ];
 
   # Machine identity
   networking.hostName = "nixos-live";
+
+  # Enable desktop environment for live USB
+  dotnix.desktop.enable = true;
 
   # Auto-login configuration for live environment
   services.greetd = {
@@ -22,23 +29,6 @@
         command = "niri-session";
         user = "tobi";
       };
-    };
-  };
-
-  # Home Manager configuration for this machine
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    backupFileExtension = "backup";
-
-    users.tobi.imports = [
-      inputs.nix-colors.homeManagerModules.default
-      ../../home-manager/home.nix
-      ../../home-manager/desktop.nix
-    ];
-
-    extraSpecialArgs = {
-      inherit theme inputs;
     };
   };
 }
