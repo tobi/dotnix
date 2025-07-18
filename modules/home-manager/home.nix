@@ -108,14 +108,18 @@ in
       gd = "git diff";
       gdc = "git diff --cached";
 
-      # System management
-      reload = lib.mkDefault "home-manager switch --flake ~/dotnix#tobi && source $HOME/.zshrc";
-
     } // lib.optionalAttrs pkgs.stdenv.isLinux {
       # Clipboard (macOS compatibility on Linux)
       pbcopy = "wl-copy";
       pbpaste = "wl-paste";
     };
+  };
+
+  # Global shell aliases (will be overridden by desktop.nix when present)
+  home.shellAliases = {
+    # System management
+    reload = lib.mkDefault "home-manager switch --flake ~/dotnix#tobi && source $HOME/.zshrc";
+    switch = lib.mkDefault "home-manager switch --flake ~/dotnix#tobi && source $HOME/.zshrc";
   };
 
   programs.mise = {
