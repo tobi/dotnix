@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, inputs, ... }:
 let
   username = "tobi";
   isDarwin = pkgs.stdenv.isDarwin;
