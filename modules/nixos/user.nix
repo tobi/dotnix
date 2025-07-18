@@ -1,4 +1,4 @@
-{ pkgs, home-manager, theme, inputs, config, lib, ... }:
+{ pkgs, home-manager, inputs, config, lib, ... }:
 
 {
   imports = [
@@ -28,7 +28,8 @@
     ];
 
     extraSpecialArgs = {
-      inherit theme inputs;
+      theme = config.dotnix.theme;
+      inherit inputs;
     };
   };
 

@@ -1,5 +1,5 @@
 # Live USB Installer Configuration
-{ inputs, pkgs, theme, home-manager, config, lib, modulesPath, ... }:
+{ inputs, pkgs, home-manager, config, lib, modulesPath, ... }:
 
 {
   imports = [

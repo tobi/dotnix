@@ -1,7 +1,7 @@
 { nixpkgs }:
 
 {
-  mkMachines = { inputs, theme }:
+  mkMachines = { inputs }:
     let
       machinesPath = ./modules/machines;
       machineNames = builtins.attrNames (builtins.readDir machinesPath);
@@ -23,7 +23,7 @@
         system = "x86_64-linux";
         inherit pkgs;
         specialArgs = {
-          inherit inputs theme;
+          inherit inputs;
           home-manager = inputs.home-manager;
         };
         modules = [

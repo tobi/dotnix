@@ -18,9 +18,6 @@
       # Helper function to generate packages for each system
       forEachSystem = nixpkgs.lib.genAttrs systems;
 
-      # Theme configuration
-      theme = import ./config/themes.nix { inherit nix-colors; };
-
       # Import utilities
       utils = import ./utils.nix { inherit nixpkgs; };
 
@@ -40,7 +37,7 @@
       # NixOS configurations
       # ------------------------------------------------------------
       nixosConfigurations = utils.mkMachines {
-        inherit inputs theme;
+        inherit inputs;
       };
 
       # ------------------------------------------------------------

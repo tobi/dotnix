@@ -1,6 +1,10 @@
 { config, lib, pkgs, ... }:
 
 {
+  imports = [
+    ./theme.nix
+  ];
+  
   options.dotnix = {
     home = {
       enable = lib.mkOption {
