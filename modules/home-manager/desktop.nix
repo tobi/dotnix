@@ -62,6 +62,8 @@
     ./apps/alacritty.nix
     ./apps/niri.nix
     ./apps/chatgpt.nix
+    ./apps/claude.nix
+    ./apps/logseq.nix
     ./apps/chromium.nix
     ./apps/google-chrome.nix
     ./apps/cursor.nix
