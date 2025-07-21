@@ -19,7 +19,7 @@
       forEachSystem = nixpkgs.lib.genAttrs systems;
 
       # Import utilities
-      utils = import ./utils.nix { inherit nixpkgs; };
+      utils = import ./utils/utils.nix { inherit nixpkgs; };
 
       # Generate pkgs for home-manager (Darwin)
       mkPkgs = system:
