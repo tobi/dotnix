@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(hostname), Bash(lsblk), Bash(lshw:*), Bash(journalctl:*), Bash(cat:*), Bash(ls:*), Bash(lspci:*), Bash(lsusb:*),Bash(nix-shell:*), Bash(systemctl:*), Bash/uname, Bash/wc, Bash/grep, Bash/find, Bash(nix:*), Bash/pwd, Bash/realpath, mcp__mcp-nixos__nixos_search, mcp__mcp-nixos__nixos_search, mcp__mcp-nixos__home_manager_search, mcp__mcp-(nixos:*)
+allowed-tools: Bash(hostname), Bash(lsblk), Bash(lshw:*), Bash(journalctl:*), Bash(cat:*), Bash(ls:*), Bash(lspci:*), Bash(lsusb:*),Bash(nix-shell:*), Bash(systemctl:*), Bash/uname, Bash/wc, Bash/grep, Bash/find, Bash(nix:*), Bash/pwd, Bash/realpath, mcp__mcp-nixos__nixos_search, mcp__mcp-nixos__nixos_search, mcp__mcp-nixos__home_manager_search, mcp__mcp-(nixos:*), Bash(*)
 description: Collect and summarize NixOS hardware, configuration, and log metadata for LLM-based diagnostics, including flake directory, rebuild logs, and flake check.
 ---
 
@@ -33,7 +33,7 @@ Kernel: !`uname -a`
 </host>
 
 <hardware>
-!`neofetch -l none --pipe`
+!`cat /proc/cpuinfo`
 </hardware>
 
 <nix_files>
@@ -100,10 +100,6 @@ Ignore everything that isn't from the current boot.
 <rebuild_logs>
 Most recent nixos-rebuild log (if available): !`find /var/log -type f -iname '*nixos-rebuild*' -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -1 | cut -d' ' -f2- | xargs -r tail -n 250`
 </rebuild_logs>
-
-<dmesg>
-!`dmesg  tail -n 250`
-</dmesg>
 
 </logs>
 
