@@ -7,9 +7,8 @@ This file provides context and guidelines for Claude when working on this NixOS 
 This is a **clean, modern NixOS flake configuration** with the following key principles:
 
 ### Design Philosophy
-- **No helper functions**: Direct use of `nixpkgs.lib.nixosSystem` for clarity
-- **Explicit over implicit**: All configuration is visible in flake.nix
-- **Modular organization**: Clean separation of concerns
+- **Modular organization**: Clean separation of concerns with helper functions for reusability
+- **Explicit configuration**: Clear and maintainable patterns
 - **Centralized theming**: Single source of truth for colors/themes
 
 ### Directory Structure
@@ -75,9 +74,9 @@ dotnix.desktop.enable = true;  # Enables desktop environment
 - **Minimal comments**: Remove verbose example comments, keep only essential ones
 
 ### Flake Structure
-- **Simple inputs**: Pass inputs directly from flake to modules via specialArgs
-- **No abstractions**: Keep flake.nix explicit and readable
-- **Direct nixosSystem calls**: No wrapper functions or lib helpers
+- **Helper functions**: Use utilities like `mkMachines` for cleaner, more maintainable code
+- **Clear abstractions**: Reduce boilerplate while keeping configuration readable
+- **Consistent patterns**: Standardized machine configuration generation
 - **Clear separation**: Each machine gets its own clear configuration block
 
 ### Module Patterns
@@ -101,14 +100,12 @@ dotnix.desktop.enable = true;  # Enables desktop environment
 ## 🚨 Important Rules
 
 ### What NOT to do:
-- ❌ Don't create helper functions in lib/
-- ❌ Don't use mkNixosSystem or similar abstractions
 - ❌ Don't put home-manager config inline in flake.nix
 - ❌ Don't duplicate user configuration across machines
 - ❌ Don't leave commented-out code or verbose example comments
 
 ### What TO do:
-- ✅ Use direct `nixpkgs.lib.nixosSystem` calls
+- ✅ Use helper functions like `mkMachines` to reduce boilerplate
 - ✅ Use dotnix options for conditional module loading
 - ✅ Keep machine configs focused on hardware/system settings
 - ✅ Use centralized modules/nixos/user.nix for user management
@@ -156,8 +153,8 @@ nix build .#nixosConfigurations.usb-stick.config.system.build.isoImage
 ## 📝 File-Specific Notes
 
 ### flake.nix
-- Contains all nixosConfigurations directly (no lib imports)
-- Simplified specialArgs without modules-home pattern
+- Uses helper functions from utils/utils.nix for cleaner configuration generation
+- Consistent specialArgs pattern across all machines
 - Theme configuration loaded once and passed to all machines
 
 ### modules/nixos/user.nix
@@ -181,10 +178,10 @@ nix build .#nixosConfigurations.usb-stick.config.system.build.isoImage
 ## 🔄 Migration Notes
 
 This configuration recently underwent major restructuring:
-- Removed lib/common.nix and all helper functions
+- Added helper functions in utils/utils.nix for better maintainability
 - Reorganized all modules under modules/ directory
 - Replaced modules-home pattern with dotnix options
 - Moved utility scripts to top-level bin/ directory
 - Centralized NixOS modules in modules/nixos/
 
-The architecture is now more modular and follows NixOS conventions.
+The architecture is now more modular and follows clean coding practices.

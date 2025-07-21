@@ -4,9 +4,9 @@ A clean, modern NixOS flake configuration with cross-platform home-manager dotfi
 
 ## 🏗️ Architecture
 
-This configuration follows a **clean architecture** with explicit patterns and no helper functions. Built around three core principles:
+This configuration follows a **clean architecture** with modular patterns and helpful abstractions. Built around three core principles:
 
-1. **Explicit over implicit**: All configuration is visible in flake.nix
+1. **Clear abstractions**: Helper functions reduce boilerplate while maintaining readability
 2. **Modular organization**: Clean separation between system, home, and machine configs
 3. **Centralized theming**: Single source of truth for colors and fonts
 
@@ -49,10 +49,10 @@ This triggers the centralized user management system (`modules/nixos/user.nix`) 
 
 ### Key Features
 
-- **No Helper Functions**: Direct use of `nixpkgs.lib.nixosSystem` for clarity
+- **Helper Functions**: Use utilities like `mkMachines` to reduce boilerplate and improve maintainability
 - **Modular Design**: All modules organized under `modules/` directory
 - **Centralized User Management**: Single `modules/nixos/user.nix` handles all user setup
-- **dotnix Options Pattern**: Clean conditional loading instead of complex abstractions
+- **dotnix Options Pattern**: Clean conditional loading with simple abstractions
 - **Centralized Theming**: Single theme configuration in `config/themes.nix`
 - **Cross-Platform**: Home-manager configs work on both NixOS and macOS
 
@@ -100,20 +100,7 @@ This triggers the centralized user management system (`modules/nixos/user.nix`) 
 2. Add `configuration.nix` and `hardware-configuration.nix`
 3. Import `../../nixos/user.nix` in your configuration.nix
 4. Set `dotnix.desktop.enable = true` if you want a desktop environment
-5. Update `flake.nix` with new nixosConfiguration:
-
-```nix
-"your-machine" = nixpkgs.lib.nixosSystem {
-  system = "x86_64-linux";
-  pkgs = mkPkgs "x86_64-linux";
-  specialArgs = {
-    inherit inputs theme home-manager;
-  };
-  modules = [
-    ./modules/machines/your-machine/configuration.nix
-  ];
-};
-```
+5. The machine will be automatically detected by the `mkMachines` utility function
 
 ## 🏠 Home Configuration
 
@@ -196,17 +183,15 @@ nixos-rebuild build-vm --flake .#frameling
 This configuration recently underwent major restructuring to achieve:
 
 ### What We Avoid
-- ❌ Helper functions in lib/ directories
-- ❌ Complex `mkNixosSystem` or similar abstractions
 - ❌ Inline home-manager config in flake.nix
 - ❌ Duplicated user configuration across machines
 - ❌ Commented-out code or verbose examples
 
 ### What We Use Instead
-- ✅ Direct `nixpkgs.lib.nixosSystem` calls for clarity
+- ✅ Helper functions like `mkMachines` for cleaner code
 - ✅ dotnix options for conditional module loading
 - ✅ Centralized `modules/nixos/user.nix` for user management
 - ✅ Clean module organization under `modules/` directory
-- ✅ Simple, explicit configuration patterns
+- ✅ Maintainable configuration patterns with good abstractions
 
-This creates a maintainable, understandable system that follows NixOS conventions without unnecessary complexity.
+This creates a maintainable, understandable system that follows NixOS conventions with helpful abstractions that reduce complexity.
