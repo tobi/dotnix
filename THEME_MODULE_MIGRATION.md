@@ -16,7 +16,7 @@ The theme configuration has been transformed from a simple imported file to a pr
    - `config/themes.nix` - logic moved into the module
 
 3. **Updated Files**:
-   - `modules/nixos/dot.nix` - now imports theme module
+   - `modules/nixos/config.nix` - now imports theme module
    - `modules/nixos/user.nix` - passes `config.dotnix.theme` to home-manager
    - `flake.nix` - removed theme import
    - `utils.nix` - removed theme parameter

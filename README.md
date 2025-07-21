@@ -40,7 +40,7 @@ This triggers the centralized user management system (`modules/nixos/user.nix`) 
 │   │   ├── usb-stick/        # Live USB configuration
 │   │   └── zerg-wsl2/        # WSL2 configuration
 │   └── nixos/                 # NixOS system modules
-│       ├── dot.nix           # dotnix options definition
+│       ├── config.nix        # dotnix options definition
 │       ├── niri.nix          # Niri window manager config
 │       └── user.nix          # Centralized user management
 ├── devshell.nix               # Development environment

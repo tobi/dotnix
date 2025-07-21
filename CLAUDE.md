@@ -29,7 +29,7 @@ This is a **clean, modern NixOS flake configuration** with the following key pri
 │   │   ├── zerg-wsl2/        # WSL2 development
 │   │   └── usb-stick/        # Live USB/installer
 │   └── nixos/                 # NixOS system modules
-│       ├── dot.nix           # dotnix options definition
+│       ├── config.nix        # dotnix options definition
 │       ├── niri.nix          # Niri window manager config
 │       └── user.nix          # Centralized user management
 └── flake.nix                  # Main flake (no lib/common.nix!)
@@ -165,7 +165,7 @@ nix build .#nixosConfigurations.usb-stick.config.system.build.isoImage
 - Conditionally imports modules based on dotnix options
 - Manages desktop-specific environment variables and security settings
 
-### modules/nixos/dot.nix
+### modules/nixos/config.nix
 - Defines dotnix.home.enable and dotnix.desktop.enable options
 - Central place for configuration feature flags
 

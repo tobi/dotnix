@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ./dot.nix
+    ./config.nix
     home-manager.nixosModules.home-manager
   ];
 
