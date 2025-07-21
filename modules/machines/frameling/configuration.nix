@@ -52,11 +52,11 @@
     };
     kernelParams = [
       "quiet"
-      "splash"
       "boot.shell_on_fail"
       "rd.systemd.show_status=auto"
       "rd.udev.log_level=3"
       "vt.global_cursor_default=0"
+      "amdgpu.dcdebugmask=0" # Disable GPU debug mask
     ];
 
 
@@ -70,7 +70,28 @@
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
-    settings.General.Experimental = true;
+    settings = {
+      General = {
+        Experimental = true;
+        KernelExperimental = true; # Enable LE Audio and other experimental features
+      };
+    };
+  };
+
+  # Enable Bluetooth LE Audio support
+  systemd.user.services.pipewire.environment.PIPEWIRE_LATENCY = "128/48000";
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    pulse.enable = true;
+    extraConfig.pipewire."91-bluetooth-le" = {
+      "context.modules" = [
+        {
+          name = "libpipewire-module-bluez5-codec-lc3plus";
+          args = { };
+        }
+      ];
+    };
   };
 
   # Networking
