@@ -1,6 +1,0 @@
-{ inputs, ... }:
-{
-  imports = [
-    ./configuration.nix
-  ];
-}
