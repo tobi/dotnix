@@ -72,6 +72,7 @@
     ./apps/mako.nix
     ./apps/gtk.nix
     ./apps/fuzzel.nix
+    ./apps/typora.nix
   ];
 }
 
