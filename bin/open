@@ -1,6 +1,6 @@
 #!/bin/sh
 
-[[ -x /usr/bin/open ]] && exec /usr/bin/open $*
+[[ -x /usr/bin/open ]] && exec /usr/bin/open "$@"
 
 # This script launches a .desktop application by searching through specified directories
 

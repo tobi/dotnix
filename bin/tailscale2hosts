@@ -5,14 +5,12 @@ require 'date'
 require 'json'
 require 'fileutils'
 
-# Find the Tailscale binary path
+# Find the Tailscale binary path (use macos build in one if available)
 #: () -> String
 def find_tailscale_binary #: -> String
-  if File.exist?("/Applications/Tailscale.app/Contents/MacOS/Tailscale")
-    "/Applications/Tailscale.app/Contents/MacOS/Tailscale"
-  else
-    "tailscale"
-  end
+  binary = `which tailscale`.strip
+  puts "using tailscale from #{binary}"
+  binary
 end
 
 # Get Tailscale status and extract host-to-IP mappings
@@ -22,11 +20,12 @@ def extract_tailscale_hosts(binary) #: -> Hash[String, String]
     status = JSON.parse(`#{binary   } status --json`)
 
     status['Peer'].each_with_object({}) do |(_, params), hosts|
-      case params
-      in { 'HostName' => hostname, 'TailscaleIPs' => [ip, *_] } if hostname && !ip.nil?
-        hosts[hostname] = ip
-      else
-        # Skip entries without hostname or IPs
+      hostname = params['HostName']
+      tailscale_ips = params['TailscaleIPs']
+
+      if hostname && tailscale_ips && !tailscale_ips.empty?
+        ip = tailscale_ips.first
+        hosts[hostname] = ip if ip
       end
     end.tap { |hosts| hosts.delete('localhost') }
   rescue => e
@@ -77,8 +76,6 @@ begin
   tailscale_hosts = extract_tailscale_hosts(binary)
   backup_path = backup_hosts_file
 
-
-  puts "Successfully updated /etc/hosts with #{tailscale_hosts.size} Tailscale entries"
   update_hosts_file(tailscale_hosts)
   puts "Successfully updated /etc/hosts with #{tailscale_hosts.size} Tailscale entries"
   puts "Backup created at #{backup_path}"
