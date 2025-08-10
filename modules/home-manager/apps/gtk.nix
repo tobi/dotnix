@@ -13,8 +13,8 @@
       size = 10;
     };
     theme = {
-      name = "Adwaita-${theme.variant}";
-      package = pkgs.gnome-themes-extra;
+      name = "Colloid-${if theme.variant == "dark" then "Dark" else "Light"}";
+      package = pkgs.colloid-gtk-theme;
     };
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = theme.variant == "dark";
