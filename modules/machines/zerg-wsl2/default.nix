@@ -14,8 +14,9 @@
   # WSL configuration
   wsl.enable = true;
   wsl.defaultUser = "tobi";
-  
+
   # WSL doesn't need desktop environment
   dotnix.home.enable = true;
   dotnix.desktop.enable = false;
 }
+

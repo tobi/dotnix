@@ -18,3 +18,4 @@
   dotnix.desktop.enable = true;
   dotnix.themeName = "nord";
 }
+

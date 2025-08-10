@@ -4,9 +4,11 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./disko-config.nix
     ./configuration.nix
     ../../nixos/user.nix
     ../../nixos/niri.nix
+    inputs.disko.nixosModules.disko
     inputs.nixos-hardware.nixosModules.common-cpu-amd
     inputs.nixos-hardware.nixosModules.common-cpu-amd-pstate
     inputs.nixos-hardware.nixosModules.common-gpu-amd
@@ -19,3 +21,4 @@
   # Enable desktop environment
   dotnix.desktop.enable = true;
 }
+

@@ -109,3 +109,4 @@ in
     dotnix.theme = lib.mkOverride 900 (buildTheme config.dotnix.themeName config.dotnix.themeFont);
   };
 }
+

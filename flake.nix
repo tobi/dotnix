@@ -43,12 +43,14 @@
       # ------------------------------------------------------------
       # Home Manager configurations
       # ------------------------------------------------------------
-      homeConfigurations = {
-        "tobi" = home-manager.lib.homeManagerConfiguration {
-          pkgs = mkPkgs "aarch64-darwin";
-          modules = [ ./modules/home-manager/home.nix ];
-        };
-      };
+      homeConfigurations = forEachSystem
+        (system:  
+          let pkgs = mkPkgs system;
+          in home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [ ./modules/home-manager/home.nix ];
+          }
+        );
 
 
       # ------------------------------------------------------------
@@ -77,6 +79,10 @@
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nix-colors.url = "github:misterio77/nix-colors";
+
+    disko.url = "github:nix-community/disko";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
   };
 
 }
+

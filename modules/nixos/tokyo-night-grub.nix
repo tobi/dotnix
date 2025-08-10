@@ -31,3 +31,4 @@ in
   # Direct path to the theme directory for GRUB
   tokyo-night = "${theme}/share/grub/themes/tokyo-night";
 }
+

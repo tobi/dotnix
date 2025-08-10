@@ -53,9 +53,10 @@ in
       echo "Python version: $(python --version)"
       echo "🚀 Development shell activated, you can now compile things"
     '';
-    
+
     # Prefer zsh as the shell
     preferLocalBuild = true;
     shell = "${pkgs.zsh}/bin/zsh";
   };
 }
+

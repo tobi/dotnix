@@ -297,3 +297,4 @@
     nerd-fonts.symbols-only
   ];
 }
+
