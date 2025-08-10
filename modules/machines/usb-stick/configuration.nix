@@ -115,3 +115,4 @@
   # Set the NixOS release version
   system.stateVersion = "25.11";
 }
+

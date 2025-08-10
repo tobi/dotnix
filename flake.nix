@@ -83,6 +83,10 @@
 
     try.url = "github:tobi/try";
     try.inputs.nixpkgs.follows = "nixpkgs";
+
+    disko.url = "github:nix-community/disko";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
   };
 
 }
+

@@ -209,7 +209,7 @@
     zsh
     bash
     fuse
-    xdg-user-dirs  # Fix Steam xdg-user-dir warnings
+    xdg-user-dirs # Fix Steam xdg-user-dir warnings
 
     # Terminals
     kitty
@@ -294,3 +294,4 @@
     nerd-fonts.symbols-only
   ];
 }
+

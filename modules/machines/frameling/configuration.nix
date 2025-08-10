@@ -289,3 +289,4 @@
     nerd-fonts.symbols-only
   ];
 }
+
