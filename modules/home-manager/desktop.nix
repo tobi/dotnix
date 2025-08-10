@@ -6,7 +6,7 @@
     libnotify
     rustdesk
     gcr
-    gnome-themes-extra
+    colloid-gtk-theme
     gnome-keyring
     libsecret
     wev
