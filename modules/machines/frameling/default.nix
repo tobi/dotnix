@@ -16,5 +16,6 @@
   # Enable desktop environment
   dotnix.home.enable = true;
   dotnix.desktop.enable = true;
-  dotnix.themeName = "nord";
+
+  dotnix.themeName = "everforest";
 }
