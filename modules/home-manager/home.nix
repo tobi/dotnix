@@ -194,7 +194,7 @@ in
     nixfmt-rfc-style
     nixfmt-tree
     comma
-    duckdb
+
     ffmpeg
 
 

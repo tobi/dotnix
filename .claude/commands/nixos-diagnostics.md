@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(hostname), Bash(lsblk), Bash(lshw:*), Bash(journalctl:*), Bash(cat:*), Bash(ls:*), Bash(lspci:*), Bash(lsusb:*),Bash(nix-shell:*), Bash(systemctl:*), Bash/uname, Bash/wc, Bash/grep, Bash/find, Bash(nix:*), Bash/pwd, Bash/realpath, mcp__mcp-nixos__nixos_search, mcp__mcp-nixos__nixos_search, mcp__mcp-nixos__home_manager_search, mcp__mcp-(nixos:*), Bash(*)
+allowed-tools: Bash(hostname), Bash(lsblk), Bash(lshw:*), Bash(journalctl:*), Bash(cat:*), Bash(ls:*), Bash(lspci:*), Bash(lsusb:*),Bash(nix-shell:*), Bash(systemctl:*), Bash/uname, Bash/wc, Bash/grep, Bash/find, Bash(nix:*), Bash/pwd, Bash/realpath, mcp__mcp-nixos__nixos_search, mcp__mcp-nixos__nixos_search, mcp__mcp-nixos__home_manager_search, mcp__mcp-(nixos:*), Bash(dmesg:*), Bash(exa:*), Bash(mount)
 description: Collect and summarize NixOS hardware, configuration, and log metadata for LLM-based diagnostics, including flake directory, rebuild logs, and flake check.
 ---
 
@@ -30,7 +30,12 @@ User: !`whoami`
 Home directory: !`realpath ~`
 Flake directory (realpath): !`realpath ~/dotnix`
 Kernel: !`uname -a`
+Memory: !`free -h`
 </host>
+
+<dmesg>
+!`dmesg`
+</dmesg>
 
 <hardware>
 !`cat /proc/cpuinfo`
@@ -39,27 +44,19 @@ Kernel: !`uname -a`
 <nix_files>
 
 <tree>
-!`exa --tree ~/dotnix`
+!`exa --tree .`
 </tree>
 
 - @flake.nix - root flake
-- @home/home.nix - home-manager flake
-- @desktop/desktop.nix - desktop flake
-- @machines/!`hostname` - (if it exists) - has the nixos configuration. Usually there is a configuration.nix and a hardware-configuration.nix in there. You can ignore the other files in machines/ folder, unless otherwise prompted.
+- @modules/home/home.nix - home-manager flake
+- @modules/machines/!`hostname` - (if it exists) - has the nixos configuration. Usually there is a configuration.nix and a hardware-configuration.nix in there. You can ignore the other files in machines/ folder, unless otherwise prompted.
+- @modules/machines/!`hostname`/configuration.nix - has the nixos configuration for this host.
 
 </nix_files>
 
 <flake_check>
 nix flake check output: !`nix flake check --no-build 2>&1 | tail -n 250`
 </flake_check>
-
-<disk_usage>
-!`df -h`
-</disk_usage>
-
-<memory_usage>
-!`free -h`
-</memory_usage>
 
 <lscpu>
 !`lscpu`
@@ -97,9 +94,6 @@ Ignore everything that isn't from the current boot.
 !`journalctl -k`
 </kernel_logs>
 
-<rebuild_logs>
-Most recent nixos-rebuild log (if available): !`find /var/log -type f -iname '*nixos-rebuild*' -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -1 | cut -d' ' -f2- | xargs -r tail -n 250`
-</rebuild_logs>
 
 </logs>
 
