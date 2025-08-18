@@ -21,7 +21,7 @@
   boot = {
     loader = {
       systemd-boot.enable = true;
-      # systemd-boot.consoleMode = "max";
+      systemd-boot.consoleMode = "max";
       systemd-boot.configurationLimit = 6;
       efi.canTouchEfiVariables = true;
     };
@@ -32,16 +32,7 @@
     # Plymouth for graphical boot
     plymouth = {
       enable = true;
-      theme = "cuts";
-      themePackages = with pkgs; [
-        # Use adi1090x themes which includes many options
-        (adi1090x-plymouth-themes.override {
-          selected_themes = [ "cuts" "hexagon_dots" ];
-        })
-      ];
-      # extraConfig = ''
-      #   # DeviceScale=1.5
-      # '';
+      theme = "bgrt";
     };
 
     # we need latest kernel to deal with power issues
@@ -50,13 +41,19 @@
     kernel.sysctl = {
       "kernel.dmesg_restrict" = 0; # Allow non-root dmesg access
     };
+
     kernelParams = [
       "quiet"
       "boot.shell_on_fail"
       "rd.systemd.show_status=auto"
       "rd.udev.log_level=3"
       "vt.global_cursor_default=0"
-      "amdgpu.dcdebugmask=0" # Disable GPU debug mask
+
+      # Disable GPU debug mask
+      "amdgpu.dcdebugmask=0"
+
+      # Enable AMD P-State
+      "amd_pstate=active"
     ];
 
 
@@ -67,32 +64,21 @@
     };
   };
 
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-    settings = {
-      General = {
-        Experimental = true;
-        KernelExperimental = true; # Enable LE Audio and other experimental features
+  hardware = {
+    bluetooth = {
+      enable = true;
+      powerOnBoot = true;
+      settings = {
+        General = {
+          Experimental = true;
+          KernelExperimental = true; # Enable LE Audio and other experimental features
+        };
       };
     };
+
+    enableRedistributableFirmware = true;
   };
 
-  # Enable Bluetooth LE Audio support
-  systemd.user.services.pipewire.environment.PIPEWIRE_LATENCY = "128/48000";
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    pulse.enable = true;
-    extraConfig.pipewire."91-bluetooth-le" = {
-      "context.modules" = [
-        {
-          name = "libpipewire-module-bluez5-codec-lc3plus";
-          args = { };
-        }
-      ];
-    };
-  };
 
   # Networking
   networking = {
@@ -121,8 +107,8 @@
   # Create plugdev group for U2F/FIDO2 devices
   users.groups.plugdev = { };
 
-  # Udev rules for FIDO2/WebAuthn devices
-  services.udev.packages = [ pkgs.libfido2 ];
+  # Udev rules for FIDO2/WebAuthn devices and Thunderbolt
+  services.udev.packages = [ pkgs.libfido2 pkgs.bolt ];
 
   # Services
   services = {
@@ -135,6 +121,7 @@
     upower.enable = true;
     thermald.enable = true;
     fwupd.enable = true;
+    hardware.bolt.enable = true;
 
     # Tailscale, this is needed for exit notes to to work
     tailscale.enable = true;
@@ -172,6 +159,9 @@
     extraPackages = with pkgs; [
       libgdiplus
       ffmpeg
+      kopia
+      kopia-ui
+      restic
       libva
       libvdpau
       gst_all_1.gstreamer
@@ -283,6 +273,8 @@
     tailscale
   ];
 
+  # Udisks2 for automounting USB devices
+  services.udisks2.enable = true;
 
   # Fonts
   fonts.packages = with pkgs; [

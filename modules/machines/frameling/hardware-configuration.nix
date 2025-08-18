@@ -9,9 +9,9 @@
       (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "thunderbolt" "usb_storage" "uas" "sd_mod" ];
+  boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "usb_storage" "uas" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-amd" ];
+  boot.kernelModules = [ "kvm-amd" "typec" "ucsi_acpi" "thunderbolt" ];
   boot.extraModulePackages = [ ];
 
   boot.initrd.luks.devices."cryptroot".device = "/dev/disk/by-uuid/95d1bea6-669c-4317-a952-9d6a09ba0272";
@@ -36,7 +36,6 @@
       fsType = "vfat";
       options = [ "fmask=0077" "dmask=0077" "uid=0" "gid=0" ];
     };
-
 
   swapDevices = [ ];
 
