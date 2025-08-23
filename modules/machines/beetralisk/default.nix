@@ -21,5 +21,8 @@
 
   # Enable desktop environment
   dotnix.desktop.enable = true;
-}
 
+  # Theme configuration
+  dotnix.theme.name = "everforest";
+  dotnix.theme.variant = "dark";
+}

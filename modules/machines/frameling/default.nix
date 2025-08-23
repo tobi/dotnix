@@ -18,6 +18,8 @@
   dotnix.home.enable = true;
   dotnix.desktop.enable = true;
 
-  dotnix.themeName = "everforest";
+  # Theme configuration
+  dotnix.theme.name = "everforest";
+  dotnix.theme.variant = "dark";
 }
 

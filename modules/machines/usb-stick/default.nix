@@ -21,6 +21,10 @@
   # Enable desktop environment for live USB
   dotnix.desktop.enable = true;
 
+  # Theme configuration
+  dotnix.theme.name = "everforest";
+  dotnix.theme.variant = "dark";
+
   # Auto-login configuration for live environment
   services.greetd = {
     enable = true;
