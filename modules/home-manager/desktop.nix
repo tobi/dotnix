@@ -53,7 +53,7 @@
   };
 
   # Symlink current theme wallpaper to ~/.config/wallpaper.jpg
-  home.file.".config/wallpaper.jpg".source = theme.wallpaper;
+  home.file.".config/wallpaper.jpg".source = theme.wallpaperPath;
 
   imports = [
     ./apps/waybar.nix
