@@ -46,7 +46,10 @@
       homeConfigurations = {
         "tobi" = home-manager.lib.homeManagerConfiguration {
           pkgs = mkPkgs "aarch64-darwin";
-          modules = [ ./modules/home-manager/home.nix ];
+          modules = [
+            ./modules/home-manager/home.nix
+            inputs.try.homeManagerModules.default
+          ];
         };
       };
 
@@ -77,6 +80,9 @@
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nix-colors.url = "github:misterio77/nix-colors";
+
+    try.url = "github:tobi/try";
+    try.inputs.nixpkgs.follows = "nixpkgs";
   };
 
 }

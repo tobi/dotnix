@@ -8,9 +8,9 @@
 
     settings = {
       add_newline = true;
-      command_timeout = 200;
+      command_timeout = 1000;
       format = "[$username$hostname](light blue) $directory$character";
-      right_format = "$git_branch$git_status$cmd_duration$python$ruby";
+      right_format = "$git_branch$git_state$git_status$cmd_duration$python$ruby";
 
       username = {
         show_always = true;
@@ -25,8 +25,8 @@
       };
 
       directory = {
-        truncation_length = 2;
-        truncation_symbol = "…/";
+        fish_style_pwd_dir_length = 1;
+        before_repo_root_style = "bold green";
       };
 
       character = {
@@ -35,9 +35,18 @@
       };
 
       # Disable unused modules
-      # git_metrics.disabled = true;
-      # gcloud.disabled = true;
-      # package.disabled = true;
+      git_metrics.disabled = true;
+      git_status.disabled = true;
+      gcloud.disabled = true;
+      package.disabled = true;
+      nodejs.disabled = true;
+      bun.disabled = true;
+      ruby.disabled = true;
+      python.disabled = true;
+      rust.disabled = true;
+      swift.disabled = true;
+      terraform.disabled = true;
+      time.disabled = true;
     };
   };
 }
