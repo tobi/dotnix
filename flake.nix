@@ -21,7 +21,7 @@
       # Import utilities
       utils = import ./utils/utils.nix { inherit nixpkgs; };
 
-      # Generate pkgs for home-manager (Darwin)
+      # Generate pkgs for home-manager
       mkPkgs = system:
         import nixpkgs {
           inherit system;
@@ -48,7 +48,6 @@
           pkgs = mkPkgs "aarch64-darwin";
           modules = [
             ./modules/home-manager/home.nix
-            inputs.try.homeManagerModules.default
           ];
         };
       };
@@ -86,6 +85,7 @@
 
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
+
   };
 
 }

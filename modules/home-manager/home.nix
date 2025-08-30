@@ -144,7 +144,7 @@ in
   imports = [
     ./apps/starship.nix
     ./apps/neovim.nix
-    # inputs.try.homeManagerModules.default
+    inputs.try.homeManagerModules.default
   ];
 
   # Essential packages organized by category
