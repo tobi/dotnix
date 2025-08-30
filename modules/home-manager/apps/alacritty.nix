@@ -1,9 +1,13 @@
-{ config
-, lib
-, pkgs
-, theme
-, ...
-}:
+/*
+  Alacritty Terminal Emulator Configuration
+
+  Features:
+  - GPU-accelerated terminal emulator
+  - Theme integration with nix-colors
+  - Custom keybindings and settings
+*/
+
+{ pkgs, theme, ... }:
 let
   palette = theme.palette;
 in
@@ -210,19 +214,4 @@ in
       };
     };
   };
-
-  # Desktop entry for Alacritty
-  xdg.desktopEntries.Alacritty = {
-    name = "Alacritty";
-    comment = "GPU-accelerated terminal emulator";
-    exec = "alacritty";
-    terminal = false;
-    type = "Application";
-    icon = "terminal";
-    categories = [
-      "Utility"
-      "TerminalEmulator"
-    ];
-  };
 }
-

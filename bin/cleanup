@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# cleanup - Clean up Nix store and generations
+
+set -euo pipefail
+
+# Colors for output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
+
+# Configuration
+readonly KEEP_GENERATIONS="${1:-30}"
+readonly KEEP_DAYS="${2:-30}"
+
+echo -e "${BLUE}🧹 Cleaning up Nix store and generations...${NC}"
+echo -e "${BLUE}Keep generations: ${KEEP_GENERATIONS}${NC}"
+echo -e "${BLUE}Keep days: ${KEEP_DAYS}${NC}"
+echo
+
+# Function to run command with error handling
+run_cmd() {
+    local cmd="$1"
+    local desc="$2"
+
+    echo -e "${YELLOW}${desc}...${NC}"
+    if eval "$cmd"; then
+        echo -e "${GREEN}✅ ${desc} completed${NC}"
+    else
+        echo -e "${RED}❌ ${desc} failed${NC}"
+        return 1
+    fi
+}
+
+# Clean up system generations
+if [ -f /etc/NIXOS ]; then
+    run_cmd "sudo nix-collect-garbage --delete-older-than ${KEEP_DAYS}d" "Cleaning system store"
+    run_cmd "sudo nixos-rebuild --delete-generations ${KEEP_GENERATIONS}d" "Cleaning system generations"
+fi
+
+# Clean up user generations
+run_cmd "home-manager expire-generations \"-${KEEP_DAYS} days\"" "Cleaning home-manager generations"
+
+# Clean up user store
+run_cmd "nix-collect-garbage --delete-older-than ${KEEP_DAYS}d" "Cleaning user store"
+
+# Optimize store
+run_cmd "nix store optimise" "Optimizing Nix store"
+
+echo
+echo -e "${GREEN}🎉 Cleanup completed!${NC}"
+echo -e "${BLUE}You can run 'nix store gc' again if you want to free more space.${NC}"

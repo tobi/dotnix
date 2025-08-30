@@ -5,23 +5,19 @@
 
   time.timeZone = "America/Toronto";
 
-  # Nix Settings
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    auto-optimise-store = true;
-  };
-
-  nix.gc = {
-    automatic = true;
-    options = "--delete-older-than 7d";
-    dates = "weekly";
+  # Networking
+  networking = {
+    networkmanager.enable = true;
+    firewall = {
+      allowedTCPPorts = [ 22 ]; # SSH only
+      allowedUDPPorts = [ ];    # No UDP ports by default
+    };
   };
 
   # Boot Configuration
   boot = {
     loader = {
       systemd-boot.enable = true;
-      # systemd-boot.consoleMode = "max";
       systemd-boot.configurationLimit = 6;
       efi.canTouchEfiVariables = true;
     };
@@ -34,14 +30,10 @@
       enable = true;
       theme = "cuts";
       themePackages = with pkgs; [
-        # Use adi1090x themes which includes many options
         (adi1090x-plymouth-themes.override {
           selected_themes = [ "cuts" "hexagon_dots" ];
         })
       ];
-      # extraConfig = ''
-      #   # DeviceScale=1.5
-      # '';
     };
 
     # we need latest kernel to deal with power issues
@@ -59,11 +51,10 @@
       "amdgpu.dcdebugmask=0" # Disable GPU debug mask
     ];
 
-
     # Configure initrd for smoother LUKS prompt
     initrd = {
       verbose = true;
-      systemd.enable = true; # Use systemd in initrd for better Plymouth integration
+      systemd.enable = true;
     };
   };
 
@@ -73,7 +64,7 @@
     settings = {
       General = {
         Experimental = true;
-        KernelExperimental = true; # Enable LE Audio and other experimental features
+        KernelExperimental = true;
       };
     };
   };
@@ -94,29 +85,11 @@
     };
   };
 
-  # Networking
-  networking = {
-    networkmanager.enable = true;
-    firewall = {
-      enable = true;
-      allowedTCPPorts = [ 22 ]; # SSH
-      allowedUDPPorts = [ ];
-    };
-  };
-
-  # Add ZRAM for better memory management
-  zramSwap = {
-    enable = true;
-    algorithm = "zstd";
-    memoryPercent = 40;
-  };
-
   # Programs
   programs.nix-ld.enable = true;
   programs.fuse.userAllowOther = true;
   programs.appimage.enable = true;
   programs.appimage.binfmt = true;
-
 
   # Create plugdev group for U2F/FIDO2 devices
   users.groups.plugdev = { };
@@ -129,7 +102,17 @@
     flatpak.enable = true;
     blueman.enable = true;
     seatd.enable = true;
-    openssh.enable = true;
+
+    # SSH with security hardening
+    openssh = {
+      enable = true;
+      settings = {
+        PasswordAuthentication = false;
+        PermitRootLogin = "no";
+        X11Forwarding = false;
+      };
+    };
+
     printing.enable = true;
     chrony.enable = true;
     upower.enable = true;
@@ -149,8 +132,10 @@
 
   # Security
   security = {
-    rtkit.enable = true;
     pam.services.greetd.enableGnomeKeyring = true;
+
+    # Enable apparmor
+    apparmor.enable = true;
   };
 
   # Steam
@@ -207,11 +192,9 @@
     };
   };
 
-
   # System Packages
   environment.systemPackages = with pkgs; [
     # Core tools
-    git
     zsh
     bash
     xdg-user-dirs
@@ -232,8 +215,6 @@
     kanshi
     anyrun
     xwayland-satellite
-    pciutils
-    usbutils
 
     # Applications
     chromium
@@ -244,17 +225,8 @@
     file-roller
 
     # System tools
-    vim
-    nano
-    tree
     zip
     p7zip
-    file
-    which
-    lsof
-    rsync
-    htop
-    iotop
 
     # Audio
     pavucontrol
@@ -273,28 +245,19 @@
     pcsclite
     libfido2
 
-    # Network tools
-    bind.dnsutils # dig, nslookup
-    nmap
-    traceroute
-    iperf3
-
     # Tailscale
     tailscale
   ];
 
-
-  # Fonts
-  fonts.packages = with pkgs; [
-    inter
-    noto-fonts
-    noto-fonts-emoji
-    noto-fonts-cjk-sans
-
-    nerd-fonts.fira-code
-    nerd-fonts.droid-sans-mono
-    nerd-fonts.caskaydia-mono
-    nerd-fonts.symbols-only
+  # Assertions for better error messages
+  assertions = [
+    {
+      assertion = config.dotnix.desktop.enable -> config.programs.niri.enable;
+      message = "Desktop environment requires Niri window manager to be enabled";
+    }
+    {
+      assertion = config.networking.hostName != "";
+      message = "Hostname must be set for this machine";
+    }
   ];
 }
-

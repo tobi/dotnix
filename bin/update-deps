@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# update-deps - Update flake dependencies and commit changes
+
+set -euo pipefail
+
+# Colors for output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
+
+# Configuration
+readonly FLAKE_PATH="${HOME}/dotnix"
+
+echo -e "${BLUE}📦 Updating flake dependencies...${NC}"
+echo -e "${BLUE}Flake path: ${FLAKE_PATH}${NC}"
+echo
+
+# Change to flake directory
+cd "${FLAKE_PATH}"
+
+# Update flake inputs
+echo -e "${YELLOW}Updating flake inputs...${NC}"
+if nix flake update; then
+    echo -e "${GREEN}✅ Flake inputs updated successfully${NC}"
+else
+    echo -e "${RED}❌ Failed to update flake inputs${NC}"
+    exit 1
+fi
+
+# Check if flake.lock changed
+if git diff --quiet flake.lock; then
+    echo -e "${YELLOW}No changes to flake.lock${NC}"
+    exit 0
+fi
+
+# Commit changes
+echo -e "${YELLOW}Committing changes...${NC}"
+git add flake.lock
+git commit -m "chore: update flake dependencies
+
+- Updated all flake inputs to latest versions
+- flake.lock updated automatically"
+
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}✅ Dependencies updated and committed${NC}"
+else
+    echo -e "${RED}❌ Failed to commit changes${NC}"
+    exit 1
+fi

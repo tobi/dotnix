@@ -1,8 +1,13 @@
-{ config
-, theme
-, pkgs
-, ...
-}:
+/*
+  Ghostty Terminal Emulator Configuration
+
+  Features:
+  - Wayland-native terminal emulator
+  - Theme integration with nix-colors
+  - Modern terminal features
+*/
+
+{ theme, ... }:
 let
   palette = theme.palette;
 in
@@ -20,9 +25,6 @@ in
       font-size = 12;
 
       theme = "dotnix";
-
-      # GTK theme settings to avoid warnings
-      # gtk-theme-variant = theme.variant;
 
       # Keep shell integration but disable problematic features
       shell-integration = "detect";
@@ -62,19 +64,4 @@ in
       };
     };
   };
-
-  # Desktop entry for Ghostty
-  xdg.desktopEntries.Ghostty = {
-    name = "Ghostty";
-    comment = "Wayland-native terminal emulator";
-    exec = "ghostty";
-    terminal = false;
-    type = "Application";
-    icon = "terminal";
-    categories = [
-      "Utility"
-      "TerminalEmulator"
-    ];
-  };
 }
-

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# test-configs - Test all NixOS machine configurations
+# Validates that all configurations build successfully
+
+set -euo pipefail
+
+# Colors for output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
+
+# Configuration
+readonly FLAKE_PATH="${1:-.}"
+readonly MACHINES=("frameling" "zerg-wsl2" "usb-stick" "beetralisk")
+
+echo -e "${BLUE}🧪 Testing NixOS configurations...${NC}"
+echo -e "${BLUE}Flake path: ${FLAKE_PATH}${NC}"
+echo
+
+failed_machines=()
+passed_machines=()
+
+for machine in "${MACHINES[@]}"; do
+    echo -e "${YELLOW}Testing ${machine}...${NC}"
+
+    if nixos-rebuild build --flake "${FLAKE_PATH}#${machine}" 2>/dev/null; then
+        echo -e "${GREEN}✅ ${machine} - PASSED${NC}"
+        passed_machines+=("$machine")
+    else
+        echo -e "${RED}❌ ${machine} - FAILED${NC}"
+        failed_machines+=("$machine")
+    fi
+    echo
+done
+
+# Summary
+echo -e "${BLUE}📊 Test Summary:${NC}"
+echo -e "${GREEN}Passed: ${#passed_machines[@]}${NC}"
+echo -e "${RED}Failed: ${#failed_machines[@]}${NC}"
+
+if [ ${#failed_machines[@]} -eq 0 ]; then
+    echo -e "${GREEN}🎉 All configurations passed!${NC}"
+    exit 0
+else
+    echo -e "${RED}💥 Failed machines: ${failed_machines[*]}${NC}"
+    exit 1
+fi

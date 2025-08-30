@@ -16,11 +16,7 @@ in
     else "/home/${username}";
 
 
-  # Global environment variables
-  home.sessionVariables = {
-    DOTFILES = "$HOME/dotnix";
-    MANPAGER = "sh -c 'col -bx | ${pkgs.bat}/bin/bat -l man -p'";
-  };
+  # Global environment variables are now managed by the environment module
 
   # Git configuration
   programs.git = {
@@ -118,8 +114,8 @@ in
   # Global shell aliases (will be overridden by desktop.nix when present)
   home.shellAliases = {
     # System management
-    reload = lib.mkDefault "home-manager switch --flake ~/dotnix#tobi && source $HOME/.zshrc";
-    switch = lib.mkDefault "home-manager switch --flake ~/dotnix#tobi && source $HOME/.zshrc";
+    reload = "switch";
+    switch = lib.mkDefault "~/dotnix/bin/switch";
   };
 
   programs.mise = {

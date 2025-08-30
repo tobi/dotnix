@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+# switch - Smart switch script for NixOS and home-manager
+# Automatically detects environment and runs appropriate command
+
+set -euo pipefail
+
+# Colors for output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
+
+# Configuration
+readonly FLAKE_PATH="${HOME}/dotnix"
+readonly USERNAME="${USER:-tobi}"
+
+# Detect environment
+detect_environment() {
+    if [ -n "${WSL_DISTRO_NAME:-}" ]; then
+        echo "wsl"
+    elif [ -f /etc/NIXOS ]; then
+        echo "nixos"
+    else
+        echo "other"
+    fi
+}
+
+# Show usage
+usage() {
+    cat << EOF
+Usage: switch [OPTIONS]
+
+Smart switch script that automatically detects your environment and runs the appropriate command.
+
+OPTIONS:
+    -h, --help          Show this help message
+    -v, --verbose       Enable verbose output
+    -q, --quiet         Suppress non-error output
+    --dry-run          Show what would be done without executing
+    --force            Force rebuild even if no changes detected
+
+ENVIRONMENTS:
+    nixos              Full NixOS system rebuild
+    wsl                WSL2 NixOS rebuild
+    other              Home-manager only rebuild
+
+EXAMPLES:
+    switch             # Normal switch
+    switch --verbose  # Verbose output
+    switch --dry-run  # Show what would happen
+    switch --force    # Force rebuild
+
+EOF
+}
+
+# Parse arguments
+VERBOSE=false
+QUIET=false
+DRY_RUN=false
+FORCE=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -v|--verbose)
+            VERBOSE=true
+            shift
+            ;;
+        -q|--quiet)
+            QUIET=true
+            shift
+            ;;
+        --dry-run)
+            DRY_RUN=true
+            shift
+            ;;
+        --force)
+            FORCE=true
+            shift
+            ;;
+        *)
+            echo -e "${RED}Unknown option: $1${NC}" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Logging functions
+log_info() {
+    if [[ "$QUIET" != "true" ]]; then
+        echo -e "${BLUE}ℹ️  $1${NC}"
+    fi
+}
+
+log_success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+log_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+log_error() {
+    echo -e "${RED}❌ $1${NC}" >&2
+}
+
+# Detect environment
+detect_environment() {
+    if [ -n "${WSL_DISTRO_NAME:-}" ]; then
+        echo "wsl"
+    elif [ -f /etc/NIXOS ]; then
+        echo "nixos"
+    else
+        echo "other"
+    fi
+}
+
+# Main switch function
+main() {
+    local env_type
+    env_type=$(detect_environment)
+
+    if [[ "$QUIET" != "true" ]]; then
+        echo -e "${BLUE}🔄 Switching configuration...${NC}"
+        echo -e "${BLUE}Environment: ${env_type}${NC}"
+        echo -e "${BLUE}Flake: ${FLAKE_PATH}${NC}"
+        echo
+    fi
+
+    local cmd=""
+    case "$env_type" in
+        "wsl")
+            log_info "Running WSL configuration switch..."
+            cmd="sudo nixos-rebuild switch --flake \"${FLAKE_PATH}\""
+            ;;
+        "nixos")
+            log_info "Running NixOS system switch..."
+            cmd="sudo nixos-rebuild switch --flake \"${FLAKE_PATH}\""
+            ;;
+        "other")
+            log_info "Running home-manager switch..."
+            cmd="home-manager switch --flake \"${FLAKE_PATH}#${USERNAME}\""
+            ;;
+        *)
+            log_error "Unknown environment type: ${env_type}"
+            exit 1
+            ;;
+    esac
+
+    # Add flags
+    if [[ "$VERBOSE" == "true" ]]; then
+        cmd="$cmd --verbose"
+    fi
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_info "Dry run mode - showing what would be executed:"
+        echo "$cmd"
+        exit 0
+    fi
+
+    # Execute command
+    if eval "$cmd"; then
+        log_success "Switch completed successfully!"
+        if [[ "$QUIET" != "true" ]]; then
+            echo -e "${GREEN}You may need to restart your shell or log out/in for changes to take effect.${NC}"
+        fi
+    else
+        log_error "Switch failed!"
+        exit 1
+    fi
+}
+
+# Run main function
+main "$@"

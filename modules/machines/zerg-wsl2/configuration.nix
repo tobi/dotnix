@@ -10,11 +10,7 @@
 
   networking.hostName = "zerg-wsl2";
 
-  # ───── Core Nix settings ────────────────────────────────────────────────
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    auto-optimise-store = true; # deduplicate after builds
-  };
+
 
   # ───── WSL Configuration ────────────────────────────────────────────────
   wsl.enable = true;
@@ -51,8 +47,6 @@
 
     # Fix missing commands from diagnostics
     tzdata # Fix timezone warnings
-    pciutils # lspci
-    usbutils # lsusb
   ];
 
   # Environment variables for WSL2 NVIDIA support
@@ -73,7 +67,6 @@
 
   # ───── Fallback libs for binary blobs ──────────────────────────────────
   programs.nix-ld = {
-    enable = true;
     libraries = with pkgs; [
       # Standard libraries for dynamic linking
       stdenv.cc.cc.lib
