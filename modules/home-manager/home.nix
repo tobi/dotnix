@@ -66,10 +66,15 @@ in
 
     # Interactive shell setup
     initContent = ''
+      # ── Line navigation ────────────────────────────────────────
+      # Ensure Ctrl+A and Ctrl+E work for beginning/end of line
+      bindkey '^A' beginning-of-line
+      bindkey '^E' end-of-line
+
       # ── Ctrl-← / Ctrl-→ word jumps ────────────────────────────
       # Ghostty sends CSI 1;5D / 1;5C; map them to the usual widgets.
-      bindkey -M emacs '^[[1;5D' backward-word
-      bindkey -M emacs '^[[1;5C' forward-word
+      bindkey '^[[1;5D' backward-word
+      bindkey '^[[1;5C' forward-word
 
       echo
       export PATH="$HOME/bin:$HOME/.local/bin:$HOME/dotnix/bin:${lib.optionalString isDarwin ":/opt/dev/bin"}:$PATH"
@@ -144,7 +149,7 @@ in
   imports = [
     ./apps/starship.nix
     ./apps/neovim.nix
-    inputs.try.homeManagerModules.default
+    ./apps/try.nix
   ];
 
   # Essential packages organized by category
