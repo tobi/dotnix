@@ -20,7 +20,7 @@ in
       curl
       wget
 
-      # Development tools
+          # Development tools
       gnumake
       stdenv.cc
       llvm
@@ -33,6 +33,11 @@ in
       automake
       libtool
       libuuid
+
+      # Nix development tools
+      nixpkgs-fmt
+      statix
+      deadnix
 
       # Language runtimes
       ruby_3_4

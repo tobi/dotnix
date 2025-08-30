@@ -1,0 +1,176 @@
+#!/usr/bin/env bash
+# optimize - System optimization script for NixOS
+
+set -euo pipefail
+
+# Colors for output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
+
+# Logging functions
+log_info() {
+    echo -e "${BLUE}ℹ️  $1${NC}"
+}
+
+log_success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+log_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+log_error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+# Show usage
+usage() {
+    cat << EOF
+Usage: optimize [OPTIONS]
+
+System optimization script for NixOS. Performs various optimizations to improve
+system performance, clean up disk space, and maintain system health.
+
+OPTIONS:
+    -h, --help          Show this help message
+    -v, --verbose       Enable verbose output
+    -q, --quiet         Suppress non-essential output
+    --dry-run          Show what would be done without executing
+    --aggressive       Perform more aggressive optimizations
+
+OPERATIONS:
+    - Clean Nix store garbage
+    - Optimize Nix store
+    - Clean old system generations
+    - Clean old home-manager generations
+    - Defragment databases (if aggressive)
+    - Update system (if not dry-run)
+
+EXAMPLES:
+    optimize                    # Standard optimization
+    optimize --verbose         # Verbose output
+    optimize --dry-run         # Show what would happen
+    optimize --aggressive      # More thorough optimization
+
+EOF
+}
+
+# Parse arguments
+VERBOSE=false
+QUIET=false
+DRY_RUN=false
+AGGRESSIVE=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -v|--verbose)
+            VERBOSE=true
+            shift
+            ;;
+        -q|--quiet)
+            QUIET=true
+            shift
+            ;;
+        --dry-run)
+            DRY_RUN=true
+            shift
+            ;;
+        --aggressive)
+            AGGRESSIVE=true
+            shift
+            ;;
+        *)
+            echo -e "${RED}Unknown option: $1${NC}" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Run command with appropriate flags
+run_cmd() {
+    local cmd="$1"
+    local desc="$2"
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_info "Would run: $cmd"
+        return 0
+    fi
+
+    if [[ "$QUIET" != "true" ]]; then
+        log_info "$desc..."
+    fi
+
+    if eval "$cmd"; then
+        if [[ "$QUIET" != "true" ]]; then
+            log_success "$desc completed"
+        fi
+    else
+        log_error "$desc failed"
+        return 1
+    fi
+}
+
+# Main optimization function
+main() {
+    if [[ "$QUIET" != "true" ]]; then
+        echo -e "${BLUE}🚀 NixOS System Optimization${NC}"
+        echo -e "${BLUE}===========================${NC}"
+        if [[ "$AGGRESSIVE" == "true" ]]; then
+            echo -e "${YELLOW}Running in aggressive mode${NC}"
+        fi
+        echo
+    fi
+
+    # Clean Nix store garbage
+    run_cmd "nix-collect-garbage --delete-older-than 7d" "Cleaning Nix store"
+
+    # Optimize Nix store
+    run_cmd "nix store optimise" "Optimizing Nix store"
+
+    # Clean system generations (keep last 5)
+    if [[ -f /etc/NIXOS ]]; then
+        run_cmd "sudo nix-collect-garbage --delete-older-than 7d" "Cleaning system store"
+        run_cmd "sudo nixos-rebuild --delete-generations 5d" "Cleaning old system generations"
+    fi
+
+    # Clean home-manager generations
+    run_cmd "home-manager expire-generations \"-7 days\"" "Cleaning old home-manager generations"
+
+    # Aggressive optimizations
+    if [[ "$AGGRESSIVE" == "true" ]]; then
+        log_info "Running aggressive optimizations..."
+
+        # Clean more aggressively
+        run_cmd "nix-collect-garbage --delete-older-than 1d" "Aggressive Nix store cleanup"
+
+        # Update system
+        if [[ "$DRY_RUN" != "true" ]]; then
+            log_info "Updating system..."
+            if command -v nh >/dev/null 2>&1; then
+                run_cmd "nh os switch" "Updating system with nh"
+            elif [[ -f /etc/NIXOS ]]; then
+                run_cmd "sudo nixos-rebuild switch --upgrade" "Updating system"
+            else
+                run_cmd "home-manager switch" "Updating home-manager"
+            fi
+        fi
+    fi
+
+    if [[ "$DRY_RUN" != "true" ]] && [[ "$QUIET" != "true" ]]; then
+        echo
+        log_success "Optimization completed!"
+        log_info "Consider running 'health-check' to verify system status"
+    fi
+}
+
+# Run main function
+main "$@"

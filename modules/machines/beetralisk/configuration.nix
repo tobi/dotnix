@@ -9,17 +9,7 @@
   # Networking
   networking.hostName = "beetralisk";
 
-  # Nix Settings
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    auto-optimise-store = true;
-  };
 
-  nix.gc = {
-    automatic = true;
-    options = "--delete-older-than 7d";
-    dates = "weekly";
-  };
 
   # Boot Configuration
   boot = {
@@ -87,7 +77,6 @@
   networking = {
     networkmanager.enable = true;
     firewall = {
-      enable = true;
       allowedTCPPorts = [ 22 ]; # SSH
       allowedUDPPorts = [ ];
     };
@@ -100,11 +89,7 @@
     memoryPercent = 40;
   };
 
-  # Programs
-  programs = {
-    nix-ld.enable = true;
-    fuse.userAllowOther = true;
-  };
+
 
 
   # Create plugdev group for U2F/FIDO2 devices
@@ -120,7 +105,7 @@
     seatd.enable = true;
     openssh.enable = true;
     printing.enable = true;
-    chrony.enable = true;
+
     upower.enable = true;
     thermald.enable = true;
     fwupd.enable = true;
@@ -130,23 +115,14 @@
     tailscale.useRoutingFeatures = "client";
   };
 
-  # Fix NTP startup dependencies
-  systemd.services.chronyd = {
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
-  };
+
 
   # Security
   security = {
-    rtkit.enable = true;
     pam.services.greetd.enableGnomeKeyring = true;
   };
 
-  # Appimage support
-  programs.appimage = {
-    enable = true;
-    binfmt = true;
-  };
+
 
   # Steam
   programs.steam = {
@@ -205,7 +181,6 @@
   # System Packages
   environment.systemPackages = with pkgs; [
     # Core tools
-    git
     zsh
     bash
     fuse
@@ -227,8 +202,6 @@
     kanshi
     anyrun
     xwayland-satellite
-    pciutils
-    usbutils
 
     # Applications
     chromium
@@ -239,17 +212,8 @@
     file-roller
 
     # System tools
-    vim
-    nano
-    tree
     zip
     p7zip
-    file
-    which
-    lsof
-    rsync
-    htop
-    iotop
 
     # Audio
     pavucontrol
@@ -268,12 +232,6 @@
     pcsclite
     libfido2
 
-    # Network tools
-    bind.dnsutils # dig, nslookup
-    nmap
-    traceroute
-    iperf3
-
     # Package management
     nix-index
 
@@ -281,17 +239,6 @@
     tailscale
   ];
 
-  # Fonts
-  fonts.packages = with pkgs; [
-    inter
-    noto-fonts
-    noto-fonts-emoji
-    noto-fonts-cjk-sans
 
-    nerd-fonts.fira-code
-    nerd-fonts.droid-sans-mono
-    nerd-fonts.caskaydia-mono
-    nerd-fonts.symbols-only
-  ];
 }
 

@@ -111,8 +111,8 @@ in
   # Global shell aliases (will be overridden by desktop.nix when present)
   home.shellAliases = {
     # System management
-    reload = lib.mkDefault "home-manager switch --flake ~/dotnix#tobi && source $HOME/.zshrc";
-    switch = lib.mkDefault "home-manager switch --flake ~/dotnix#tobi && source $HOME/.zshrc";
+    reload = "switch";
+    switch = lib.mkDefault "~/dotnix/bin/switch";
   };
 
   programs.mise = {
@@ -214,4 +214,3 @@ in
     path = "~/src/tries";
   };
 }
-

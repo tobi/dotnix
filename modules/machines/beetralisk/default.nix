@@ -6,6 +6,7 @@
     ./hardware-configuration.nix
     ./disko-config.nix
     ./configuration.nix
+    ../../nixos/common.nix
     ../../nixos/user.nix
     ../../nixos/niri.nix
     inputs.disko.nixosModules.disko

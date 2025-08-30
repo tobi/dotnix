@@ -5,16 +5,13 @@
 
   time.timeZone = "America/Toronto";
 
-  # Nix Settings
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    auto-optimise-store = true;
-  };
-
-  nix.gc = {
-    automatic = true;
-    options = "--delete-older-than 7d";
-    dates = "weekly";
+  # Networking
+  networking = {
+    networkmanager.enable = true;
+    firewall = {
+      allowedTCPPorts = [ 22 ]; # SSH only
+      allowedUDPPorts = [ ];    # No UDP ports by default
+    };
   };
 
   # Boot Configuration
@@ -56,11 +53,10 @@
       "amd_pstate=active"
     ];
 
-
     # Configure initrd for smoother LUKS prompt
     initrd = {
       verbose = true;
-      systemd.enable = true; # Use systemd in initrd for better Plymouth integration
+      systemd.enable = true;
     };
   };
 
@@ -80,29 +76,11 @@
   };
 
 
-  # Networking
-  networking = {
-    networkmanager.enable = true;
-    firewall = {
-      enable = true;
-      allowedTCPPorts = [ 22 ]; # SSH
-      allowedUDPPorts = [ ];
-    };
-  };
-
-  # Add ZRAM for better memory management
-  zramSwap = {
-    enable = true;
-    algorithm = "zstd";
-    memoryPercent = 40;
-  };
-
   # Programs
   programs.nix-ld.enable = true;
   programs.fuse.userAllowOther = true;
   programs.appimage.enable = true;
   programs.appimage.binfmt = true;
-
 
   # Create plugdev group for U2F/FIDO2 devices
   users.groups.plugdev = { };
@@ -115,7 +93,17 @@
     flatpak.enable = true;
     blueman.enable = true;
     seatd.enable = true;
-    openssh.enable = true;
+
+    # SSH with security hardening
+    openssh = {
+      enable = true;
+      settings = {
+        PasswordAuthentication = false;
+        PermitRootLogin = "no";
+        X11Forwarding = false;
+      };
+    };
+
     printing.enable = true;
     chrony.enable = true;
     upower.enable = true;
@@ -136,8 +124,10 @@
 
   # Security
   security = {
-    rtkit.enable = true;
     pam.services.greetd.enableGnomeKeyring = true;
+
+    # Enable apparmor
+    apparmor.enable = true;
   };
 
   # Steam
@@ -197,11 +187,9 @@
     };
   };
 
-
   # System Packages
   environment.systemPackages = with pkgs; [
     # Core tools
-    git
     zsh
     bash
     xdg-user-dirs
@@ -222,8 +210,6 @@
     kanshi
     anyrun
     xwayland-satellite
-    pciutils
-    usbutils
 
     # Applications
     chromium
@@ -234,17 +220,8 @@
     file-roller
 
     # System tools
-    vim
-    nano
-    tree
     zip
     p7zip
-    file
-    which
-    lsof
-    rsync
-    htop
-    iotop
 
     # Audio
     pavucontrol
@@ -262,12 +239,6 @@
     # FIDO2/WebAuthn support
     pcsclite
     libfido2
-
-    # Network tools
-    bind.dnsutils # dig, nslookup
-    nmap
-    traceroute
-    iperf3
 
     # Tailscale
     tailscale

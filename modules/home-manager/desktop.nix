@@ -49,7 +49,6 @@
   };
 
   home.shellAliases = {
-    switch = "sudo nixos-rebuild switch --flake ~/dotnix && source ~/.zshrc";
     reload = "switch";
   };
 

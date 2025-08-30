@@ -43,14 +43,14 @@
       # ------------------------------------------------------------
       # Home Manager configurations
       # ------------------------------------------------------------
-      homeConfigurations = {
-        "tobi" = home-manager.lib.homeManagerConfiguration {
-          pkgs = mkPkgs "aarch64-darwin";
-          modules = [
-            ./modules/home-manager/home.nix
-          ];
-        };
-      };
+      homeConfigurations = forEachSystem
+        (system:  
+          let pkgs = mkPkgs system;
+          in home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [ ./modules/home-manager/home.nix ];
+          }
+        );
 
 
       # ------------------------------------------------------------

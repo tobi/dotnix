@@ -4,6 +4,7 @@
 {
   imports = [
     ./configuration.nix
+    ../../nixos/common.nix
     inputs.nixos-wsl.nixosModules.wsl
     ../../nixos/user.nix
   ];
@@ -18,5 +19,7 @@
   # WSL doesn't need desktop environment
   dotnix.home.enable = true;
   dotnix.desktop.enable = false;
+
+
 }
 
