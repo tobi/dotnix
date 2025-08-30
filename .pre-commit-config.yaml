@@ -1,0 +1,33 @@
+repos:
+  - repo: https://github.com/nix-community/nixpkgs-fmt
+    rev: main
+    hooks:
+      - id: nixpkgs-fmt
+        name: Format Nix files
+        description: Format Nix code with nixpkgs-fmt
+        entry: nixpkgs-fmt
+        language: system
+        files: \.nix$
+        exclude: ^.*generated.*$
+
+  - repo: https://github.com/ners/nix
+    rev: main
+    hooks:
+      - id: statix
+        name: Lint Nix files
+        description: Lint Nix code with statix
+        entry: statix check
+        language: system
+        files: \.nix$
+        pass_filenames: false
+
+  - repo: https://github.com/ners/nix
+    rev: main
+    hooks:
+      - id: deadnix
+        name: Find dead code in Nix files
+        description: Find dead code in Nix files with deadnix
+        entry: deadnix
+        language: system
+        files: \.nix$
+        pass_filenames: false
