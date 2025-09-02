@@ -19,8 +19,13 @@ in
   # Global environment variables
   home.sessionVariables = {
     DOTFILES = "$HOME/dotnix";
-    MANPAGER = "sh -c 'col -bx | ${pkgs.bat}/bin/bat -l man -p'";
+    # MANPAGER = "sh -c 'col -bx | ${pkgs.bat}/bin/bat -l man -p'";
     EDITOR = "nvim";
+  };
+
+  programs.bat = {
+    enable = true;
+    config.theme = "OneHalfDark";
   };
 
   # Git configuration
@@ -73,16 +78,19 @@ in
 
       # ── Ctrl-← / Ctrl-→ word jumps ────────────────────────────
       # Ghostty sends CSI 1;5D / 1;5C; map them to the usual widgets.
+<<<<<<< HEAD
       bindkey '^[[1;5D' backward-word
       bindkey '^[[1;5C' forward-word
+=======
+      # bindkey -M emacs '^[[1;5D' backward-word
+      # bindkey -M emacs '^[[1;5C' forward-word
+      export PATH="$HOME/bin:$HOME/.local/bin:$HOME/dotnix/bin${lib.optionalString isDarwin ":/opt/dev/bin"}:$PATH"
+>>>>>>> ea7c153 (tame bat)
 
-      echo
-      export PATH="$HOME/bin:$HOME/.local/bin:$HOME/dotnix/bin:${lib.optionalString isDarwin ":/opt/dev/bin"}:$PATH"
-
-      [ -f ~/.zshrc.local ] && echo "* Adding ~/.zshrc.local" >&2 && source ~/.zshrc.local
+      [ -f ~/.zshrc.local ] && source ~/.zshrc.local
 
       # Show system info on shell startup
-      echo && ${lib.optionalString isLinux "nitch"}
+      echo ${lib.optionalString isLinux "&& nitch"} && fastfetch
     '';
 
 
@@ -201,6 +209,7 @@ in
 
 
     # Nice-to-have
+    fastfetch
     gum
     bat-extras.batgrep
     bat-extras.batman
