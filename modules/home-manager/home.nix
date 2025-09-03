@@ -19,7 +19,6 @@ in
   # Global environment variables
   home.sessionVariables = {
     DOTFILES = "$HOME/dotnix";
-    # MANPAGER = "sh -c 'col -bx | ${pkgs.bat}/bin/bat -l man -p'";
     EDITOR = "nvim";
   };
 
@@ -71,57 +70,46 @@ in
 
     # Interactive shell setup
     initContent = ''
-      # ── Line navigation ────────────────────────────────────────
-      # Ensure Ctrl+A and Ctrl+E work for beginning/end of line
+      # ── Ctrl-← / Ctrl-→ word jumps ────────────────────────────
       bindkey '^A' beginning-of-line
       bindkey '^E' end-of-line
 
-      # ── Ctrl-← / Ctrl-→ word jumps ────────────────────────────
-      # Ghostty sends CSI 1;5D / 1;5C; map them to the usual widgets.
-      bindkey '^[[1;5D' backward-word
-      bindkey '^[[1;5C' forward-word
+      export PATH="$HOME/.local/bin:$DOTFILES/bin:$PATH"
 
-      export PATH="$HOME/bin:$HOME/.local/bin:$HOME/dotnix/bin${lib.optionalString isDarwin ":/opt/dev/bin"}:$PATH"
-
+      # -- Local zshrc ────────────────────────────────────────────
       [ -f ~/.zshrc.local ] && source ~/.zshrc.local
-
-      # Show system info on shell startup
-      echo ${lib.optionalString isLinux "&& nitch"} && fastfetch
     '';
-
-
-    shellAliases = {
-      # Editor and tools
-      e = "nvim";
-      n = "nvim";
-      lg = "lazygit";
-
-      # File operations
-      ls = "eza";
-      ll = "eza -l";
-      la = "eza -a";
-      lla = "eza -la";
-      tree = "eza --tree";
-      ".." = "cd ..";
-
-      # Git shortcuts
-      gs = "git status";
-      gc = "git commit -m";
-      gd = "git diff";
-      gdc = "git diff --cached";
-
-    } // lib.optionalAttrs pkgs.stdenv.isLinux {
-      # Clipboard (macOS compatibility on Linux)
-      pbcopy = "wl-copy";
-      pbpaste = "wl-paste";
-    };
   };
 
-  # Global shell aliases (will be overridden by desktop.nix when present)
   home.shellAliases = {
-    # System management
-    reload = "switch";
-    switch = lib.mkDefault "~/dotnix/bin/switch";
+    # update home-manager or nixos
+    switch = "switch && source $HOME/.zshrc";
+
+    # Editor and tools
+    n = "${pkgs.neovim}/bin/nvim";
+    grep = "${pkgs.ripgrep}/bin/rg -uuu";
+    lg = "${pkgs.lazygit}/bin/lazygit";
+    gs = "${pkgs.git}/bin/git status";
+    bat = "${pkgs.bat}/bin/bat";
+    sg = "${pkgs.ast-grep}/bin/ast-grep";
+    rg = "${pkgs.ripgrep}/bin/rg";
+
+    # File operations
+    ".." = "cd ..";
+    ls = "${pkgs.eza}/bin/eza";
+    ll = "${pkgs.eza}/bin/eza -l";
+    la = "${pkgs.eza}/bin/eza -a";
+    lla = "${pkgs.eza}/bin/eza -la";
+    tree = "${pkgs.eza}/bin/eza --tree";
+
+    # clipboard
+    c = "pbcopy";
+    v = "pbpaste";
+
+  } // lib.optionalAttrs pkgs.stdenv.isLinux {
+    # Clipboard (macOS compatibility on Linux)
+    pbcopy = "${pkgs.wl-copy}/bin/wl-copy";
+    pbpaste = "${pkgs.wl-paste}/bin/wl-paste";
   };
 
   programs.mise = {
@@ -158,64 +146,62 @@ in
 
   # Essential packages organized by category
   home.packages = with pkgs; [
-    # Core utilities
-    fd
-    bat
-    fzf
-    eza
-    ripgrep
-    wget
-    curl
-    jq
-    age
-    gh
-    fswatch
-    zstd
+    # ── Core utilities ──────────────────────────────────────────────────
+    age                      # Simple, modern and secure file encryption
+    bat                      # Cat clone with syntax highlighting
+    curl                     # Command line tool for transferring data
+    eza                      # Modern replacement for ls
+    fd                       # Simple, fast and user-friendly find
+    fswatch                  # File change monitor
+    fzf                      # General-purpose command-line fuzzy finder
+    gh                       # GitHub CLI tool
+    jq                       # Lightweight and flexible JSON processor
+    ripgrep                  # Fast text search tool
+    wget                     # Network utility to retrieve files
+    zstd                     # Fast compression algorithm
 
-    # System tools
-    htop
-    sysz
-    mtr
-    dust
-    yazi
-    mprocs
-    procs
-    mask
-    pv
-    killall
+    # ── System tools ────────────────────────────────────────────────────
+    dust                     # More intuitive version of du
+    htop                     # Interactive process viewer
+    killall                  # Kill processes by name
+    mask                     # CLI task runner defined by a simple markdown file
+    mprocs                   # Run multiple commands in parallel
+    mtr                      # Network diagnostic tool
+    procs                    # Modern replacement for ps
+    pv                       # Terminal-based tool for monitoring data
+    sysz                     # System information tool
+    yazi                     # Terminal file manager
 
-    # Development
-    gnumake
-    sqlite
-    zlib.dev
-    stdenv.cc
-    openssl.dev
-    libffi.dev
-    pkg-config
-    lazygit
-    hyperfine
-    tokei
-    nixpkgs-fmt
-    nixfmt-rfc-style
-    nixfmt-tree
-    comma
-    envsubst
-    duckdb
-    ffmpeg
+    # ── Development tools ───────────────────────────────────────────────
+    ast-grep                 # Fast structural search and replace
+    comma                    # Runs programs without installing them
+    duckdb                   # Analytical database
+    envsubst                 # Substitute environment variables in shell format
+    ffmpeg                   # Multimedia framework
+    gnumake                  # GNU make utility
+    hyperfine                # Command-line benchmarking tool
+    lazygit                  # Simple terminal UI for git
+    libffi.dev               # Foreign function interface library
+    nixfmt-rfc-style         # Nix code formatter (RFC style)
+    nixfmt-tree              # Nix code formatter (tree style)
+    nixpkgs-fmt              # Nix code formatter
+    openssl.dev              # Cryptography and SSL/TLS toolkit
+    pkg-config               # Helper tool for compiling applications
+    sqlite                   # SQL database engine
+    stdenv.cc                # C/C++ compiler toolchain
+    tokei                    # Count your code, quickly
+    unzip                    # ZIP archive extraction utility
+    zlib.dev                 # Compression library
+    zsync                    # File synchronization tool
 
-
-    # Nice-to-have
-    fastfetch
-    gum
-    bat-extras.batgrep
-    bat-extras.batman
-    bat-extras.batdiff
+    # ── Nice-to-have utilities ───────────────────────────────────────────
+    fastfetch                # Fast system information tool
+    gum                      # Tool for glamorous shell scripts
 
   ] ++ lib.optionals isLinux [
-    sysz
-    nitch
+    nitch                    # Minimal system information tool
+    sysz                     # System information tool
   ] ++ lib.optionals isDarwin [
-    # gcloud
   ];
 
 

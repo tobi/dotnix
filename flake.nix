@@ -9,6 +9,8 @@
     , ...
     } @inputs:
     let
+      # Import overlays
+      rubyOverlay = import ./modules/overlays/ruby.nix;
       # Support both Linux and Darwin
       systems = [
         "x86_64-linux"
@@ -28,6 +30,7 @@
           config.allowUnfree = true;
           overlays = [
             inputs.niri.overlays.niri
+            rubyOverlay
           ];
         };
     in
@@ -44,6 +47,7 @@
       # ------------------------------------------------------------
       # Home Manager configurations
       # ------------------------------------------------------------
+<<<<<<< HEAD
       homeConfigurations = forEachSystem
         (system:
           let pkgs = mkPkgs system;
@@ -52,6 +56,17 @@
             modules = [ ./modules/home-manager/home.nix ];
           }
         );
+=======
+      # Home Manager expects `homeConfigurations.<name>` at the top level.
+      # Provide a concrete configuration for the local Darwin user "tobi".
+      homeConfigurations = {
+        "tobi" = home-manager.lib.homeManagerConfiguration {
+          pkgs = mkPkgs "aarch64-darwin";
+          extraSpecialArgs = { inherit inputs; };
+          modules = [ ./modules/home-manager/home.nix ];
+        };
+      };
+>>>>>>> 1a6d3d9 (Add ruby jemalloc overlay to enable jemalloc support for all Ruby versions)
 
 
       # ------------------------------------------------------------

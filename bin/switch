@@ -169,7 +169,6 @@ main() {
         if [[ "$QUIET" != "true" ]]; then
             echo -e "${GREEN}You may need to restart your shell or log out/in for changes to take effect.${NC}"
         fi
-        source ~/.zshrc
     else
         log_error "Switch failed!"
         exit 1

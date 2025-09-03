@@ -9,9 +9,10 @@
       pkgs = import nixpkgs {
         system = "x86_64-linux";
         config.allowUnfree = true;
-        overlays = [
-          inputs.niri.overlays.niri
-        ];
+      overlays = [
+        inputs.niri.overlays.niri
+        (import ../modules/overlays/ruby.nix)
+      ];
       };
     in
     builtins.listToAttrs (map

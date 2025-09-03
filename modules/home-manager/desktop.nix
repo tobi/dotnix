@@ -2,28 +2,35 @@
 {
 
   home.packages = with pkgs; [
-    wbg
-    libnotify
-    rustdesk
-    gcr
-    colloid-gtk-theme
-    gnome-keyring
-    libsecret
-    wev
-    unzip
-    zsync
-    dropbox-cli
-    blueberry
-    pavucontrol
-    pamixer
-    brightnessctl
-    dex
-    wine
-    gnupg
-    nil
-    xdg-desktop-portal-gtk
-    playerctl
-    spotify-player
+    # Desktop environment and window management
+    wbg                      # Wallpaper setter for Wayland
+    xdg-desktop-portal-gtk   # XDG desktop portal for GTK applications
+
+    # Audio control
+    pavucontrol              # PulseAudio volume control GUI
+    pamixer                  # PulseAudio command-line mixer
+    playerctl                # Media player controller
+    spotify-player           # Spotify TUI client
+
+    # System utilities
+    brightnessctl            # Screen brightness control
+    blueberry                # Bluetooth manager
+    dex                      # Desktop entry execution
+    libnotify                # Desktop notifications library
+    wev                      # Wayland event viewer
+
+    # Security and authentication
+    gcr                      # GNOME crypto services
+    gnome-keyring            # GNOME keyring daemon
+    gnupg                    # GNU Privacy Guard
+    libsecret                # Secret service library
+
+    # File operations and compression
+    dropbox-cli              # Dropbox command-line interface
+
+    # Applications
+    rustdesk                 # Remote desktop client
+    wine                     # Windows compatibility layer
   ];
 
   # probably should go to home
@@ -46,10 +53,6 @@
         "x-scheme-handler/https" = "google-chrome.desktop";
       };
     };
-  };
-
-  home.shellAliases = {
-    reload = "switch";
   };
 
   # Symlink current theme wallpaper to ~/.config/wallpaper.jpg
