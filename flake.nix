@@ -38,13 +38,14 @@
       # ------------------------------------------------------------
       nixosConfigurations = utils.mkMachines {
         inherit inputs;
+        machinesPath = ./modules/machines;
       };
 
       # ------------------------------------------------------------
       # Home Manager configurations
       # ------------------------------------------------------------
       homeConfigurations = forEachSystem
-        (system:  
+        (system:
           let pkgs = mkPkgs system;
           in home-manager.lib.homeManagerConfiguration {
             inherit pkgs;

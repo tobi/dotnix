@@ -1,15 +1,10 @@
 { nixpkgs }:
 
 {
-  mkMachines = { inputs }:
+  mkMachines = { inputs, machinesPath }:
     let
-      machinesPath = ../modules/machines;
-      machineNames = builtins.attrNames (builtins.readDir machinesPath);
-      machineDirs = builtins.filter
-        (name:
-          (builtins.readDir machinesPath).${name} == "directory"
-        )
-        machineNames;
+      # Hardcode host names for now
+      hostNames = [ "frameling" "zerg-wsl2" "usb-stick" "beetralisk" ];
 
       pkgs = import nixpkgs {
         system = "x86_64-linux";
@@ -34,6 +29,6 @@
           ];
         };
       })
-      machineDirs);
+      hostNames);
 }
 
