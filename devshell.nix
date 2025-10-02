@@ -20,7 +20,7 @@ in
       curl
       wget
 
-          # Development tools
+      # Development tools
       gnumake
       stdenv.cc
       llvm

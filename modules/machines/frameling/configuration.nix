@@ -10,7 +10,7 @@
     networkmanager.enable = true;
     firewall = {
       allowedTCPPorts = [ 22 ]; # SSH only
-      allowedUDPPorts = [ ];    # No UDP ports by default
+      allowedUDPPorts = [ ]; # No UDP ports by default
     };
   };
 

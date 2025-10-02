@@ -203,31 +203,5 @@ in
           brightWhite = colorScheme.palette.base07;
         };
       };
-      in
-      {
-      options.dotnix.theme = lib.mkOption {
-        type = lib.types.attrs;
-        default = buildTheme "catppuccin-mocha" "Inter";
-        description = "The complete theme configuration object";
-        internal = true;
-      };
-
-      options.dotnix.themeName = lib.mkOption {
-        type = lib.types.str;
-        default = "catppuccin-mocha";
-        description = "The nix-colors color scheme name to use";
-        example = "nord";
-      };
-
-      options.dotnix.themeFont = lib.mkOption {
-        type = lib.types.str;
-        default = "Inter";
-        description = "The system font to use";
-        example = "Roboto";
-      };
-
-      config = {
-        # Build the theme object based on the configuration options
-        dotnix.theme = lib.mkOverride 900 (buildTheme config.dotnix.themeName config.dotnix.themeFont);
-      };
-    }
+    };
+}
