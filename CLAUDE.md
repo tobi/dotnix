@@ -19,14 +19,14 @@ This is a **clean, modern NixOS flake configuration** with the following key pri
 │   ├── secrets/               # Age encrypted secrets
 │   └── themes.nix             # Centralized theme system
 ├── modules/                    # All modular configurations
+│   ├── machines/             # Machine-specific configurations
+│   │   ├── frameling/        # Desktop workstation
+│   │   ├── zerg-wsl2/        # WSL2 development
+│   │   └── usb-stick/        # Live USB/installer
 │   ├── home-manager/          # Home-manager modules
 │   │   ├── apps/             # Individual app modules (alacritty, niri, etc.)
 │   │   ├── desktop.nix       # Desktop environment imports
 │   │   └── home.nix          # Core home configuration
-│   ├── machines/              # Machine-specific configurations
-│   │   ├── frameling/        # Desktop workstation
-│   │   ├── zerg-wsl2/        # WSL2 development
-│   │   └── usb-stick/        # Live USB/installer
 │   └── nixos/                 # NixOS system modules
 │       ├── config.nix        # dotnix options definition
 │       ├── niri.nix          # Niri window manager config
