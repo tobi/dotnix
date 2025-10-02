@@ -78,14 +78,10 @@ in
 
       # ── Ctrl-← / Ctrl-→ word jumps ────────────────────────────
       # Ghostty sends CSI 1;5D / 1;5C; map them to the usual widgets.
-<<<<<<< HEAD
       bindkey '^[[1;5D' backward-word
       bindkey '^[[1;5C' forward-word
-=======
-      # bindkey -M emacs '^[[1;5D' backward-word
-      # bindkey -M emacs '^[[1;5C' forward-word
+
       export PATH="$HOME/bin:$HOME/.local/bin:$HOME/dotnix/bin${lib.optionalString isDarwin ":/opt/dev/bin"}:$PATH"
->>>>>>> ea7c153 (tame bat)
 
       [ -f ~/.zshrc.local ] && source ~/.zshrc.local
 
