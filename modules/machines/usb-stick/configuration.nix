@@ -3,7 +3,7 @@
 {
 
   # ISO image settings
-  isoImage.isoName = "nixos-usb-stick-tobi.iso";
+  image.fileName = "nixos-usb-stick-tobi.iso";
   isoImage.squashfsCompression = "zstd";
 
   # Include the dotnix directory in the ISO
