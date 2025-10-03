@@ -41,16 +41,6 @@
       # ------------------------------------------------------------
       # Home Manager configurations
       # ------------------------------------------------------------
-<<<<<<< HEAD
-      homeConfigurations = forEachSystem
-        (system:
-          let pkgs = mkPkgs system;
-          in home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            modules = [ ./modules/home-manager/home.nix ];
-          }
-        );
-=======
       # Home Manager expects `homeConfigurations.<name>` at the top level.
       # Provide a concrete configuration for the local Darwin user "tobi".
       homeConfigurations = {
@@ -60,7 +50,6 @@
           modules = [ ./modules/home-manager/home.nix ];
         };
       };
->>>>>>> 1a6d3d9 (Add ruby jemalloc overlay to enable jemalloc support for all Ruby versions)
 
 
       # ------------------------------------------------------------
