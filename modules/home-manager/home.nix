@@ -193,6 +193,7 @@ in
     unzip                    # ZIP archive extraction utility
     zlib.dev                 # Compression library
     zsync                    # File synchronization tool
+    zellij                   # Terminal multiplexer
 
     # ── Nice-to-have utilities ───────────────────────────────────────────
     fastfetch                # Fast system information tool

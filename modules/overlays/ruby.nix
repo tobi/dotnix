@@ -2,7 +2,10 @@
 final: prev:
 let
   lib = prev.lib;
-  enable = rb: rb.override { jemallocSupport = true; };
+  enable = rb: rb.override {
+    # enable jemalloc support (requires a manual build)
+    #jemallocSupport = true;
+  };
   rubies =
     lib.mapAttrs
       (_: rb: enable rb)

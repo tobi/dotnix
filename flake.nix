@@ -25,7 +25,10 @@
       mkPkgs = system:
         utils.mkPkgs {
           inherit system;
-          extraOverlays = [ inputs.niri.overlays.niri ];
+          extraOverlays = [
+            inputs.niri.overlays.niri
+            (import ./modules/overlays/ruby.nix)
+          ];
         };
     in
     {
