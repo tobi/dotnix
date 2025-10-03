@@ -108,8 +108,8 @@ in
 
   } // lib.optionalAttrs pkgs.stdenv.isLinux {
     # Clipboard (macOS compatibility on Linux)
-    pbcopy = "${pkgs.wl-copy}/bin/wl-copy";
-    pbpaste = "${pkgs.wl-paste}/bin/wl-paste";
+    pbcopy = "${pkgs.wl-clipboard}/bin/wl-copy";
+    pbpaste = "${pkgs.wl-clipboard}/bin/wl-paste";
   };
 
   programs.mise = {
