@@ -9,8 +9,6 @@
     , ...
     } @inputs:
     let
-      # Import overlays
-      rubyOverlay = import ./modules/overlays/ruby.nix;
       # Support both Linux and Darwin
       systems = [
         "x86_64-linux"
@@ -20,18 +18,14 @@
       # Helper function to generate packages for each system
       forEachSystem = nixpkgs.lib.genAttrs systems;
 
-      # Import utilities
+      # Import utilities with centralized overlay system
       utils = import ./utils/utils.nix { inherit nixpkgs; };
 
-      # Generate pkgs for home-manager
+      # Generate pkgs for home-manager using centralized overlay system
       mkPkgs = system:
-        import nixpkgs {
+        utils.mkPkgs {
           inherit system;
-          config.allowUnfree = true;
-          overlays = [
-            inputs.niri.overlays.niri
-            rubyOverlay
-          ];
+          extraOverlays = [ inputs.niri.overlays.niri ];
         };
     in
     {
