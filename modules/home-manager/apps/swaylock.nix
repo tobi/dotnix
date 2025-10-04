@@ -23,8 +23,8 @@ in
       color = opacity theme.background;
       font = "FiraCode Nerd Font";
       line-color = opacity theme.cyan;
-      font-size = 50;
-      indicator-radius = 300;
+      font-size = 26;
+      indicator-radius = 150;
       indicator-thickness = 7;
       show-failed-attempts = true;
       ignore-empty-password = true;
@@ -72,7 +72,7 @@ in
     };
   };
 
-  # Use Home Manager's built-in swayidle service instead of manual systemd service
+  # Use Home Manager's built-in swayidle service
   services.swayidle = {
     enable = true;
     timeouts = [
