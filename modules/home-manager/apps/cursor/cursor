@@ -4,11 +4,9 @@ if [[ -f "$cursor_app" ]]; then
     # If no arguments provided, just launch Cursor
     if [[ $# -eq 0 ]]; then
         appimage-run "$cursor_app"
-    else
-        # Otherwise, try to reuse existing window
-        appimage-run "$cursor_app" --reuse-window "$@"
+        exit 0
     fi
-else
-    echo "Cursor AppImage not found."
-    exit 1
 fi
+
+echo "Cursor AppImage not found."
+exit 1

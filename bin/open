@@ -5,7 +5,7 @@
 
 # This script launches applications with intelligent fallback
 # Normalize open: always open outside of the tty (if interactive), support launching by full path, $PATH, or .desktop file.
-# - If run from a tty (interactive), always background the app (nohup ... &)
+# - If run from a tty (interactive), always background the app
 # - If run from a GUI (not a tty), exec the app directly
 # - If argument is a full path and executable, run it
 # - If argument is in $PATH, run it
@@ -13,10 +13,12 @@
 
 run_app() {
   if [ -t 0 ]; then
-    nohup "$1" "${@:2}" > /dev/null 2>&1 &
+    # Running from terminal - background the process
+    "$1" "${@:2}" > /dev/null 2>&1 &
     disown
     exit 0
   else
+    # Running from GUI - exec directly
     exec "$1" "${@:2}"
   fi
 }
@@ -29,23 +31,25 @@ fi
 APP="$1"
 shift
 
-# 1. Full path and executable
+# Priority 1: Full path and executable
 if [[ "$APP" == */* && -x "$APP" ]]; then
   run_app "$APP" "$@"
 fi
 
-# 2. In $PATH
+# Priority 2: Command in PATH
 if command -v "$APP" >/dev/null 2>&1; then
   run_app "$APP" "$@"
 fi
 
-# 3. .desktop file (case-insensitive search)
+# Priority 3: Desktop file (case-insensitive search)
 input=$(echo "$APP" | tr '[:upper:]' '[:lower:]')
 search_dirs="
   $HOME/.local/state/nix/profiles/home-manager/home-path/share/applications
   $HOME/.nix-profile/share/applications
   /usr/share/applications
 "
+
+# Add XDG directories if they exist
 if [ -n "$XDG_DATA_HOME" ]; then
   search_dirs="$XDG_DATA_HOME/applications $search_dirs"
 fi
@@ -56,6 +60,7 @@ if [ -n "$XDG_DATA_DIRS" ]; then
   done
 fi
 
+# Search for the .desktop file
 found=""
 for dir in $search_dirs; do
   [ -d "$dir" ] || continue
@@ -71,74 +76,18 @@ done
 
 if [ -n "$found" ]; then
   if [ -t 0 ]; then
-    nohup dex "$found" > /dev/null 2>&1 &
+    # Running from terminal - background dex
+    dex "$found" > /dev/null 2>&1 &
     disown
     exit 0
   else
+    # Running from GUI - exec dex directly
     exec dex "$found"
   fi
 fi
 
-echo "Could not find or launch: $APP"
-exit 1
-
-
-run_app() {
-  if [ -t 0 ]; then
-    nohup "$1" > /dev/null 2>&1
-    exit 0
-  else
-    exec "$1"
-  fi
-}
-
-if [ -z "$1" ]; then
-  echo "Usage: $0 <app-name-or-path>"
-  exit 1
-fi
-
-# Priority 1: Exact path (if it contains / and is executable)
-if [[ "$1" == */* && -x "$1" ]]; then
-  run_app "$1"
-fi
-
-# Priority 2: Command in PATH
-if command -v "$1" >/dev/null 2>&1; then
-  run_app "$1"
-fi
-
-# Priority 3: Desktop file fallback
-echo "Searching for $1.desktop file..."
-
-# Convert input to lowercase for desktop file search
-input=$(echo "$1" | tr '[:upper:]' '[:lower:]')
-
-# Directories to search for .desktop files
-search_dirs="
-  $HOME/.local/state/nix/profiles/home-manager/home-path/share/applications
-  $HOME/.nix-profile/share/applications
-  /usr/share/applications
-"
-
-search_dirs+=$(IFS=:; for d in $XDG_DATA_HOME:$XDG_DATA_DIRS; do
-  [ -n "$d" ] && echo "$d/share/applications"
-done)
-
-# Search for the .desktop file
-for dir in $search_dirs; do
-  for file in "$dir"/*; do
-    # Convert filename to lowercase
-    filename=$(basename "$file" | tr '[:upper:]' '[:lower:]')
-    if [ "$filename" = "$input.desktop" ] || [ "$filename" = "$input" ]; then
-      echo "Opening $file"
-      dex "$file"
-      exit 0
-    fi
-  done
-done
-
-echo "Error: Could not find or execute '$1'"
+echo "Error: Could not find or execute '$APP'"
 echo "  - Not found as executable path"
 echo "  - Not found in PATH"
-echo "  - No $1.desktop file found"
+echo "  - No $APP.desktop file found"
 exit 1

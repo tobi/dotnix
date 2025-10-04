@@ -34,7 +34,7 @@ overview {
 
 // Output configuration
 output "eDP-1" {
-    scale 1.5
+    scale 1.4
     transform "normal"
     position x=0 y=0
 }
@@ -312,11 +312,11 @@ binds {
 
     Super+Return { spawn "ghostty"; }
 
-    Super+X { spawn "~/dotnix/bin/open-or-focus" "cursor" "cursor"; }
-    Super+Shift+X { spawn "~/dotnix/bin/open" "cursor"; }
-    Super+B { spawn "~/dotnix/bin/open-or-focus" "google-chrome" "google-chrome"; }
-    Super+Shift+B { spawn "~/dotnix/bin/open" "google-chrome"; }
-    Super+A { spawn "~/dotnix/bin/open-or-focus" "chatgpt" "chrome-chat.openai.com__-Default"; }
+    Super+X { spawn-sh "~/dotnix/bin/open-or-focus ~/.local/bin/cursor cursor"; }
+    Super+Shift+X { spawn-sh "~/dotnix/bin/open cursor"; }
+    Super+B { spawn-sh "~/dotnix/bin/open-or-focus google-chrome google-chrome"; }
+    Super+Shift+B { spawn-sh "~/dotnix/bin/open google-chrome"; }
+    Super+A { spawn-sh "~/dotnix/bin/open-or-focus chatgpt chrome-chat.openai.com__-Default"; }
 
     Mod+Tab { focus-workspace-previous; }
 
