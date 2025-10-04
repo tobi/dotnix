@@ -15,8 +15,7 @@
     enable = true;
     settings = {
       default_session = {
-        # this is a bit fragile, but gets us auto-reloading...
-        command = "niri --session --config /home/tobi/dotnix/config/niri/config.kdl";
+        command = "niri-session --config /home/tobi/dotnix/config/niri/config.kdl";
         user = "tobi";
       };
     };
