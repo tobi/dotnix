@@ -1,7 +1,7 @@
 { pkgs, inputs, ... }:
 {
   imports = [
-    inputs.try.homeManagerModules.default
+    inputs.try.homeModules.default
   ];
 
   programs.try = {

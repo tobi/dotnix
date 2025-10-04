@@ -61,7 +61,7 @@ layout {
 
     focus-ring {
         // off
-        width 2
+        width 1
 
         inactive-color "#505050"
 
@@ -86,8 +86,8 @@ layout {
     }
 
     struts {
-        left 24
-        right 24
+        // left 24
+        // right 24
      }
 }
 
@@ -167,6 +167,12 @@ window-rule {
     max-width 1000
     max-height 1000
 }
+
+window-rule {
+    match title="^Alacritty$"
+    opacity 0.8
+}
+
 
 window-rule {
     match title="^Alacritty$"
@@ -307,7 +313,7 @@ binds {
     Super+Return { spawn "ghostty"; }
 
     Super+X { spawn "~/dotnix/bin/open" "cursor"; }
-    Super+C { spawn "~/dotnix/bin/open" "google-chrome"; }
+    Super+B { spawn "~/dotnix/bin/open" "google-chrome"; }
     Super+A { spawn "~/dotnix/bin/open" "chatgpt"; }
 
     Mod+Tab { focus-workspace-previous; }

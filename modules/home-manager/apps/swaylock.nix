@@ -23,8 +23,8 @@ in
       color = opacity theme.background;
       font = "FiraCode Nerd Font";
       line-color = opacity theme.cyan;
-      font-size = 60;
-      indicator-radius = 100;
+      font-size = 50;
+      indicator-radius = 300;
       indicator-thickness = 7;
       show-failed-attempts = true;
       ignore-empty-password = true;
