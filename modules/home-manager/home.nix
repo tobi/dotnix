@@ -86,7 +86,7 @@ in
     switch = "switch && source $HOME/.zshrc";
 
     # Editor and tools
-    n = "${pkgs.neovim}/bin/nvim";
+    n = "nvim";
     grep = "${pkgs.ripgrep}/bin/rg -uuu";
     lg = "${pkgs.lazygit}/bin/lazygit";
     gs = "${pkgs.git}/bin/git status";
@@ -147,61 +147,61 @@ in
   # Essential packages organized by category
   home.packages = with pkgs; [
     # ── Core utilities ──────────────────────────────────────────────────
-    age                      # Simple, modern and secure file encryption
-    bat                      # Cat clone with syntax highlighting
-    curl                     # Command line tool for transferring data
-    eza                      # Modern replacement for ls
-    fd                       # Simple, fast and user-friendly find
-    fswatch                  # File change monitor
-    fzf                      # General-purpose command-line fuzzy finder
-    gh                       # GitHub CLI tool
-    jq                       # Lightweight and flexible JSON processor
-    ripgrep                  # Fast text search tool
-    wget                     # Network utility to retrieve files
-    zstd                     # Fast compression algorithm
+    age # Simple, modern and secure file encryption
+    bat # Cat clone with syntax highlighting
+    curl # Command line tool for transferring data
+    eza # Modern replacement for ls
+    fd # Simple, fast and user-friendly find
+    fswatch # File change monitor
+    fzf # General-purpose command-line fuzzy finder
+    gh # GitHub CLI tool
+    jq # Lightweight and flexible JSON processor
+    ripgrep # Fast text search tool
+    wget # Network utility to retrieve files
+    zstd # Fast compression algorithm
 
     # ── System tools ────────────────────────────────────────────────────
-    dust                     # More intuitive version of du
-    htop                     # Interactive process viewer
-    killall                  # Kill processes by name
-    mask                     # CLI task runner defined by a simple markdown file
-    mprocs                   # Run multiple commands in parallel
-    mtr                      # Network diagnostic tool
-    procs                    # Modern replacement for ps
-    pv                       # Terminal-based tool for monitoring data
-    sysz                     # System information tool
-    yazi                     # Terminal file manager
+    dust # More intuitive version of du
+    htop # Interactive process viewer
+    killall # Kill processes by name
+    mask # CLI task runner defined by a simple markdown file
+    mprocs # Run multiple commands in parallel
+    mtr # Network diagnostic tool
+    procs # Modern replacement for ps
+    pv # Terminal-based tool for monitoring data
+    sysz # System information tool
+    yazi # Terminal file manager
 
     # ── Development tools ───────────────────────────────────────────────
-    ast-grep                 # Fast structural search and replace
-    comma                    # Runs programs without installing them
-    duckdb                   # Analytical database
-    envsubst                 # Substitute environment variables in shell format
-    ffmpeg                   # Multimedia framework
-    gnumake                  # GNU make utility
-    hyperfine                # Command-line benchmarking tool
-    lazygit                  # Simple terminal UI for git
-    libffi.dev               # Foreign function interface library
-    nixfmt-rfc-style         # Nix code formatter (RFC style)
-    nixfmt-tree              # Nix code formatter (tree style)
-    nixpkgs-fmt              # Nix code formatter
-    openssl.dev              # Cryptography and SSL/TLS toolkit
-    pkg-config               # Helper tool for compiling applications
-    sqlite                   # SQL database engine
-    stdenv.cc                # C/C++ compiler toolchain
-    tokei                    # Count your code, quickly
-    unzip                    # ZIP archive extraction utility
-    zlib.dev                 # Compression library
-    zsync                    # File synchronization tool
-    zellij                   # Terminal multiplexer
+    ast-grep # Fast structural search and replace
+    comma # Runs programs without installing them
+    duckdb # Analytical database
+    envsubst # Substitute environment variables in shell format
+    ffmpeg # Multimedia framework
+    gnumake # GNU make utility
+    hyperfine # Command-line benchmarking tool
+    lazygit # Simple terminal UI for git
+    libffi.dev # Foreign function interface library
+    nixfmt-rfc-style # Nix code formatter (RFC style)
+    nixfmt-tree # Nix code formatter (tree style)
+    nixpkgs-fmt # Nix code formatter
+    openssl.dev # Cryptography and SSL/TLS toolkit
+    pkg-config # Helper tool for compiling applications
+    sqlite # SQL database engine
+    stdenv.cc # C/C++ compiler toolchain
+    tokei # Count your code, quickly
+    unzip # ZIP archive extraction utility
+    zlib.dev # Compression library
+    zsync # File synchronization tool
+    zellij # Terminal multiplexer
 
     # ── Nice-to-have utilities ───────────────────────────────────────────
-    fastfetch                # Fast system information tool
-    gum                      # Tool for glamorous shell scripts
+    fastfetch # Fast system information tool
+    gum # Tool for glamorous shell scripts
 
   ] ++ lib.optionals isLinux [
-    nitch                    # Minimal system information tool
-    sysz                     # System information tool
+    nitch # Minimal system information tool
+    sysz # System information tool
   ] ++ lib.optionals isDarwin [
   ];
 

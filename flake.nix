@@ -48,7 +48,7 @@
       # Provide a concrete configuration for the local Darwin user "tobi".
       homeConfigurations = {
         "tobi" = home-manager.lib.homeManagerConfiguration {
-          pkgs = mkPkgs "aarch64-darwin";
+          pkgs = mkPkgs (builtins.currentSystem);
           extraSpecialArgs = { inherit inputs; };
           modules = [ ./modules/home-manager/home.nix ];
         };

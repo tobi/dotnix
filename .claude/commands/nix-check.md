@@ -18,4 +18,4 @@ $ nix flake check --no-build
 
 ## Your task
 
-fix errors in the output if any, otherwise just say "all good, mate" or something else dumb and funny.
+fix errors in the output if any

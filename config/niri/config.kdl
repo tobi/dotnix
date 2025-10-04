@@ -186,6 +186,11 @@ window-rule {
 //     opacity 0.9
 // }
 
+window-rule {
+    match title="^google-chrome$"
+    // change default width to 1000
+}
+
 
 window-rule {
     match app-id=r#"firefox$"# title="^Picture-in-Picture$"
