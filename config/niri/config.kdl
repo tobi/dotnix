@@ -102,12 +102,11 @@ cursor {
     hide-when-typing
 }
 
-// spawn-at-startup "swaylock"
+spawn-at-startup "swaylock"
 spawn-at-startup "waybar"
-//spawn-at-startup "xwayland-satellite"
-// spawn-at-startup "sway-audio-idle-inhibit"
 spawn-at-startup "wbg" ".config/wallpaper.jpg"
 spawn-at-startup "ghostty"
+spawn-at-startup "sway-audio-idle-inhibit"
 
 prefer-no-csd
 
@@ -118,7 +117,7 @@ hotkey-overlay {
 screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 
 animations {
-    slowdown 2.0
+    slowdown 1.2
 
     workspace-switch {
         spring damping-ratio=0.7 stiffness=1200 epsilon=0.0001
@@ -313,9 +312,11 @@ binds {
 
     Super+Return { spawn "ghostty"; }
 
-    Super+X { spawn "~/dotnix/bin/open" "cursor"; }
-    Super+B { spawn "~/dotnix/bin/open" "google-chrome"; }
-    Super+A { spawn "~/dotnix/bin/open" "chatgpt"; }
+    Super+X { spawn "~/dotnix/bin/open-or-focus" "cursor" "cursor"; }
+    Super+Shift+X { spawn "~/dotnix/bin/open" "cursor"; }
+    Super+B { spawn "~/dotnix/bin/open-or-focus" "google-chrome" "google-chrome"; }
+    Super+Shift+B { spawn "~/dotnix/bin/open" "google-chrome"; }
+    Super+A { spawn "~/dotnix/bin/open-or-focus" "chatgpt" "chrome-chat.openai.com__-Default"; }
 
     Mod+Tab { focus-workspace-previous; }
 

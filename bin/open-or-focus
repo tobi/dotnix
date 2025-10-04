@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+# open-or-focus: Focus existing window by app name or cycle through windows, or open new application
+# Usage:
+#   open-or-focus <app-name-or-path>                    - focus by app name or launch
+#   open-or-focus <app-name-or-path> <window-search>   - focus by window-search or launch
+
+set -euo pipefail
+
+APP_NAME="$1"
+WINDOW_SEARCH="${2:-$1}"
+
+# Function to focus window
+focus_window() {
+    local window_id="$1"
+    niri msg action focus-window --id "$window_id"
+}
+
+# Get current focused window
+FOCUSED_WINDOW=$(niri msg --json windows 2>/dev/null | jq -r '.[] | select(.is_focused == true) | .id // empty' || echo "")
+
+# Look for existing windows
+if [[ -n "$WINDOW_SEARCH" ]]; then
+    # Get all windows, filter out terminals
+    WINDOWS=$(niri msg --json windows 2>/dev/null | jq -r "
+      map(select(
+        (.app_id != \"com.mitchellh.ghostty\") and
+        (.app_id != \"com.github.alacritty\")
+      ))
+    " || echo "[]")
+    
+    # Find all matching windows by app_id only (no title matching)
+    MATCHING_WINDOWS=$(echo "$WINDOWS" | jq -r "
+      map(select(
+        (.app_id == \"$WINDOW_SEARCH\") or
+        (.app_id | test(\"$WINDOW_SEARCH\"; \"i\"))
+      )) | sort_by(.id)
+    " || echo "[]")
+    
+    # Get array of just the window IDs
+    WINDOW_IDS=$(echo "$MATCHING_WINDOWS" | jq -r '.[] | .id' || echo "")
+    
+    if [[ -n "$WINDOW_IDS" ]]; then
+        # Convert to array
+        IDS_ARRAY=($WINDOW_IDS)
+        
+        # Check if currently focused window is in our matching list
+        CURRENT_INDEX=-1
+        for i in "${!IDS_ARRAY[@]}"; do
+            if [[ "${IDS_ARRAY[$i]}" == "$FOCUSED_WINDOW" ]]; then
+                CURRENT_INDEX=$i
+                break
+            fi
+        done
+        
+        if [[ $CURRENT_INDEX -ge 0 ]]; then
+            # Currently focused window matches - cycle to next
+            NEXT_INDEX=$(( (CURRENT_INDEX + 1) % ${#IDS_ARRAY[@]} ))
+            TARGET_WINDOW="${IDS_ARRAY[$NEXT_INDEX]}"
+        else
+            # Not currently focused on a matching window - go to first (oldest/lowest ID)
+            TARGET_WINDOW="${IDS_ARRAY[0]}"
+        fi
+        
+        focus_window "$TARGET_WINDOW"
+        exit 0
+    fi
+fi
+
+# No window found - launch the application using open script
+exec ~/dotnix/bin/open "$APP_NAME"

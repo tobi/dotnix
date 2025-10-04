@@ -15,7 +15,7 @@
   xdg.desktopEntries.cursor = {
     name = "Cursor";
     comment = "Launch the latest Cursor AppImage";
-    exec = "${pkgs.stdenv.shell} ${./cursor}";
+    exec = "cursor";
     icon = "Cursor";
     terminal = false;
     type = "Application";

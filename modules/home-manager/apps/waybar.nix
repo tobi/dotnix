@@ -22,10 +22,7 @@ in
       window#waybar {
         background: #${palette.base00};
         color: #${palette.base05};
-        transition-property: background-color;
-        transition-duration: 0.5s;
-        transition-property: height;
-        transition-duration: 0.5s;
+        transition: background-color 0.5s, height 0.5s;
       }
 
       window#waybar.hidden {
@@ -34,19 +31,16 @@ in
 
       #workspaces {
         background: #${palette.base01};
-        margin: 0px 5px;
-        padding: 0px 1px;
+        margin: 0 5px;
+        padding: 0 1px;
         border-radius: 15px;
-        border: 0px;
-        font-style: normal;
         color: #${palette.base05};
       }
 
       #workspaces button {
-        padding: 0px 5px;
-        margin: 0px 3px;
+        padding: 0 5px;
+        margin: 0 3px;
         border-radius: 15px;
-        border: 0px;
         color: #${palette.base05};
         background: transparent;
         transition: all 0.3s ease-in-out;
@@ -55,38 +49,41 @@ in
       #workspaces button.active {
         color: #${palette.base0D};
         background: #${palette.base02};
-        border-radius: 15px;
         min-width: 40px;
-        transition: all 0.3s ease-in-out;
       }
 
       #workspaces button:hover {
         color: #${palette.base0B};
         background: #${palette.base02};
-        border-radius: 15px;
       }
 
       .modules-left, .modules-center, .modules-right {
         background: #${palette.base01};
-        margin: 0px 5px;
-        padding: 0px 1px;
+        margin: 0 5px;
+        padding: 0 1px;
         border-radius: 15px;
-        border: 0px;
       }
 
-
-      #clock, #cpu, #memory, #disk, #temperature, #network, #battery,
-      #bluetooth, #wireplumber, #power-profiles-daemon, #custom-dropbox, #custom-tailscale, #mpris
-      {
-        margin: 0px 5px;
+      #clock, #cpu, #memory, #network, #battery, #bluetooth, #wireplumber, 
+      #power-profiles-daemon, #custom-dropbox, #custom-tailscale, #mpris {
+        margin: 0 5px;
         min-width: 15px;
       }
 
       #tray {
-        /* margin-left: 40px; */
+        margin: 0 10px;
+        padding: 0 5px;
       }
 
-      #cpu, #memory, #battery, #wireplumber{
+      #tray > .passive {
+        -gtk-icon-effect: dim;
+      }
+
+      #tray > .needs-attention {
+        -gtk-icon-effect: highlight;
+      }
+
+      #cpu, #memory, #battery, #wireplumber {
         min-width: 45px;
       }
 
@@ -94,16 +91,12 @@ in
         color: yellow;
       }
 
-      #battery.critical:not(.charging). .disconneted {
+      #battery.critical:not(.charging) {
         color: red;
         animation: pulse 10s ease-in-out infinite;
       }
 
-      .muted {
-        color: #${palette.base03};
-      }
-
-      .disabled {
+      .muted, .disabled {
         color: #${palette.base03};
       }
 
@@ -119,7 +112,7 @@ in
         color: #${palette.base03};
       }
 
-      #mpris{
+      #mpris {
         padding: 0 20px;
       }
 
@@ -135,7 +128,6 @@ in
         color: #${palette.base03};
       }
 
-      /* Tooltip styling */
       tooltip {
         background: #${palette.base00};
         color: #${palette.base05};
@@ -157,7 +149,6 @@ in
         modules-left = [
           "niri/workspaces"
           "power-profiles-daemon"
-          "custom/terminals"
           "mpris"
         ];
         modules-center = [
@@ -336,13 +327,11 @@ in
           tooltip = true;
         };
 
-        "custom/terminals" = {
-          format = "{text}";
-          return-type = "json";
-          exec = "${./waybar/waybar-count-terms}";
-          interval = 5;
-          tooltip = true;
+        tray = {
+          icon-size = 14;
+          spacing = 6;
         };
+
       }
     ];
   };

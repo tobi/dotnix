@@ -185,3 +185,4 @@ This configuration recently underwent major restructuring:
 - Centralized NixOS modules in modules/nixos/
 
 The architecture is now more modular and follows clean coding practices.
+- to rebuild nixos or reapply home-manager just run "switch". But keep in mind that this requires sudo so likely just ask the user to do it
