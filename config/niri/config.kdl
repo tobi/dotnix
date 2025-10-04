@@ -11,7 +11,9 @@ input {
 
     touchpad {
         tap
+        dwt
         accel-profile "flat"
+        click-method "clickfinger"
         scroll-factor 0.5
     }
 
@@ -102,10 +104,10 @@ cursor {
 
 spawn-at-startup "swaylock"
 spawn-at-startup "waybar"
-spawn-at-startup "xwayland-satellite"
+//spawn-at-startup "xwayland-satellite"
+// spawn-at-startup "sway-audio-idle-inhibit"
 spawn-at-startup "wbg" ".config/wallpaper.jpg"
-spawn-at-startup "sway-audio-idle-inhibit"
-spawn-at-startup "alacritty"
+spawn-at-startup "ghostty"
 
 prefer-no-csd
 
@@ -168,22 +170,22 @@ window-rule {
     max-height 1000
 }
 
-window-rule {
-    match title="^Alacritty$"
-    opacity 0.8
-}
+// window-rule {
+//     match title="^Alacritty$"
+//     opacity 0.8
+// }
 
 
-window-rule {
-    match title="^Alacritty$"
-    opacity 0.8
-}
+// window-rule {
+//     match title="^Alacritty$"
+//     opacity 0.8
+// }
 
-window-rule {
-    match title="^Alacritty$" is-active=true
-    draw-border-with-background false
-    opacity 0.9
-}
+// window-rule {
+//     match title="^Alacritty$" is-active=true
+//     draw-border-with-background false
+//     opacity 0.9
+// }
 
 
 window-rule {
