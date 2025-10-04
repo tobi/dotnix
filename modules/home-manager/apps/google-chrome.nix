@@ -5,8 +5,8 @@
 }:
 
 {
-  # Enable Google Chrome with Wayland support
-  # google-chrome-stable --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable --disable-features=WebAuthenticationChromeOSAuthenticator --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 --enable-bluetooth-serial-communication --enable-experimental-web-platform-features
+  # Enable Google Chrome with Wayland support and gnome-keyring password storage
+  # google-chrome-stable --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable --disable-features=WebAuthenticationChromeOSAuthenticator --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 --enable-bluetooth-serial-communication --enable-experimental-web-platform-features --password-store=gnome-libsecret
   programs.google-chrome = {
     enable = true;
     commandLineArgs = [
@@ -22,6 +22,8 @@
       # Bluetooth transport debugging and fixes
       "--enable-bluetooth-serial-communication"
       "--enable-experimental-web-platform-features"
+      # Use gnome-keyring for password storage
+      "--password-store=gnome-libsecret"
     ];
   };
 
@@ -40,7 +42,7 @@
     name = "Google Chrome";
     genericName = "Web Browser";
     comment = "Access the Internet";
-    exec = "${pkgs.google-chrome}/bin/google-chrome-stable --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable --disable-features=WebAuthenticationChromeOSAuthenticator --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 --enable-bluetooth-serial-communication --enable-experimental-web-platform-features %U";
+    exec = "${pkgs.google-chrome}/bin/google-chrome-stable --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable --disable-features=WebAuthenticationChromeOSAuthenticator --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 --enable-bluetooth-serial-communication --enable-experimental-web-platform-features --password-store=gnome-libsecret %U";
     terminal = false;
     icon = "google-chrome";
     type = "Application";
@@ -58,11 +60,11 @@
     actions = {
       new-window = {
         name = "New Window";
-        exec = "${pkgs.google-chrome}/bin/google-chrome-stable --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable --disable-features=WebAuthenticationChromeOSAuthenticator --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 --enable-bluetooth-serial-communication --enable-experimental-web-platform-features";
+        exec = "${pkgs.google-chrome}/bin/google-chrome-stable --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable --disable-features=WebAuthenticationChromeOSAuthenticator --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 --enable-bluetooth-serial-communication --enable-experimental-web-platform-features --password-store=gnome-libsecret";
       };
       new-private-window = {
         name = "New Incognito Window";
-        exec = "${pkgs.google-chrome}/bin/google-chrome-stable --incognito --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable --disable-features=WebAuthenticationChromeOSAuthenticator --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 --enable-bluetooth-serial-communication --enable-experimental-web-platform-features";
+        exec = "${pkgs.google-chrome}/bin/google-chrome-stable --incognito --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable --disable-features=WebAuthenticationChromeOSAuthenticator --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 --enable-bluetooth-serial-communication --enable-experimental-web-platform-features --password-store=gnome-libsecret";
       };
     };
   };
