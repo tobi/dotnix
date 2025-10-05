@@ -5,26 +5,11 @@
 }:
 
 {
-  # Enable Google Chrome with Wayland support and gnome-keyring password storage
-  # google-chrome-stable --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable --disable-features=WebAuthenticationChromeOSAuthenticator --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 --enable-bluetooth-serial-communication --enable-experimental-web-platform-features --password-store=gnome-libsecret
-  programs.google-chrome = {
-    enable = true;
-    commandLineArgs = [
-      "--enable-features=UseOzonePlatform"
-      "--ozone-platform=wayland"
-      "--enable-wayland-ime"
-      "--wayland-text-input-version=3"
-      # WebAuthn and CTAP transport fixes
-      "--enable-logging=stderr"
-      "--v=1"
-      "--enable-features=WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable"
-      "--disable-features=WebAuthenticationChromeOSAuthenticator"
-      # Bluetooth transport debugging and fixes
-      "--enable-bluetooth-serial-communication"
-      "--enable-experimental-web-platform-features"
-      # Use gnome-keyring for password storage
-      "--password-store=gnome-libsecret"
-    ];
+  programs.google-chrome.enable = true;
+
+  home.file.".local/bin/chrome" = {
+    source = ./chrome/chrome;
+    executable = true;
   };
 
   # Set default applications for Google Chrome
@@ -42,7 +27,7 @@
     name = "Google Chrome";
     genericName = "Web Browser";
     comment = "Access the Internet";
-    exec = "${pkgs.google-chrome}/bin/google-chrome-stable --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable --disable-features=WebAuthenticationChromeOSAuthenticator --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 --enable-bluetooth-serial-communication --enable-experimental-web-platform-features --password-store=gnome-libsecret %U";
+    exec = "chrome %U";
     terminal = false;
     icon = "google-chrome";
     type = "Application";
@@ -60,13 +45,28 @@
     actions = {
       new-window = {
         name = "New Window";
-        exec = "${pkgs.google-chrome}/bin/google-chrome-stable --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable --disable-features=WebAuthenticationChromeOSAuthenticator --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 --enable-bluetooth-serial-communication --enable-experimental-web-platform-features --password-store=gnome-libsecret";
+        exec = "chrome";
       };
       new-private-window = {
         name = "New Incognito Window";
-        exec = "${pkgs.google-chrome}/bin/google-chrome-stable --incognito --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable --disable-features=WebAuthenticationChromeOSAuthenticator --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 --enable-bluetooth-serial-communication --enable-experimental-web-platform-features --password-store=gnome-libsecret";
+        exec = "chrome --incognito";
       };
     };
+  };
+
+  # Desktop entry for Google Chrome (Shopify profile)
+  xdg.desktopEntries.google-chrome-shopify = {
+    name = "Google Chrome (Shopify)";
+    genericName = "Web Browser";
+    comment = "Access the Internet with Shopify profile";
+    exec = "chrome --user-data-dir=\\$HOME/Shopify/profile %U";
+    terminal = false;
+    icon = "google-chrome";
+    type = "Application";
+    categories = [
+      "Network"
+      "WebBrowser"
+    ];
   };
 }
 
