@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-cursor_app="$(find ~/Applications -maxdepth 1 -name 'Cursor*.AppImage' | sort | tail -n 1)"
+cursor_app="$(find $HOME/Applications -maxdepth 1 -name 'Cursor*.AppImage' | sort | head -n 1)"
 if [[ -f "$cursor_app" ]]; then
     # If no arguments provided, just launch Cursor
-    if [[ $# -eq 0 ]]; then
-        appimage-run "$cursor_app"
-        exit 0
-    fi
+    appimage-run "$cursor_app" "$*" > /dev/null &
+    disown
+    exit 0
 fi
 
 echo "Cursor AppImage not found."

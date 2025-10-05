@@ -188,3 +188,4 @@ The architecture is now more modular and follows clean coding practices.
 - to rebuild nixos or reapply home-manager just run "switch". But keep in mind that this requires sudo so likely just ask the user to do it
 - use the /nix-check command when you want to see if the config is good
 - use the nixos-config-expert agent liberally
+- if you changed config.kdl its good to rerun niri validate

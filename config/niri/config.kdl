@@ -34,7 +34,7 @@ overview {
 
 // Output configuration
 output "eDP-1" {
-    scale 1.4
+    scale 1.5
     transform "normal"
     position x=0 y=0
 }
@@ -210,7 +210,7 @@ layer-rule {
 }
 
 switch-events {
-    lid-close { spawn "systemctl suspend"; }
+    lid-close { spawn "systemctl" "suspend"; }
 }
 
 
@@ -321,7 +321,11 @@ binds {
     Super+Shift+X { spawn-sh "~/dotnix/bin/open cursor"; }
     Super+B { spawn-sh "~/dotnix/bin/open-or-focus google-chrome google-chrome"; }
     Super+Shift+B { spawn-sh "~/dotnix/bin/open google-chrome"; }
+    Super+V { spawn-sh "~/dotnix/bin/open-or-focus google-chrome-shopify google-chrome"; }
+    Super+Shift+V { spawn-sh "~/dotnix/bin/open google-chrome-shopify"; }
+    Super+S { spawn-sh "~/dotnix/bin/open-or-focus Slack chrome-app.slack.com__-Default"; }
     Super+A { spawn-sh "~/dotnix/bin/open-or-focus chatgpt chrome-chat.openai.com__-Default"; }
+    Super+E { spawn-sh "~/dotnix/bin/open-or-focus GoogleMeet chrome-meet.google.com__-Default"; }
 
     Mod+Tab { focus-workspace-previous; }
 
