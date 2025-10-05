@@ -68,6 +68,8 @@
     ./apps/logseq.nix
     ./apps/chromium.nix
     ./apps/google-chrome.nix
+    ./apps/google-meet.nix
+    ./apps/slack.nix
     ./apps/cursor.nix
     ./apps/swaylock.nix
     ./apps/steam.nix
