@@ -51,6 +51,9 @@
 
       # Enable AMD P-State
       "amd_pstate=active"
+
+      # Disable btusb autosuspend for WebAuthn BLE reliability
+      "btusb.enable_autosuspend=0"
     ];
 
     # Configure initrd for smoother LUKS prompt
@@ -67,7 +70,12 @@
       settings = {
         General = {
           Experimental = true;
+          ControllerMode = "dual";
+          Privacy = "device";
           KernelExperimental = true; # Enable LE Audio and other experimental features
+        };
+        Policy = {
+          AutoEnable = "true";
         };
       };
     };
@@ -85,8 +93,17 @@
   # Create plugdev group for U2F/FIDO2 devices
   users.groups.plugdev = { };
 
-  # Udev rules for FIDO2/WebAuthn devices and Thunderbolt
+  # FIDO2/WebAuthn and Bluetooth device access
   services.udev.packages = [ pkgs.libfido2 pkgs.bolt ];
+  services.udev.extraRules = ''
+    # MediaTek MT7922 Bluetooth adapter for WebAuthn hybrid transport
+    # Framework AMD laptop - allows Chrome/Chromium to use BLE for passkeys
+    # Uses uaccess tag for systemd-logind dynamic ACLs (follows libfido2 pattern)
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0717", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+    # Keep MediaTek BT awake, no autosuspend
+    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0e8d", TEST=="power/control", ATTR{power/control}="on"
+  '';
 
   # Services
   services = {
@@ -121,6 +138,10 @@
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
   };
+  systemd.services.bluetooth.serviceConfig.ExecStart = [
+    ""
+    "${pkgs.bluez}/libexec/bluetooth/bluetoothd -f /etc/bluetooth/main.conf --experimental"
+  ];
 
   # Security
   security = {
