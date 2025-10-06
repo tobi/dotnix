@@ -4,11 +4,27 @@
 , ...
 }:
 
+let
+  chromeScript = "${config.home.homeDirectory}/.local/bin/chrome";
+in
 {
   programs.google-chrome.enable = true;
 
   home.file.".local/bin/chrome" = {
-    source = ./chrome/chrome;
+    text = ''
+      #!/usr/bin/env bash
+      exec ${pkgs.google-chrome}/bin/google-chrome-stable \
+        --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable,DesktopPWAsLinkCapturing,DesktopPWAsWithoutExtensions,WebRTCPipeWireCapturer \
+        --disable-features=WebAuthenticationChromeOSAuthenticator \
+        --ozone-platform=wayland \
+        --enable-wayland-ime \
+        --wayland-text-input-version=3 \
+        --enable-logging=stderr \
+        --enable-bluetooth-serial-communication \
+        --enable-experimental-web-platform-features \
+        --password-store=gnome-libsecret \
+        "$@"
+    '';
     executable = true;
   };
 
@@ -27,7 +43,7 @@
     name = "Google Chrome";
     genericName = "Web Browser";
     comment = "Access the Internet";
-    exec = "chrome %U";
+    exec = "${chromeScript} --class=google-chrome %U";
     terminal = false;
     icon = "google-chrome";
     type = "Application";
@@ -45,11 +61,11 @@
     actions = {
       new-window = {
         name = "New Window";
-        exec = "chrome";
+        exec = "${chromeScript} --class=google-chrome --new-window";
       };
       new-private-window = {
         name = "New Incognito Window";
-        exec = "chrome --incognito";
+        exec = "${chromeScript} --class=google-chrome --incognito";
       };
     };
   };
@@ -59,7 +75,7 @@
     name = "Google Chrome (Shopify)";
     genericName = "Web Browser";
     comment = "Access the Internet with Shopify profile";
-    exec = "chrome --user-data-dir=\\$HOME/Shopify/profile %U";
+    exec = "${chromeScript} --user-data-dir=Shopify/profile --class=google-chrome-shopify %U";
     terminal = false;
     icon = "google-chrome";
     type = "Application";

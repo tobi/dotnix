@@ -1,93 +1,85 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# on osx we just exec its own open, only on linux do we want to emulate its behavior
-[[ -x /usr/bin/open ]] && exec /usr/bin/open "$@"
+# On macOS, defer to the native open
+[ -x /usr/bin/open ] && exec /usr/bin/open "$@"
 
-# This script launches applications with intelligent fallback
-# Normalize open: always open outside of the tty (if interactive), support launching by full path, $PATH, or .desktop file.
-# - If run from a tty (interactive), always background the app
-# - If run from a GUI (not a tty), exec the app directly
-# - If argument is a full path and executable, run it
-# - If argument is in $PATH, run it
-# - If argument matches a .desktop file, open it with dex
-
-run_app() {
-  if [ -t 0 ]; then
-    # Running from terminal - background the process
-    "$1" "${@:2}" > /dev/null 2>&1 &
-    disown
-    exit 0
-  else
-    # Running from GUI - exec directly
-    exec "$1" "${@:2}"
-  fi
-}
+# Simplified launcher: run everything in a user scope under apps.slice
+# - From a TTY: start in background and return immediately
+# - From GUI/non-TTY: exec and let systemd manage the process
 
 if [ -z "$1" ]; then
-  echo "Usage: $0 <app-name-or-path>"
+  echo "Usage: $0 <command> [args...]"
   exit 1
+else
+  app=$1
+  shift
 fi
 
-APP="$1"
-shift
-
-# Priority 1: Full path and executable
-if [[ "$APP" == */* && -x "$APP" ]]; then
-  run_app "$APP" "$@"
-fi
-
-# Priority 2: Command in PATH
-if command -v "$APP" >/dev/null 2>&1; then
-  run_app "$APP" "$@"
-fi
-
-# Priority 3: Desktop file (case-insensitive search)
-input=$(echo "$APP" | tr '[:upper:]' '[:lower:]')
-search_dirs="
+search_dirs=(
   $HOME/.local/state/nix/profiles/home-manager/home-path/share/applications
+  $HOME/.nix-profile/home-path/share/applications
   $HOME/.nix-profile/share/applications
+  $HOME/Applications
   /usr/share/applications
-"
+)
 
-# Add XDG directories if they exist
-if [ -n "$XDG_DATA_HOME" ]; then
-  search_dirs="$XDG_DATA_HOME/applications $search_dirs"
-fi
+error() {
+  if [ -t 1 ]; then
+    echo "error: $1" >&2
+  else
+    notify-send "error: $1" -u critical -t 3000 -i dialog-error
+  fi
+  exit 1
+}
+
+# Add all $XDG_DATA_DIRS to search_dirs, if set
 if [ -n "$XDG_DATA_DIRS" ]; then
-  IFS=: read -ra xdg_dirs <<< "$XDG_DATA_DIRS"
-  for d in "${xdg_dirs[@]}"; do
-    search_dirs="$search_dirs $d/applications"
+  IFS=':' read -ra xdg_dirs <<< "$XDG_DATA_DIRS"
+  for dir in "${xdg_dirs[@]}"; do
+    search_dirs+=("$dir/applications")
   done
 fi
 
-# Search for the .desktop file
-found=""
-for dir in $search_dirs; do
-  [ -d "$dir" ] || continue
-  for file in "$dir"/*.desktop; do
-    [ -e "$file" ] || continue
-    filename=$(basename "$file" | tr '[:upper:]' '[:lower:]')
-    if [ "$filename" = "$input.desktop" ] || [ "$filename" = "$input" ]; then
-      found="$file"
-      break 2
+
+resolve_app() {
+  if [ -x "$app" ]; then
+    cli=("$app")
+    return 0
+  fi
+  if command -v "$app" >/dev/null 2>&1; then
+    cli=("$app")
+    return 0
+  fi
+  for dir in "${search_dirs[@]}"; do
+    if [ -x "$dir/$app" ]; then
+      cli=("$dir/$app")
+      return 0
+    fi
+    if [ -f "$dir/$app.desktop" ]; then
+      cli=(dex "$dir/$app.desktop")
+      return 0
+    fi
+    if [ -f "$dir/$app.AppImage" ]; then
+      cli=(appimage-run "$dir/$app.AppImage")
+      return 0
     fi
   done
-done
 
-if [ -n "$found" ]; then
-  if [ -t 0 ]; then
-    # Running from terminal - background dex
-    dex "$found" > /dev/null 2>&1 &
-    disown
-    exit 0
-  else
-    # Running from GUI - exec dex directly
-    exec dex "$found"
-  fi
+  return 1
+}
+
+
+if ! resolve_app; then
+  error "app not found: $app"
 fi
 
-echo "Error: Could not find or execute '$APP'"
-echo "  - Not found as executable path"
-echo "  - Not found in PATH"
-echo "  - No $APP.desktop file found"
-exit 1
+cli+=("$@")
+
+# From a TTY, don't block the terminal: run as a transient service and return
+if [ -t 1 ]; then
+  systemd-run --user --quiet --slice=apps.slice "${cli[@]}"
+  exit 0
+fi
+
+# From non-TTY contexts, replace the process and let systemd keep tracking it
+exec systemd-run --user --scope --quiet --slice=apps.slice -- "${cli[@]}"
