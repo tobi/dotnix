@@ -5,7 +5,6 @@
   # Each sub-module contributes to programs.niri.settings
   imports = [
     ./input.nix
-    ./cursor.nix
     ./outputs.nix
     ./layout.nix
     ./startup.nix

@@ -19,13 +19,12 @@
     focus-ring = {
       enable = true;
       width = 1;
-      inactive-color = "#505050";
-      active-gradient = {
+      active.gradient = {
         from = "teal";
         to = "purple";
         angle = 90;
       };
-      inactive-gradient = {
+      inactive.gradient = {
         from = "#505050";
         to = "#808080";
         angle = 45;
@@ -36,9 +35,9 @@
     border = {
       enable = false;
       width = 3;
-      active-color = "#ffc87f";
-      inactive-color = "#505050";
-      urgent-color = "#9b0000";
+      active.color = "#ffc87f";
+      inactive.color = "#505050";
+      urgent.color = "#9b0000";
     };
 
     shadow = {

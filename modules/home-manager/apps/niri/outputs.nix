@@ -4,7 +4,6 @@
   programs.niri.settings.outputs = {
     "eDP-1" = {
       scale = 1.5;
-      transform = "normal";
       position = {
         x = 0;
         y = 0;

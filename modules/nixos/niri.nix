@@ -15,7 +15,7 @@
     enable = true;
     settings = {
       default_session = {
-        command = "niri-session --config /home/tobi/dotnix/config/niri/config.kdl";
+        command = "niri-session";
         user = "tobi";
       };
     };

@@ -4,17 +4,12 @@
   programs.niri.settings = {
     prefer-no-csd = true;
 
-    hotkey-overlay = {
-      skip-at-startup = true;
-    };
+    hotkey-overlay.skip-at-startup = true;
 
-    screenshot-path = "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png";
 
-    overview = {
-      workspace-shadow.enable = false;
-    };
+    overview.workspace-shadow.enable = false;
 
-    environment = {};
+    environment = { };
 
     layer-rules = [
       {
@@ -24,6 +19,8 @@
         place-within-backdrop = true;
       }
     ];
+
+    screenshot-path = "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png";
 
     switch-events.lid-close.action.spawn = [ "systemctl" "suspend" ];
   };

@@ -7,6 +7,7 @@
     (modulesPath + "/installer/cd-dvd/installation-cd-base.nix")
     (modulesPath + "/installer/cd-dvd/iso-image.nix")
     ../../nixos/user.nix
+    ../../nixos/niri.nix
     inputs.nixos-hardware.nixosModules.common-pc
     inputs.nixos-hardware.nixosModules.common-pc-ssd
     inputs.nixos-hardware.nixosModules.common-cpu-intel

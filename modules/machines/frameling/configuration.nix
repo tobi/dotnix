@@ -54,6 +54,11 @@
 
       # Disable btusb autosuspend for WebAuthn BLE reliability
       "btusb.enable_autosuspend=0"
+
+      # Apple Pro Display XDR - ignore broken HID interfaces
+      # The display has malformed HID descriptors causing disconnect loop
+      # HID_QUIRK_IGNORE (0x00000004) tells kernel to ignore HID, display still works
+      "usbhid.quirks=0x05ac:0x9243:0x00000004"
     ];
 
     # Configure initrd for smoother LUKS prompt

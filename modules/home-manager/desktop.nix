@@ -3,34 +3,34 @@
 
   home.packages = with pkgs; [
     # Desktop environment and window management
-    wbg                      # Wallpaper setter for Wayland
-    xdg-desktop-portal-gtk   # XDG desktop portal for GTK applications
+    wbg # Wallpaper setter for Wayland
+    xdg-desktop-portal-gtk # XDG desktop portal for GTK applications
 
     # Audio control
-    pavucontrol              # PulseAudio volume control GUI
-    pamixer                  # PulseAudio command-line mixer
-    playerctl                # Media player controller
-    spotify-player           # Spotify TUI client
+    pavucontrol # PulseAudio volume control GUI
+    pamixer # PulseAudio command-line mixer
+    playerctl # Media player controller
+    spotify-player # Spotify TUI client
 
     # System utilities
-    brightnessctl            # Screen brightness control
-    blueberry                # Bluetooth manager
-    dex                      # Desktop entry execution
-    libnotify                # Desktop notifications library
-    wev                      # Wayland event viewer
+    brightnessctl # Screen brightness control
+    blueberry # Bluetooth manager
+    dex # Desktop entry execution
+    libnotify # Desktop notifications library
+    wev # Wayland event viewer
 
     # Security and authentication
-    gcr                      # GNOME crypto services
-    gnome-keyring            # GNOME keyring daemon
-    gnupg                    # GNU Privacy Guard
-    libsecret                # Secret service library
+    gcr # GNOME crypto services
+    gnome-keyring # GNOME keyring daemon
+    gnupg # GNU Privacy Guard
+    libsecret # Secret service library
 
     # File operations and compression
-    dropbox-cli              # Dropbox command-line interface
+    dropbox-cli # Dropbox command-line interface
 
     # Applications
-    rustdesk                 # Remote desktop client
-    wine                     # Windows compatibility layer
+    rustdesk # Remote desktop client
+    wine # Windows compatibility layer
   ];
 
   # probably should go to home

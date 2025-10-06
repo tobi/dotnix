@@ -32,19 +32,6 @@
 
   boot.blacklistedKernelModules = [ "snd_pcsp" ];
 
-  # Niri window manager
-  programs.niri.enable = true;
-
-  # Auto-login to niri using greetd
-  services.greetd = {
-    enable = true;
-    settings = {
-      default_session = {
-        command = "niri-session";
-        user = "tobi";
-      };
-    };
-  };
 
   # Enable dotnix desktop features
   dotnix.desktop.enable = true;

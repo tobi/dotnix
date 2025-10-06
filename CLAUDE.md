@@ -185,6 +185,67 @@ This configuration recently underwent major restructuring:
 - Centralized NixOS modules in modules/nixos/
 
 The architecture is now more modular and follows clean coding practices.
+
+## 🔍 Searching the Codebase
+
+### Using ast-grep for Structural Code Search
+
+`ast-grep` is a powerful AST-based search tool that understands Nix syntax. It's significantly more powerful than `rg` for finding structural patterns because it matches on the parse tree, not just text.
+
+**When to use ast-grep vs ripgrep:**
+- Use `ast-grep` when searching for **structural patterns** (attribute paths, function calls, specific language constructs)
+- Use `rg` when searching for **text patterns** (strings, comments, variable names as text)
+
+**Key ast-grep patterns for this codebase:**
+
+```bash
+# Find all theme customizations (attribute path with metavariable)
+ast-grep -p 'theme.$FIELD' -l nix
+# Returns: theme.palette, theme.wallpaperPath, theme.systemFont, etc.
+
+# Find all config.dotnix references
+ast-grep -p 'config.dotnix.$FIELD' -l nix
+# Returns: config.dotnix.desktop.enable, config.dotnix.theme, etc.
+
+# Find all palette color uses
+ast-grep -p 'palette.$COLOR' -l nix
+# Returns: palette.base00, palette.base0D, etc.
+
+# Find all flake input references
+ast-grep -p 'inputs.$INPUT' -l nix
+# Returns: inputs.niri.overlays.niri, inputs.home-manager, etc.
+
+# Find conditional configurations
+ast-grep -p 'lib.mkIf $COND $VAL' -l nix
+# Returns all conditional module options
+
+# Find default value declarations
+ast-grep -p 'lib.mkDefault $VAL' -l nix
+
+# Find with pkgs expressions
+ast-grep -p 'with pkgs; $BODY' -l nix
+```
+
+**Important notes:**
+- `ast-grep` defaults to searching the current directory recursively - no need to specify paths
+- Metavariables like `$FIELD`, `$VAL`, `$COND` capture any matching AST node
+- String literals need quotes: `'"$STRING"'` to match all strings
+- Does NOT work for: multi-level metavariables (`$OBJ.$FIELD.enable`), assignment patterns (`enable = $VAL`), or complex let expressions
+
+**Common use cases:**
+```bash
+# Refactoring: Find all uses of a config option
+ast-grep -p 'config.dotnix.desktop.enable' -l nix
+
+# Understanding: See all theme attribute accesses
+ast-grep -p 'theme.$FIELD' -l nix | wc -l  # Count: 76 locations
+
+# Code review: Find all conditional desktop configurations
+ast-grep -p 'lib.mkIf config.dotnix.desktop.enable $VAL' -l nix
+```
+
+## 🔧 Development Commands
+
 - to rebuild nixos or reapply home-manager just run "switch". But keep in mind that this requires sudo so likely just ask the user to do it
 - use the /nix-check command when you want to see if the config is good
 - use the nixos-config-expert agent liberally
