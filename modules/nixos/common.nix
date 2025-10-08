@@ -115,10 +115,6 @@
   # Common security settings
   security = {
     rtkit.enable = lib.mkIf config.dotnix.desktop.enable true;
-    sudo.extraConfig = ''
-      Defaults lecture=never
-      Defaults passwd_timeout=0
-    '';
 
     # Additional security hardening
     protectKernelImage = true;

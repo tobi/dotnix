@@ -8,6 +8,8 @@
     ../../nixos/common.nix
     ../../nixos/user.nix
     ../../nixos/niri.nix
+    ../../nixos/warp.nix
+    ../../nixos/authentication.nix
     inputs.nixos-hardware.nixosModules.framework-amd-ai-300-series
   ];
 
