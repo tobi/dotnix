@@ -22,6 +22,8 @@
 
     screenshot-path = "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png";
 
-    switch-events.lid-close.action.spawn = [ "systemctl" "suspend" ];
+    # switch-events.lid-close.action.spawn = [ "systemctl" "suspend" ];
+    switch-events.lid-close.action.spawn = [ "swaylock" ];
+
   };
 }

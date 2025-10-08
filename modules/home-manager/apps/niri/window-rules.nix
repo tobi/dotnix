@@ -16,25 +16,35 @@
     # Google Chrome window
     {
       matches = [
-        { title = "^google-chrome$"; }
+        { app-id = "^google-chrome"; }
       ];
+      default-column-width.proportion = 0.66;
     }
 
-    # Firefox Picture-in-Picture
+    {
+      matches = [{
+        app-id = "^chrome-meet.google.com__-Default$";
+      }];
+      open-focused = true;
+      default-column-width.proportion = 0.99;
+
+    }
+
     {
       matches = [
-        { app-id = "firefox$"; title = "^Picture-in-Picture$"; }
+        { app-id = "^chrome-app.slack.com__client-Default$"; }
       ];
-      open-floating = true;
+      open-focused = true;
+      default-column-width.proportion = 0.66;
     }
 
     # Global corner radius for all windows
     {
       geometry-corner-radius = {
-        top-left = 14.0;
-        top-right = 14.0;
-        bottom-left = 14.0;
-        bottom-right = 14.0;
+        top-left = 6.0;
+        top-right = 6.0;
+        bottom-left = 6.0;
+        bottom-right = 6.0;
       };
       clip-to-geometry = true;
     }

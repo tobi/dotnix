@@ -5,6 +5,7 @@
     gaps = 15;
     center-focused-column = "never";
     background-color = "transparent";
+    always-center-single-column = true;
 
     preset-column-widths = [
       { proportion = 0.33333; }
@@ -51,6 +52,6 @@
       color = "#000000";
     };
 
-    struts = {};
+    struts = { };
   };
 }

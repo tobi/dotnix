@@ -32,7 +32,7 @@
 
   programs.niri.settings.cursor = {
     theme = "capitaine-cursors";
-    size = 26;
+    size = 28;
     hide-when-typing = true;
   };
 

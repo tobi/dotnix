@@ -23,9 +23,9 @@ in
       color = opacity theme.background;
       font = "FiraCode Nerd Font";
       line-color = opacity theme.cyan;
-      font-size = 26;
-      indicator-radius = 150;
-      indicator-thickness = 7;
+      font-size = 36;
+      indicator-radius = 100;
+      indicator-thickness = 10;
       show-failed-attempts = true;
       ignore-empty-password = true;
       indicator-caps-lock = true;
@@ -38,7 +38,7 @@ in
       # Clock and text display
       clock = true;
       indicator = true;
-      datestr = " %a, %B %-d";
+      datestr = " %a, %b %-d";
       timestr = " %I:%M%p";
       text-ver = "󰭖";
       text-wrong = "󱋟";
@@ -77,21 +77,41 @@ in
     enable = true;
     timeouts = [
       {
-        timeout = 120; # 2 minutes - turn off screens
-        command = "${pkgs.niri}/bin/niri msg action power-off-monitors";
+        timeout = 180; # 3 minutes - lock screen
+        command = "${pkgs.swaylock-effects}/bin/swaylock -f";
       }
       {
-        timeout = 300; # 5 minutes - lock screen and then suspend
-        command = "${pkgs.swaylock-effects}/bin/swaylock && systemctl suspend";
+        timeout = 280; # 4 minutes 40 seconds - turn off monitors
+        command = "${pkgs.niri}/bin/niri msg action power-off-monitors";
+        resumeCommand = "${pkgs.niri}/bin/niri msg action power-on-monitors";
+      }
+      {
+        timeout = 355; # in seconds
+        command = "${pkgs.libnotify}/bin/notify-send 'Locking in 5 seconds' -t 5000";
+      }
+      {
+        timeout = 360; # 6 minutes - suspend
+        command = "systemctl suspend";
       }
     ];
-    # Resume commands - turn monitors back on when activity is detected
     events = [
+      # Lock before any sleep/suspend (lid close, suspend button, etc)
+      {
+        event = "before-sleep";
+        command = "${pkgs.swaylock-effects}/bin/swaylock -f --fade-in 0.3";
+      }
+      # Turn monitors back on after resume
       {
         event = "after-resume";
         command = "${pkgs.niri}/bin/niri msg action power-on-monitors";
       }
+      # Lock when logind signals lock
+      {
+        event = "lock";
+        command = "${pkgs.swaylock-effects}/bin/swaylock -f --fade-in 0.3";
+      }
     ];
+    # extraArgs = [ "-w" ]; # Wait for lock command to finish before continuing
   };
 }
 
