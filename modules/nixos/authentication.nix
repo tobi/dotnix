@@ -9,6 +9,13 @@
     Defaults passwd_timeout=30
   '';
 
+  # 1Password polkit integration
+  programs._1password.enable = true;
+  programs._1password-gui = {
+    enable = true;
+    polkitPolicyOwners = [ "tobi" ];
+  };
+
   # Enable fingerprint authentication
   services.fprintd.enable = true;
   services.fprintd.tod.enable = true;
