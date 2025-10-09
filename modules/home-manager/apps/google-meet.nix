@@ -17,4 +17,10 @@ in
     type = "Application";
     startupNotify = true;
   };
+
+  # Register hotkey for open-or-focus
+  dotnix.desktop.hotkeys."Super+E" = {
+    executable = "GoogleMeet";
+    focusClass = "chrome-meet.google.com__-Default";
+  };
 }

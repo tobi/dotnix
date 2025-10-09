@@ -59,6 +59,7 @@
   home.file.".config/wallpaper.jpg".source = theme.wallpaperPath;
 
   imports = [
+    ./dotnix-options.nix
     ./apps/waybar.nix
     ./apps/ghostty.nix
     ./apps/alacritty.nix
@@ -77,6 +78,7 @@
     ./apps/gtk.nix
     ./apps/fuzzel.nix
     ./apps/typora.nix
+    ./apps/warp.nix
   ];
 }
 

@@ -18,5 +18,11 @@ in
     # mimeType = [ "text/html" "text/xml" "application/xhtml_xml" ];
     startupNotify = true;
   };
+
+  # Register hotkey for open-or-focus
+  dotnix.desktop.hotkeys."Super+A" = {
+    executable = "ChatGPT";
+    focusClass = "chrome-chat.openai.com__-Default";
+  };
 }
 

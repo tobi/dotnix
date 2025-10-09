@@ -30,12 +30,12 @@ in
 
   # Set default applications for Google Chrome
   xdg.mimeApps.defaultApplications = {
-    "text/html" = "google-chrome.desktop";
-    "x-www-browser" = "google-chrome.desktop";
-    "x-scheme-handler/http" = "google-chrome.desktop";
-    "x-scheme-handler/https" = "google-chrome.desktop";
-    "x-scheme-handler/pdf" = "google-chrome.desktop";
-    "application/pdf" = "google-chrome.desktop";
+    "text/html" = "google-chrome-shopify.desktop";
+    "x-www-browser" = "google-chrome-shopify.desktop";
+    "x-scheme-handler/http" = "google-chrome-shopify.desktop";
+    "x-scheme-handler/https" = "google-chrome-shopify.desktop";
+    "x-scheme-handler/pdf" = "google-chrome-shopify.desktop";
+    "application/pdf" = "google-chrome-shopify.desktop";
   };
 
   # Desktop entry for Google Chrome
@@ -75,7 +75,7 @@ in
     name = "Google Chrome (Shopify)";
     genericName = "Web Browser";
     comment = "Access the Internet with Shopify profile";
-    exec = "${chromeScript} --user-data-dir=Shopify/profile --class=google-chrome-shopify %U";
+    exec = "${chromeScript} --user-data-dir=${config.home.homeDirectory}/Shopify/profile --class=google-chrome-shopify %U";
     terminal = false;
     icon = "google-chrome";
     type = "Application";
@@ -83,6 +83,17 @@ in
       "Network"
       "WebBrowser"
     ];
+  };
+
+  # Register hotkeys for open-or-focus
+  dotnix.desktop.hotkeys."Super+B" = {
+    executable = "google-chrome";
+    focusClass = "google-chrome";
+  };
+
+  dotnix.desktop.hotkeys."Super+N" = {
+    executable = "google-chrome-shopify";
+    focusClass = "google-chrome-shopify";
   };
 }
 

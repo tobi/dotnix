@@ -1,7 +1,43 @@
-{ ... }:
+{ config, lib, ... }:
 
+let
+  # Generate hotkey bindings from registered apps
+  generateHotkeyBinds = hotkeys:
+    let
+      # For each hotkey, generate main bind (focus or open depending on focusClass)
+      mainBinds = lib.mapAttrs' (key: cfg:
+        lib.nameValuePair key {
+          action.spawn = if cfg.focusClass != null
+            then [
+              "~/dotnix/bin/open-or-focus"
+              cfg.executable
+              cfg.focusClass
+            ]
+            else [
+              "~/dotnix/bin/open"
+              cfg.executable
+            ];
+        }
+      ) hotkeys;
+
+      # For each hotkey, generate open bind (with Shift) - always forces new instance
+      openBinds = lib.mapAttrs' (key: cfg:
+        let
+          # Convert "Super+X" to "Super+Shift+X"
+          shiftKey = lib.replaceStrings ["Super+"] ["Super+Shift+"] key;
+        in
+        lib.nameValuePair shiftKey {
+          action.spawn = [
+            "~/dotnix/bin/open"
+            cfg.executable
+          ];
+        }
+      ) hotkeys;
+    in
+    mainBinds // openBinds;
+in
 {
-  programs.niri.settings.binds = {
+  programs.niri.settings.binds = (generateHotkeyBinds config.dotnix.desktop.hotkeys) // {
     # ============================================================================
     # System & Utility
     # ============================================================================
@@ -168,20 +204,8 @@
     "Alt+Space".action.spawn = [ "fuzzel" ];
     "Super+Return".action.spawn = [ "ghostty" ];
 
-    # Application-specific keybindings
-    "Super+X".action.spawn-sh = "~/dotnix/bin/open-or-focus ${../cursor/cursor} cursor";
-    "Super+Shift+X".action.spawn-sh = "~/dotnix/bin/open ${../cursor/cursor}";
-
-    "Super+B".action.spawn = [ "~/dotnix/bin/open-or-focus" "google-chrome" "google-chrome" ];
-    "Super+Shift+B".action.spawn = [ "~/dotnix/bin/open" "google-chrome" ];
-
-    "Super+N".action.spawn-sh = "~/dotnix/bin/open-or-focus google-chrome-shopify google-chrome-shopify";
-    "Super+Shift+N".action.spawn-sh = "~/dotnix/bin/open google-chrome-shopify";
-
-
-    "Super+S".action.spawn = [ "~/dotnix/bin/open-or-focus" "Slack" "chrome-app.slack.com__-Default" ];
-    "Super+A".action.spawn = [ "~/dotnix/bin/open-or-focus" "ChatGPT" "chrome-chat.openai.com__-Default" ];
-    "Super+E".action.spawn = [ "~/dotnix/bin/open-or-focus" "GoogleMeet" "chrome-meet.google.com__-Default" ];
+    # Application-specific keybindings are now registered in individual app modules
+    # via dotnix.desktop.hotkeys and generated above
 
     "Mod+Tab".action.focus-workspace-previous = { };
 

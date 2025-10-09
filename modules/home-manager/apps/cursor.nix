@@ -23,6 +23,12 @@
       "Utility"
     ];
   };
+
+  # Register hotkey for open-or-focus
+  dotnix.desktop.hotkeys."Super+X" = {
+    executable = "Cursor";
+    focusClass = "cursor";
+  };
 }
 
 

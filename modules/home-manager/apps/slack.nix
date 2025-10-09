@@ -12,7 +12,7 @@ in
   xdg.desktopEntries.Slack = {
     name = "Slack";
     comment = "Slack Desktop";
-    exec = "${chromeScript} --user-data-dir=Shopify/profile --new-window --app=https://app.slack.com/client --name=Slack --class=Slack";
+    exec = "${chromeScript} ${config.home.homeDirectory}/Shopify/profile --new-window --app=https://app.slack.com/client --name=Slack --class=Slack";
     terminal = false;
     icon = "slack";
     type = "Application";
@@ -21,5 +21,11 @@ in
       "Network"
       "InstantMessaging"
     ];
+  };
+
+  # Register hotkey for open-or-focus
+  dotnix.desktop.hotkeys."Super+S" = {
+    executable = "Slack";
+    focusClass = "chrome-app.slack.com__client-Default";
   };
 }
