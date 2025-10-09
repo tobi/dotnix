@@ -108,6 +108,9 @@
 
     # Keep MediaTek BT awake, no autosuspend
     ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0e8d", TEST=="power/control", ATTR{power/control}="on"
+
+    # Disable PCIe port wakeups to prevent spurious wakes during s2idle
+    ACTION=="add", SUBSYSTEM=="pci", DRIVER=="pcieport", ATTR{power/wakeup}="disabled"
   '';
 
   # Services
@@ -147,6 +150,25 @@
     ""
     "${pkgs.bluez}/libexec/bluetooth/bluetoothd -f /etc/bluetooth/main.conf --experimental"
   ];
+
+  # Power Management - Optimized for Framework AMD s2idle
+  powerManagement = {
+    enable = true;
+    scsiLinkPolicy = "med_power_with_dipm";
+
+    resumeCommands = ''
+      # Log resume events for debugging
+      echo "$(date): System resumed from suspend" >> /var/log/suspend-resume.log
+    '';
+  };
+
+  # Systemd sleep configuration - use suspend-then-hibernate
+  systemd.sleep.extraConfig = ''
+    # Hibernate after 2 hours of suspend to prevent battery drain
+    HibernateDelaySec=2h
+    AllowHybridSleep=yes
+    AllowSuspendThenHibernate=yes
+  '';
 
   # Security
   security = {
@@ -248,6 +270,11 @@
     # System tools
     zip
     p7zip
+    nss.tools
+    openssl
+    bzip2
+    netcat-openbsd
+    jq
 
     # Audio
     pavucontrol
