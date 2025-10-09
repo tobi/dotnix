@@ -4,11 +4,12 @@
     enable = true;
     settings = {
       default-timeout = 2000;
+      actions = true; 
       width = 350;
       height = 150;
       icons = true;
       border-size = 1;
-      border-radius = 8;
+      border-radius = 6;
       background-color = "#${theme.palette.base00}";
       text-color = "#${theme.palette.base05}";
       border-color = "#${theme.palette.base0D}";
@@ -18,7 +19,8 @@
 
       font = "Inter 12";
       padding = "15";
-      margin = "20";
+      margin = "10";
+      markup = true;
 
       "urgency=low" = {
         border-color = "#${theme.palette.base03}";

@@ -18,17 +18,17 @@ in
       # Window settings
       window-padding-x = 14;
       window-padding-y = 14;
-      background-opacity = 0.95;
+      background-opacity = 0.9;
       window-decoration = "none";
 
       font-family = "FiraCode Nerd Font";
-      font-size = 12;
+      font-size = 11;
 
       theme = "dotnix";
 
       # Keep shell integration but disable problematic features
-      shell-integration = "detect";
-      shell-integration-features = "no-cursor,no-sudo";
+      # shell-integration = "detect";
+      # shell-integration-features = "no-cursor,no-sudo";
     };
     themes = {
       dotnix = {

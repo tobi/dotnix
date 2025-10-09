@@ -2,7 +2,7 @@
 
 {
   programs.niri.settings.layout = {
-    gaps = 15;
+    gaps = 10;
     center-focused-column = "never";
     background-color = "transparent";
     always-center-single-column = true;
@@ -43,11 +43,11 @@
 
     shadow = {
       enable = true;
-      softness = 30.0;
-      spread = 3.0;
+      softness = 15.0;
+      spread = 1.5;
       offset = {
-        x = 3;
-        y = 3;
+        x = 1.5;
+        y = 1.5;
       };
       color = "#000000";
     };
