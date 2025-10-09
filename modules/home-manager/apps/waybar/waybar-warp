@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+# Get Warp status and format for Waybar
+status=$(warp-cli status 2>/dev/null)
+
+if [ $? -ne 0 ] || [ -z "$status" ]; then
+  echo '{"text": "󰖪", "tooltip": "Warp not running", "class": "disconnected"}'
+  exit 0
+fi
+
+# Parse the status output
+# Expected format: "Status update: Connected" or "Status update: Disconnected"
+state=$(echo "$status" | grep -oP 'Status update: \K\w+')
+
+case "$state" in
+"Connected")
+  icon="󰞉"
+  tooltip="Cloudflare WARP: Connected"
+  class="connected"
+  ;;
+"Disconnected")
+  icon="󰅛"
+  tooltip="Cloudflare WARP: Disconnected"
+  class="disconnected"
+  ;;
+"Connecting")
+  icon="󰔟"
+  tooltip="Cloudflare WARP: Connecting..."
+  class="connecting"
+  ;;
+*)
+  icon="󰋗"
+  tooltip="Cloudflare WARP: $state"
+  class="unknown"
+  ;;
+esac
+
+echo "{\"text\": \"$icon\", \"tooltip\": \"$tooltip\", \"class\": \"$class\"}"

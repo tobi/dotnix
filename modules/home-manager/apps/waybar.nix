@@ -5,7 +5,7 @@
 }:
 let
   palette = theme.palette;
-  terminal = "${pkgs.alacritty}/bin/alacritty";
+  terminal = "${pkgs.ghostty}/bin/ghostty";
 in
 {
   programs.waybar = {
@@ -17,30 +17,28 @@ in
         font-family: "FiraCode Nerd Font", monospace;
         font-size: 13px;
         min-height: 0;
+        color: #ffffff;
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
       }
 
       window#waybar {
-        background: #${palette.base00};
-        color: #${palette.base05};
+        border: none;
+        background: transparent;
         transition: background-color 0.5s, height 0.5s;
       }
 
       window#waybar.hidden {
-        opacity: 0.2;
       }
 
       #workspaces {
-        background: #${palette.base01};
+        background: transparent;
         margin: 0 5px;
-        padding: 0 1px;
-        border-radius: 15px;
-        color: #${palette.base05};
+        padding: 0 5px;
       }
 
       #workspaces button {
-        padding: 0 5px;
-        margin: 0 3px;
-        border-radius: 15px;
+        padding: 0 3px;
+        margin: 0 5px;
         color: #${palette.base05};
         background: transparent;
         transition: all 0.3s ease-in-out;
@@ -48,7 +46,8 @@ in
 
       #workspaces button.active {
         color: #${palette.base0D};
-        background: #${palette.base02};
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.2);
         min-width: 40px;
       }
 
@@ -58,14 +57,13 @@ in
       }
 
       .modules-left, .modules-center, .modules-right {
-        background: #${palette.base01};
+        background: transparent;
         margin: 0 5px;
-        padding: 0 1px;
-        border-radius: 15px;
+        padding: 0 5px;
       }
 
-      #clock, #cpu, #memory, #network, #battery, #bluetooth, #wireplumber, 
-      #power-profiles-daemon, #custom-dropbox, #custom-tailscale, #mpris {
+      #clock, #cpu, #memory, #network, #battery, #bluetooth, #wireplumber,
+      #power-profiles-daemon, #custom-dropbox, #custom-tailscale, #custom-warp, #mpris {
         margin: 0 5px;
         min-width: 15px;
       }
@@ -73,6 +71,11 @@ in
       #tray {
         margin: 0 10px;
         padding: 0 5px;
+      }
+
+      #tray > * {
+        min-width: 15px;
+        -gtk-icon-effect: dim;
       }
 
       #tray > .passive {
@@ -112,6 +115,10 @@ in
         color: #${palette.base03};
       }
 
+      #custom-warp.unknown {
+        color: #${palette.base03};
+      }
+
       #mpris {
         padding: 0 20px;
       }
@@ -132,8 +139,8 @@ in
         background: #${palette.base00};
         color: #${palette.base05};
         border: 1px solid #${palette.base01};
-        border-radius: 10px;
-        padding: 5px 10px;
+        border-radius: 6px;
+        padding: 15px 10px;
       }
 
       tooltip label {
@@ -145,7 +152,7 @@ in
         layer = "top";
         position = "top";
         spacing = 0;
-        height = 28;
+        height = 22;
         modules-left = [
           "niri/workspaces"
           "power-profiles-daemon"
@@ -156,12 +163,10 @@ in
         ];
         modules-right = [
           "wireplumber"
-          "cpu"
-          "memory"
           "network"
           "bluetooth"
           "custom/tailscale"
-          "custom/dropbox"
+          "custom/warp"
           "tray"
           "battery"
         ];
@@ -323,6 +328,15 @@ in
           exec = "${./waybar/waybar-tailscale}";
           on-click = "tailscale ip -4 | wl-copy";
           on-click-right = "tailscale ip -6 | wl-copy";
+          interval = 5;
+          tooltip = true;
+        };
+        "custom/warp" = {
+          format = "{text}";
+          return-type = "json";
+          exec = "${./waybar/waybar-warp}";
+          on-click = "warp-cli connect";
+          on-click-right = "warp-cli disconnect";
           interval = 5;
           tooltip = true;
         };
