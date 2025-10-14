@@ -7,7 +7,7 @@
   ];
 
   home.file.".local/bin/cursor" = {
-    source = ./cursor/cursor;
+    source = ./cursor/cursor.sh;
     executable = true;
   };
 
@@ -16,7 +16,7 @@
     name = "Cursor";
     comment = "Launch the latest Cursor AppImage";
     exec = "cursor";
-    icon = "Cursor";
+    icon = "${../../../config/icons/cursor.svg}";
     terminal = false;
     type = "Application";
     categories = [

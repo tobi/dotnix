@@ -59,6 +59,7 @@ VERBOSE=false
 QUIET=false
 DRY_RUN=false
 FORCE=false
+FORCE_NIXPKGS=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -129,22 +130,28 @@ main() {
         echo -e "${BLUE}🔄 Switching configuration...${NC}"
         echo -e "${BLUE}Environment: ${env_type}${NC}"
         echo -e "${BLUE}Flake: ${FLAKE_PATH}${NC}"
+        echo -e "${BLUE}Force Nixpkgs: ${FORCE_NIXPKGS}${NC}"
         echo
     fi
+
+    local extras=""
+    #if [[ "$FORCE_NIXPKGS" != "true" ]]; then
+        extras="--option extra-substituters https://install.determinate.systems --option extra-trusted-public-keys cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM="
+    #fi
 
     local cmd=""
     case "$env_type" in
         "wsl")
             log_info "Running WSL configuration switch..."
-            cmd="sudo nixos-rebuild switch --flake \"${FLAKE_PATH}\""
+            cmd="sudo nixos-rebuild switch $extras --flake \"${FLAKE_PATH}\""
             ;;
         "nixos")
             log_info "Running NixOS system switch..."
-            cmd="sudo nixos-rebuild switch --flake \"${FLAKE_PATH}\""
+            cmd="sudo nixos-rebuild switch $extras --flake \"${FLAKE_PATH}\""
             ;;
         "other")
             log_info "Running home-manager switch..."
-            cmd="home-manager switch --flake \"${FLAKE_PATH}#${USERNAME}\""
+            cmd="home-manager switch $extras --flake \"${FLAKE_PATH}#${USERNAME}\""
             ;;
         *)
             log_error "Unknown environment type: ${env_type}"

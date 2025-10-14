@@ -15,7 +15,7 @@
         };
       };
     });
-    default = {};
+    default = { };
     description = "Application hotkey bindings for open-or-focus functionality";
   };
 }

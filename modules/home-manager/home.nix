@@ -9,6 +9,7 @@ in
   programs.home-manager.enable = true;
 
   home.stateVersion = "25.05";
+  home.enableNixpkgsReleaseCheck = false;
   home.username = username;
   home.homeDirectory =
     if pkgs.stdenv.isDarwin
@@ -42,6 +43,7 @@ in
     extraConfig = {
       gpg.format = "ssh";
       gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
+      include.path = "~/.config/dev/gitconfig";
     };
   };
 

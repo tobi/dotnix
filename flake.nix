@@ -6,6 +6,7 @@
     , nixpkgs
     , home-manager
     , nix-colors
+    , determinate
     , ...
     } @inputs:
     let
@@ -25,9 +26,11 @@
       mkPkgs = system:
         utils.mkPkgs {
           inherit system;
+
           extraOverlays = [
             inputs.niri.overlays.niri
-            (import ./modules/overlays/ruby.nix)
+
+            # (import ./modules/overlays/ruby.nix)
           ];
         };
     in
@@ -68,7 +71,8 @@
     };
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0";
 
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
@@ -87,7 +91,6 @@
 
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
-
   };
 
 }

@@ -13,6 +13,7 @@ in
     name = "Google Meet";
     comment = "Google Meet Video Conferencing";
     exec = "${chromeScript} --user-data-dir=Shopify/profile --new-window --app=https://meet.google.com --name=GoogleMeet --class=GoogleMeet";
+    icon = "${../../../config/icons/google-meet.svg}";
     terminal = false;
     type = "Application";
     startupNotify = true;

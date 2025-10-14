@@ -1,6 +1,10 @@
 { pkgs, inputs, config, ... }:
 
 {
+  imports = [
+    ../../nixos/wifi-fixes.nix
+  ];
+
   system.stateVersion = "25.11";
 
   time.timeZone = "America/Toronto";

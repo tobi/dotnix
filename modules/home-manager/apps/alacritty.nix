@@ -222,7 +222,7 @@ in
     exec = "alacritty";
     terminal = false;
     type = "Application";
-    icon = "terminal";
+    icon = "${../../../config/icons/alacritty.svg}";
     categories = [
       "Utility"
       "TerminalEmulator"

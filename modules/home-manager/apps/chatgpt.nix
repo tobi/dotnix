@@ -13,6 +13,7 @@ in
     name = "ChatGPT";
     comment = "ChatGPT Web App";
     exec = "${chromeScript} --new-window --app=https://chat.openai.com --name=ChatGPT --class=ChatGPT";
+    icon = "${../../../config/icons/chatgpt.svg}";
     terminal = false;
     type = "Application";
     # mimeType = [ "text/html" "text/xml" "application/xhtml_xml" ];

@@ -1,0 +1,213 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTNIX_ROOT="$(dirname "$SCRIPT_DIR")"
+ICONS_DIR="$DOTNIX_ROOT/config/icons"
+APPS_DIR="$DOTNIX_ROOT/modules/home-manager/apps"
+
+usage() {
+    echo "Usage: $0 <AppName> --url <URL> [chrome options...]"
+    echo
+    echo "Create a web app desktop entry with automatic icon fetching"
+    echo
+    echo "Arguments:"
+    echo "  AppName           Name of the application (e.g., Hey, Notion)"
+    echo "  --url <URL>       URL of the web application"
+    echo "  [chrome options]  Additional Chrome flags to pass through"
+    echo
+    echo "Examples:"
+    echo "  $0 Hey --url https://hey.com"
+    echo "  $0 Notion --url https://notion.so --enable-features=SomeFeature"
+    exit 1
+}
+
+log_info() {
+    echo -e "${BLUE}ℹ${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}✓${NC} $1"
+}
+
+log_warn() {
+    echo -e "${YELLOW}⚠${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}✗${NC} $1"
+}
+
+# Parse arguments
+if [ $# -lt 3 ]; then
+    usage
+fi
+
+APP_NAME="$1"
+shift
+
+if [ "$1" != "--url" ]; then
+    log_error "Expected --url as second argument"
+    usage
+fi
+shift
+
+URL="$1"
+shift
+
+# Remaining arguments are Chrome options
+CHROME_OPTS=("$@")
+
+# Validate URL
+if [[ ! "$URL" =~ ^https?:// ]]; then
+    log_error "URL must start with http:// or https://"
+    exit 1
+fi
+
+# Extract domain from URL
+DOMAIN=$(echo "$URL" | sed -E 's|^https?://([^/]+).*|\1|')
+log_info "Domain: $DOMAIN"
+
+# Generate lowercase app name for file names
+APP_NAME_LOWER=$(echo "$APP_NAME" | tr '[:upper:]' '[:lower:]')
+
+# Fetch the website and extract icon URLs
+log_info "Fetching $URL to find icons..."
+HTML=$(curl -sL "$URL" || true)
+
+# Function to extract icon URL from HTML
+find_icon_url() {
+    local html="$1"
+    local base_url="$2"
+
+    # Try to find various icon meta tags (in order of preference)
+    # 1. SVG icons
+    local icon_url=$(echo "$html" | grep -oP '(?<=<link[^>]*rel="icon"[^>]*href=")[^"]*\.svg' | head -1 || true)
+
+    # 2. Apple touch icons (usually high quality)
+    if [ -z "$icon_url" ]; then
+        icon_url=$(echo "$html" | grep -oP '(?<=<link[^>]*rel="apple-touch-icon"[^>]*href=")[^"]*' | head -1 || true)
+    fi
+
+    # 3. Shortcut icon
+    if [ -z "$icon_url" ]; then
+        icon_url=$(echo "$html" | grep -oP '(?<=<link[^>]*rel="shortcut icon"[^>]*href=")[^"]*' | head -1 || true)
+    fi
+
+    # 4. Regular icon
+    if [ -z "$icon_url" ]; then
+        icon_url=$(echo "$html" | grep -oP '(?<=<link[^>]*rel="icon"[^>]*href=")[^"]*' | head -1 || true)
+    fi
+
+    # 5. Try favicon.ico as fallback
+    if [ -z "$icon_url" ]; then
+        icon_url="/favicon.ico"
+    fi
+
+    # Make URL absolute if it's relative
+    if [[ "$icon_url" =~ ^/ ]]; then
+        echo "${base_url}${icon_url}"
+    elif [[ "$icon_url" =~ ^https?:// ]]; then
+        echo "$icon_url"
+    else
+        echo "${base_url}/${icon_url}"
+    fi
+}
+
+BASE_URL=$(echo "$URL" | sed -E 's|(https?://[^/]+).*|\1|')
+ICON_URL=$(find_icon_url "$HTML" "$BASE_URL")
+log_info "Found icon URL: $ICON_URL"
+
+# Determine file extension
+if [[ "$ICON_URL" =~ \.svg$ ]]; then
+    ICON_EXT="svg"
+elif [[ "$ICON_URL" =~ \.png$ ]]; then
+    ICON_EXT="png"
+elif [[ "$ICON_URL" =~ \.jpg$ ]] || [[ "$ICON_URL" =~ \.jpeg$ ]]; then
+    ICON_EXT="jpg"
+elif [[ "$ICON_URL" =~ \.ico$ ]]; then
+    ICON_EXT="ico"
+else
+    # Default to png
+    ICON_EXT="png"
+fi
+
+ICON_FILE="$ICONS_DIR/${APP_NAME_LOWER}.${ICON_EXT}"
+
+# Download the icon
+log_info "Downloading icon to $ICON_FILE..."
+if curl -sL "$ICON_URL" -o "$ICON_FILE"; then
+    log_success "Icon downloaded successfully"
+else
+    log_warn "Failed to download icon, using default"
+    ICON_FILE=""
+fi
+
+# Generate the Nix module
+NIX_FILE="$APPS_DIR/${APP_NAME_LOWER}.nix"
+log_info "Generating Nix module at $NIX_FILE..."
+
+# Build Chrome options string
+CHROME_OPTS_STR=""
+if [ ${#CHROME_OPTS[@]} -gt 0 ]; then
+    for opt in "${CHROME_OPTS[@]}"; do
+        CHROME_OPTS_STR="$CHROME_OPTS_STR $opt"
+    done
+fi
+
+# Create the Nix module
+cat > "$NIX_FILE" << EOF
+{ config
+, lib
+, pkgs
+, ...
+}:
+
+let
+  chromeScript = "\${config.home.homeDirectory}/.local/bin/chrome";
+in
+{
+  # Desktop entry for $APP_NAME
+  xdg.desktopEntries.$APP_NAME = {
+    name = "$APP_NAME";
+    comment = "$APP_NAME Web Application";
+    exec = "\${chromeScript} --new-window --app=$URL --name=$APP_NAME --class=$APP_NAME${CHROME_OPTS_STR}";
+EOF
+
+if [ -n "$ICON_FILE" ]; then
+    cat >> "$NIX_FILE" << EOF
+    icon = "\${../../../config/icons/${APP_NAME_LOWER}.${ICON_EXT}}";
+EOF
+fi
+
+cat >> "$NIX_FILE" << EOF
+    terminal = false;
+    type = "Application";
+    startupNotify = true;
+  };
+}
+EOF
+
+log_success "Nix module created: $NIX_FILE"
+
+# Reminder to add to desktop.nix
+log_info ""
+log_info "Next steps:"
+echo "  1. Add the following line to modules/home-manager/desktop.nix imports:"
+echo "     ./apps/${APP_NAME_LOWER}.nix"
+echo "  2. Run: git add $NIX_FILE"
+if [ -n "$ICON_FILE" ]; then
+    echo "  3. Run: git add $ICON_FILE"
+fi
+echo "  4. Run: switch"
+log_info ""
+log_success "Web app '$APP_NAME' created successfully!"

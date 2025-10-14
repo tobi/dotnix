@@ -4,7 +4,7 @@ let
   lib = prev.lib;
   enable = rb: rb.override {
     # enable jemalloc support (requires a manual build)
-    #jemallocSupport = true;
+    jemallocSupport = true;
   };
   rubies =
     lib.mapAttrs

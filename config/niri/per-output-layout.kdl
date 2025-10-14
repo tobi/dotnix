@@ -1,0 +1,20 @@
+// Per-output layout overrides
+// These settings override the global layout defaults for specific displays
+
+output "eDP-1" {
+    layout {
+        default-column-width { proportion 0.5; }
+    }
+}
+
+output "Apple Computer Inc StudioDisplay 0x47040065" {
+    layout {
+        default-column-width { proportion 0.33; }
+        preset-column-widths {
+            proportion 0.25
+            proportion 0.33
+            proportion 0.5
+            proportion 0.66
+        }
+    }
+}
