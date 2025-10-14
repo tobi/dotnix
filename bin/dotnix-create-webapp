@@ -9,11 +9,10 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DOTNIX_ROOT="$(dirname "$SCRIPT_DIR")"
-ICONS_DIR="$DOTNIX_ROOT/config/icons"
-APPS_DIR="$DOTNIX_ROOT/modules/home-manager/apps"
+# Directories
+APPLICATIONS_DIR="$HOME/Applications"
+ICONS_DIR="$HOME/.local/share/icons"
+CHROME_WRAPPER="$HOME/.local/bin/chrome"
 
 usage() {
     echo "Usage: $0 <AppName> --url <URL> [chrome options...]"
@@ -80,6 +79,10 @@ log_info "Domain: $DOMAIN"
 # Generate lowercase app name for file names
 APP_NAME_LOWER=$(echo "$APP_NAME" | tr '[:upper:]' '[:lower:]')
 
+# Create directories if they don't exist
+mkdir -p "$APPLICATIONS_DIR"
+mkdir -p "$ICONS_DIR"
+
 # Fetch the website and extract icon URLs
 log_info "Fetching $URL to find icons..."
 HTML=$(curl -sL "$URL" || true)
@@ -90,22 +93,24 @@ find_icon_url() {
     local base_url="$2"
 
     # Try to find various icon meta tags (in order of preference)
+    # Using sed instead of grep -P for better compatibility
+
     # 1. SVG icons
-    local icon_url=$(echo "$html" | grep -oP '(?<=<link[^>]*rel="icon"[^>]*href=")[^"]*\.svg' | head -1 || true)
+    local icon_url=$(echo "$html" | grep 'rel="icon"' | grep -o 'href="[^"]*\.svg"' | sed 's/href="\([^"]*\)"/\1/' | head -1 || true)
 
     # 2. Apple touch icons (usually high quality)
     if [ -z "$icon_url" ]; then
-        icon_url=$(echo "$html" | grep -oP '(?<=<link[^>]*rel="apple-touch-icon"[^>]*href=")[^"]*' | head -1 || true)
+        icon_url=$(echo "$html" | grep 'rel="apple-touch-icon"' | grep -o 'href="[^"]*"' | sed 's/href="\([^"]*\)"/\1/' | head -1 || true)
     fi
 
     # 3. Shortcut icon
     if [ -z "$icon_url" ]; then
-        icon_url=$(echo "$html" | grep -oP '(?<=<link[^>]*rel="shortcut icon"[^>]*href=")[^"]*' | head -1 || true)
+        icon_url=$(echo "$html" | grep 'rel="shortcut icon"' | grep -o 'href="[^"]*"' | sed 's/href="\([^"]*\)"/\1/' | head -1 || true)
     fi
 
     # 4. Regular icon
     if [ -z "$icon_url" ]; then
-        icon_url=$(echo "$html" | grep -oP '(?<=<link[^>]*rel="icon"[^>]*href=")[^"]*' | head -1 || true)
+        icon_url=$(echo "$html" | grep 'rel="icon"' | grep -o 'href="[^"]*"' | sed 's/href="\([^"]*\)"/\1/' | head -1 || true)
     fi
 
     # 5. Try favicon.ico as fallback
@@ -146,15 +151,19 @@ ICON_FILE="$ICONS_DIR/${APP_NAME_LOWER}.${ICON_EXT}"
 # Download the icon
 log_info "Downloading icon to $ICON_FILE..."
 if curl -sL "$ICON_URL" -o "$ICON_FILE"; then
-    log_success "Icon downloaded successfully"
+    # Verify the file is not empty and is a valid image
+    if [ -s "$ICON_FILE" ]; then
+        log_success "Icon downloaded successfully"
+        ICON_PATH="$ICON_FILE"
+    else
+        log_warn "Downloaded icon is empty, removing"
+        rm -f "$ICON_FILE"
+        ICON_PATH=""
+    fi
 else
-    log_warn "Failed to download icon, using default"
-    ICON_FILE=""
+    log_warn "Failed to download icon"
+    ICON_PATH=""
 fi
-
-# Generate the Nix module
-NIX_FILE="$APPS_DIR/${APP_NAME_LOWER}.nix"
-log_info "Generating Nix module at $NIX_FILE..."
 
 # Build Chrome options string
 CHROME_OPTS_STR=""
@@ -164,50 +173,32 @@ if [ ${#CHROME_OPTS[@]} -gt 0 ]; then
     done
 fi
 
-# Create the Nix module
-cat > "$NIX_FILE" << EOF
-{ config
-, lib
-, pkgs
-, ...
-}:
+# Create the .desktop file
+DESKTOP_FILE="$APPLICATIONS_DIR/${APP_NAME}.desktop"
+log_info "Creating desktop entry at $DESKTOP_FILE..."
 
-let
-  chromeScript = "\${config.home.homeDirectory}/.local/bin/chrome";
-in
-{
-  # Desktop entry for $APP_NAME
-  xdg.desktopEntries.$APP_NAME = {
-    name = "$APP_NAME";
-    comment = "$APP_NAME Web Application";
-    exec = "\${chromeScript} --new-window --app=$URL --name=$APP_NAME --class=$APP_NAME${CHROME_OPTS_STR}";
+cat > "$DESKTOP_FILE" << EOF
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=$APP_NAME
+Comment=$APP_NAME Web Application
+Exec=$CHROME_WRAPPER --new-window --app=$URL --name=$APP_NAME --class=$APP_NAME${CHROME_OPTS_STR}
+Terminal=false
+StartupNotify=true
+Categories=Network;WebBrowser;
 EOF
 
-if [ -n "$ICON_FILE" ]; then
-    cat >> "$NIX_FILE" << EOF
-    icon = "\${../../../config/icons/${APP_NAME_LOWER}.${ICON_EXT}}";
-EOF
+if [ -n "$ICON_PATH" ]; then
+    echo "Icon=$ICON_PATH" >> "$DESKTOP_FILE"
 fi
 
-cat >> "$NIX_FILE" << EOF
-    terminal = false;
-    type = "Application";
-    startupNotify = true;
-  };
-}
-EOF
+chmod +x "$DESKTOP_FILE"
 
-log_success "Nix module created: $NIX_FILE"
-
-# Reminder to add to desktop.nix
-log_info ""
-log_info "Next steps:"
-echo "  1. Add the following line to modules/home-manager/desktop.nix imports:"
-echo "     ./apps/${APP_NAME_LOWER}.nix"
-echo "  2. Run: git add $NIX_FILE"
-if [ -n "$ICON_FILE" ]; then
-    echo "  3. Run: git add $ICON_FILE"
+log_success "Desktop entry created: $DESKTOP_FILE"
+if [ -n "$ICON_PATH" ]; then
+    log_success "Icon installed: $ICON_PATH"
 fi
-echo "  4. Run: switch"
+
 log_info ""
-log_success "Web app '$APP_NAME' created successfully!"
+log_success "Web app '$APP_NAME' is ready! You can now launch it from fuzzel or your application launcher."
