@@ -3,7 +3,7 @@
   services.mako = {
     enable = true;
     settings = {
-      default-timeout = 2000;
+      default-timeout = 8000;
       actions = true; 
       width = 350;
       height = 150;

@@ -25,9 +25,9 @@ in
         font = "FiraCode Nerd Font:size=12";
 
         # Matching
-        fuzzy = true;
+        y = true;
         show-actions = true;
-        terminal = "alacritty";
+        terminal = "ghostty";
 
         # Appearance
         line-height = 25;

@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(hostname), Bash(lsblk), Bash(lshw:*), Bash(journalctl:*), Bash(cat:*), Bash(ls:*), Bash(lspci:*), Bash(lsusb:*),Bash(nix-shell:*), Bash(systemctl:*), Bash/uname, Bash/wc, Bash/grep, Bash/find, Bash(nix:*), Bash/pwd, Bash/realpath, mcp__mcp-nixos__nixos_search, mcp__mcp-nixos__nixos_search, mcp__mcp-nixos__home_manager_search, mcp__mcp-(nixos:*), Bash(dmesg:*), Bash(exa:*), Bash(mount)
+allowed-tools: Bash(hostname), Bash(lsblk), Bash(lshw:*), Bash(journalctl:*), Bash(cat:*), Bash(ls:*), Bash(lspci:*), Bash(lsusb:*),Bash(nix-shell:*), Bash(systemctl:*), Bash/uname, Bash/wc, Bash/grep, Bash/find, Bash(nix:*), Bash/pwd, Bash/realpath, mcp__mcp-nixos__nixos_search, mcp__mcp-nixos__nixos_search, mcp__mcp-nixos__home_manager_search, mcp__mcp-(nixos:*), Bash(dmesg:*), Bash(exa:*), Bash(mount), Bash(/proc/cpuinfo), Bash(lscpu), Bash(lsusb), Bash(journalctl)
 description: Collect and summarize NixOS hardware, configuration, and log metadata for LLM-based diagnostics, including flake directory, rebuild logs, and flake check.
 ---
 
@@ -38,7 +38,7 @@ Memory: !`free -h`
 </dmesg>
 
 <hardware>
-!`cat /proc/cpuinfo`
+<!-- ! `cat /proc/cpuinfo` -->
 </hardware>
 
 <nix_files>

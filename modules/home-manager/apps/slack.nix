@@ -12,7 +12,7 @@ in
   xdg.desktopEntries.Slack = {
     name = "Slack";
     comment = "Slack Desktop";
-    exec = "${chromeScript} ${config.home.homeDirectory}/Shopify/profile --new-window --app=https://app.slack.com/client --name=Slack --class=Slack";
+    exec = "${chromeScript} --user-data-dir=${config.home.homeDirectory}/Shopify/profile --new-window --app=https://app.slack.com/client --name=Slack --class=Slack";
     terminal = false;
     icon = "slack";
     type = "Application";

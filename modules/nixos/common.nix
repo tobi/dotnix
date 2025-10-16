@@ -106,6 +106,7 @@
     noto-fonts
     noto-fonts-emoji
     noto-fonts-cjk-sans
+    freetype
     nerd-fonts.fira-code
     nerd-fonts.droid-sans-mono
     nerd-fonts.caskaydia-mono

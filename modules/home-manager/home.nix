@@ -1,4 +1,4 @@
-{ pkgs, lib, inputs, ... }:
+{ config, pkgs, lib, inputs, ... }:
 let
   username = "tobi";
   isDarwin = pkgs.stdenv.isDarwin;
@@ -16,6 +16,10 @@ in
     then "/Users/${username}"
     else "/home/${username}";
 
+  # Allow application launchers to discover apps in ~/Applications
+  xdg.systemDirs.data = lib.optionals isLinux [
+    "${config.home.homeDirectory}/Applications"
+  ];
 
   # Global environment variables
   home.sessionVariables = {

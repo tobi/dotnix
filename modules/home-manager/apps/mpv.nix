@@ -48,7 +48,7 @@ in
       screenshot-template = "%F-%P";
 
       # Audio
-      volume = 100;
+      volume = 50;
       volume-max = 150;
 
       # Subtitles
@@ -68,10 +68,12 @@ in
       "WHEEL_DOWN" = "add volume -2";
 
       # Seeking
-      "RIGHT" = "seek 15";
-      "LEFT" = "seek -5";
-      "UP" = "seek 60";
-      "DOWN" = "seek -60";
+      "RIGHT" = "seek 6";
+      "LEFT" = "seek -2";
+
+      # Volume
+      "UP" = "add volume 5";
+      "DOWN" = "add volume -5";
 
       # Playback speed
       "[" = "multiply speed 0.9091";

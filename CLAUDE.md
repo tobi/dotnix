@@ -250,3 +250,4 @@ ast-grep -p 'lib.mkIf config.dotnix.desktop.enable $VAL' -l nix
 - use the /nix-check command when you want to see if the config is good
 - use the nixos-config-expert agent liberally
 - if you changed config.kdl its good to rerun niri validate
+- for desktop, we exclusively use wayland

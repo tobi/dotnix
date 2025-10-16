@@ -1,3 +1,3 @@
 #!/bin/sh
 
-exec open Cursor $@
+exec open Cursor "$@"

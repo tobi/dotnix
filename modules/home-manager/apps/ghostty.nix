@@ -18,8 +18,8 @@ in
       # Window settings
       window-padding-x = 14;
       window-padding-y = 14;
-      background-opacity = 0.70;
-      background-blur-radius = 40;
+      background-opacity = 1;
+      # background-blur-radius = 40;
       window-decoration = "none";
 
       font-family = "FiraCode Nerd Font";

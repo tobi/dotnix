@@ -29,7 +29,7 @@
 
           extraOverlays = [
             inputs.niri.overlays.niri
-
+            inputs.ghostty.overlays.default
             # (import ./modules/overlays/ruby.nix)
           ];
         };
@@ -54,6 +54,7 @@
           pkgs = mkPkgs (builtins.currentSystem);
           extraSpecialArgs = { inherit inputs; };
           modules = [ ./modules/home-manager/home.nix ];
+          extraOverlays = [ inputs.ghostty.overlays.default ];
         };
       };
 
@@ -88,6 +89,9 @@
 
     try.url = "github:tobi/try";
     try.inputs.nixpkgs.follows = "nixpkgs";
+
+    ghostty.url = "github:ghostty-org/ghostty";
+    ghostty.inputs.nixpkgs.follows = "nixpkgs";
 
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
