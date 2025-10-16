@@ -49,8 +49,9 @@
     mimeApps = {
       enable = true;
       defaultApplications = {
-        "x-scheme-handler/http" = "google-chrome.desktop";
-        "x-scheme-handler/https" = "google-chrome.desktop";
+        "x-scheme-handler/http" = "google-chrome-shopify.desktop";
+        "x-scheme-handler/https" = "google-chrome-shopify.desktop";
+        "inode/directory" = "org.gnome.Nautilus.desktop";
       };
     };
   };
@@ -67,6 +68,7 @@
     ./apps/chatgpt.nix
     ./apps/claude.nix
     ./apps/logseq.nix
+    ./apps/neurotracker.nix
     ./apps/chromium.nix
     ./apps/google-chrome.nix
     ./apps/google-meet.nix
@@ -79,6 +81,7 @@
     ./apps/fuzzel.nix
     ./apps/typora.nix
     ./apps/warp.nix
+    ./apps/mpv.nix
   ];
 }
 

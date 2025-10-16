@@ -5,34 +5,39 @@ let
   generateHotkeyBinds = hotkeys:
     let
       # For each hotkey, generate main bind (focus or open depending on focusClass)
-      mainBinds = lib.mapAttrs' (key: cfg:
-        lib.nameValuePair key {
-          action.spawn = if cfg.focusClass != null
-            then [
-              "~/dotnix/bin/open-or-focus"
-              cfg.executable
-              cfg.focusClass
-            ]
-            else [
+      mainBinds = lib.mapAttrs'
+        (key: cfg:
+          lib.nameValuePair key {
+            action.spawn =
+              if cfg.focusClass != null
+              then [
+                "~/dotnix/bin/open-or-focus"
+                cfg.executable
+                cfg.focusClass
+              ]
+              else [
+                "~/dotnix/bin/open"
+                cfg.executable
+              ];
+          }
+        )
+        hotkeys;
+
+      # For each hotkey, generate open bind (with Shift) - always forces new instance
+      openBinds = lib.mapAttrs'
+        (key: cfg:
+          let
+            # Convert "Super+X" to "Super+Shift+X"
+            shiftKey = lib.replaceStrings [ "Super+" ] [ "Super+Shift+" ] key;
+          in
+          lib.nameValuePair shiftKey {
+            action.spawn = [
               "~/dotnix/bin/open"
               cfg.executable
             ];
-        }
-      ) hotkeys;
-
-      # For each hotkey, generate open bind (with Shift) - always forces new instance
-      openBinds = lib.mapAttrs' (key: cfg:
-        let
-          # Convert "Super+X" to "Super+Shift+X"
-          shiftKey = lib.replaceStrings ["Super+"] ["Super+Shift+"] key;
-        in
-        lib.nameValuePair shiftKey {
-          action.spawn = [
-            "~/dotnix/bin/open"
-            cfg.executable
-          ];
-        }
-      ) hotkeys;
+          }
+        )
+        hotkeys;
     in
     mainBinds // openBinds;
 in
