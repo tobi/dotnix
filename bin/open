@@ -7,18 +7,42 @@
 # - From a TTY: start in background and return immediately
 # - From GUI/non-TTY: exec and let systemd manage the process
 
+desktop-run() {
+  # From a TTY, don't block the terminal: run as a transient service and return
+  if [ -t 1 ]; then
+    systemd-run --user --quiet --slice=apps.slice -- "$@"
+  else
+    # From non-TTY contexts, replace the process and let systemd keep tracking it
+    exec systemd-run --user --scope --quiet --slice=apps.slice -- "$@"
+  fi
+}
+
 if [ -z "$1" ]; then
   echo "Usage: $0 <command> [args...]"
   exit 1
-else
-  app=$1
-  shift
 fi
 
+# # If argument is an AppImage file, use appimage-run
+# if [ -f "$1" ] && [[ "$1" == *.AppImage ]]; then
+#   if [ -t 1 ]; then
+#     appimage-run "$@" &
+#     disown
+#     exit 0
+#   else
+#     exec appimage-run "$@"
+#   fi
+# fi
+
+# If argument is a file or directory, use xdg-open
+
+
+app=$1
+shift
+
 search_dirs=(
-  $HOME/.local/state/nix/profiles/home-manager/home-path/share/applications
-  $HOME/.nix-profile/home-path/share/applications
-  $HOME/.nix-profile/share/applications
+  # $HOME/.local/state/nix/profiles/home-manager/home-path/share/applications
+  # $HOME/.nix-profile/home-path/share/applications
+  # $HOME/.nix-profile/share/applications
   $HOME/Applications
   /usr/share/applications
 )
@@ -32,6 +56,7 @@ error() {
   exit 1
 }
 
+
 # Add all $XDG_DATA_DIRS to search_dirs, if set
 if [ -n "$XDG_DATA_DIRS" ]; then
   IFS=':' read -ra xdg_dirs <<< "$XDG_DATA_DIRS"
@@ -42,14 +67,26 @@ fi
 
 
 resolve_app() {
+
+  # if its an executable, run it directly
   if [ -x "$app" ]; then
     cli=("$app")
     return 0
   fi
+
+  # if its a file or directory, use xdg-open to defer to the default desktop
+  if [ -e "$app" ] || [ -d "$app" ]; then
+    cli=("xdg-open" "$app")
+    return 0
+  fi
+
+  # if its a command, in $PATH it directly
   if command -v "$app" >/dev/null 2>&1; then
     cli=("$app")
     return 0
   fi
+
+  # Otherwise search the search_dirs for a .desktop or a .AppImage of matching name
   for dir in "${search_dirs[@]}"; do
     if [ -x "$dir/$app" ]; then
       cli=("$dir/$app")
@@ -75,11 +112,4 @@ fi
 
 cli+=("$@")
 
-# From a TTY, don't block the terminal: run as a transient service and return
-if [ -t 1 ]; then
-  systemd-run --user --quiet --slice=apps.slice "${cli[@]}"
-  exit 0
-fi
-
-# From non-TTY contexts, replace the process and let systemd keep tracking it
-exec systemd-run --user --scope --quiet --slice=apps.slice -- "${cli[@]}"
+desktop-run "${cli[@]}"

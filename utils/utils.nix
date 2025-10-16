@@ -9,6 +9,7 @@ let
       inherit system;
       config.allowUnfree = true;
       overlays = extraOverlays;
+      extraOverlays = extraOverlays;
     };
 
 in
@@ -17,12 +18,12 @@ in
   mkMachines = { inputs, machinesPath, extraOverlays ? [ ] }:
     let
       # Hardcode host names for now
-      hostNames = [ "frameling" "zerg-wsl2" "usb-stick" "beetralisk" ];
+      hostNames = builtins.attrNames (builtins.readDir machinesPath);
 
       # Use our centralized overlay system
       pkgs = mkPkgs {
         system = "x86_64-linux";
-        extraOverlays = extraOverlays;
+        inherit extraOverlays;
       };
     in
     builtins.listToAttrs (map
