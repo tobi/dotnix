@@ -62,6 +62,7 @@
   imports = [
     ./dotnix-options.nix
     ./apps/waybar.nix
+    ./apps/wireplumber.nix
     ./apps/ghostty.nix
     ./apps/alacritty.nix
     ./apps/niri.nix
