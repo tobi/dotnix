@@ -23,5 +23,6 @@ in
   dotnix.desktop.hotkeys."Super+E" = {
     executable = "GoogleMeet";
     focusClass = "chrome-meet.google.com__-Default";
+    cmd = "google-meet";
   };
 }

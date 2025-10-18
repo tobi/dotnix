@@ -8,13 +8,13 @@
       always-center-single-column = true;
 
       preset-column-widths = [
-        { proportion = 0.333; }
-        { proportion = 0.5; }
-        { proportion = 0.666; }
+        { proportion = 1. / 3.; }
+        { proportion = 1. / 2.; }
+        { proportion = 2. / 3.; }
       ];
 
       default-column-width = {
-        proportion = 0.5;
+        # fixed = 726; # let windows decide
       };
 
       focus-ring = {

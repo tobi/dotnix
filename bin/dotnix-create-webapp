@@ -10,7 +10,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Directories
-APPLICATIONS_DIR="$HOME/Applications"
+APPLICATIONS_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
 ICONS_DIR="$HOME/.local/share/icons"
 CHROME_WRAPPER="$HOME/.local/bin/chrome"
 

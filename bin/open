@@ -10,10 +10,12 @@
 desktop-run() {
   # From a TTY, don't block the terminal: run as a transient service and return
   if [ -t 1 ]; then
-    systemd-run --user --quiet --slice=apps.slice -- "$@"
+    systemd-run --same-dir --user --scope --quiet --slice=apps.slice -- $@ &
+    disown
+    exit 0
   else
     # From non-TTY contexts, replace the process and let systemd keep tracking it
-    exec systemd-run --user --scope --quiet --slice=apps.slice -- "$@"
+    exec systemd-run --same-dir --user --scope --quiet --slice=apps.slice -- $@
   fi
 }
 
@@ -22,29 +24,14 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-# # If argument is an AppImage file, use appimage-run
-# if [ -f "$1" ] && [[ "$1" == *.AppImage ]]; then
-#   if [ -t 1 ]; then
-#     appimage-run "$@" &
-#     disown
-#     exit 0
-#   else
-#     exec appimage-run "$@"
-#   fi
-# fi
-
-# If argument is a file or directory, use xdg-open
-
 
 app=$1
 shift
 
 search_dirs=(
-  # $HOME/.local/state/nix/profiles/home-manager/home-path/share/applications
-  # $HOME/.nix-profile/home-path/share/applications
-  # $HOME/.nix-profile/share/applications
   $HOME/Applications
-  /usr/share/applications
+  $HOME/local/share
+  /usr/share
 )
 
 error() {
@@ -61,7 +48,7 @@ error() {
 if [ -n "$XDG_DATA_DIRS" ]; then
   IFS=':' read -ra xdg_dirs <<< "$XDG_DATA_DIRS"
   for dir in "${xdg_dirs[@]}"; do
-    search_dirs+=("$dir/applications")
+    search_dirs+=("$dir")
   done
 fi
 
@@ -69,7 +56,7 @@ fi
 resolve_app() {
 
   # if its an executable, run it directly
-  if [ -x "$app" ]; then
+  if [[ -x "$app" && ! -d "$app" ]]; then
     cli=("$app")
     return 0
   fi
@@ -88,14 +75,22 @@ resolve_app() {
 
   # Otherwise search the search_dirs for a .desktop or a .AppImage of matching name
   for dir in "${search_dirs[@]}"; do
+
     if [ -x "$dir/$app" ]; then
       cli=("$dir/$app")
       return 0
     fi
+
+    if [ -f "$dir/applications/$app.desktop" ]; then
+      cli=(dex "$dir/$app.desktop")
+      return 0
+    fi
+
     if [ -f "$dir/$app.desktop" ]; then
       cli=(dex "$dir/$app.desktop")
       return 0
     fi
+
     if [ -f "$dir/$app.AppImage" ]; then
       cli=(appimage-run "$dir/$app.AppImage")
       return 0
@@ -111,5 +106,4 @@ if ! resolve_app; then
 fi
 
 cli+=("$@")
-
 desktop-run "${cli[@]}"

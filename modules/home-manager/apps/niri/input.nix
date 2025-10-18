@@ -20,6 +20,7 @@
 
     mouse = {
       accel-profile = "flat";
+      accel-speed = 0.0;
     };
 
     warp-mouse-to-focus.enable = true;

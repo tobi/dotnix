@@ -63,7 +63,8 @@ in
       }
 
       #clock, #cpu, #memory, #network, #battery, #bluetooth, #wireplumber,
-      #power-profiles-daemon, #custom-dropbox, #custom-tailscale, #custom-warp, #mpris {
+      #power-profiles-daemon, #custom-dropbox, #custom-tailscale, #custom-warp,
+      #custom-next-event, #mpris {
         margin: 0 5px;
         min-width: 15px;
       }
@@ -135,6 +136,43 @@ in
         color: #${palette.base03};
       }
 
+      #custom-next-event {
+        padding: 0 15px;
+      }
+
+      #custom-next-event.empty {
+        padding: 0;
+        margin: 0;
+        min-width: 0;
+      }
+
+      #custom-next-event.current {
+        color: #${palette.base05};
+      }
+
+      #custom-next-event.upcoming {
+        color: #${palette.base05};
+      }
+
+      #custom-next-event.soon {
+        color: #${palette.base0A};
+      }
+
+      #custom-next-event.now {
+        color: #${palette.base08};
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      #custom-next-event.error {
+        color: #${palette.base08};
+      }
+
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+      }
+
       tooltip {
         background: #${palette.base00};
         color: #${palette.base05};
@@ -159,6 +197,7 @@ in
           "mpris"
         ];
         modules-center = [
+          "custom/next-event"
           "clock"
         ];
         modules-right = [
@@ -338,6 +377,12 @@ in
           on-click = "warp-cli connect";
           on-click-right = "warp-cli disconnect";
           interval = 5;
+          tooltip = true;
+        };
+        "custom/next-event" = {
+          format = "󰸗 {text}";
+          return-type = "json";
+          exec = "${pkgs.ruby}/bin/ruby ${./waybar/waybar-next-event.rb}";
           tooltip = true;
         };
 

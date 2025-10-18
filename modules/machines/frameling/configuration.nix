@@ -145,6 +145,12 @@
     tailscale.useRoutingFeatures = "client";
   };
 
+  # Virtualization
+  virtualisation.docker = {
+    enable = true;
+    enableOnBoot = true;
+  };
+
   # Fix NTP startup dependencies
   systemd.services.chronyd = {
     after = [ "network-online.target" ];

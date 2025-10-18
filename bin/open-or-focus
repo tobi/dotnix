@@ -7,8 +7,13 @@
 
 set -euo pipefail
 
+WINDOW_SEARCH="$1"
+shift
+
+
+
 APP_NAME="$1"
-WINDOW_SEARCH="${2:-$1}"
+shift
 
 # Function to focus window
 focus_window() {
@@ -65,4 +70,5 @@ if [[ -n "$WINDOW_SEARCH" ]]; then
 fi
 
 # No window found - launch the application using open script
-exec ~/dotnix/bin/open "$APP_NAME"
+echo ~/dotnix/bin/open "$APP_NAME" $@
+exec ~/dotnix/bin/open "$APP_NAME" $@

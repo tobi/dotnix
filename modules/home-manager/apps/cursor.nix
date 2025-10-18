@@ -6,11 +6,6 @@
     appimage-run
   ];
 
-  home.file.".local/bin/cursor" = {
-    source = ./cursor/cursor.sh;
-    executable = true;
-  };
-
   # Define a package for the Cursor AppImage
   xdg.desktopEntries.cursor = {
     name = "Cursor";
@@ -28,6 +23,7 @@
   dotnix.desktop.hotkeys."Super+X" = {
     executable = "Cursor";
     focusClass = "cursor";
+    cmd = "cursor";
   };
 }
 

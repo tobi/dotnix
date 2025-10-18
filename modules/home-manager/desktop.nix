@@ -73,6 +73,8 @@
     ./apps/chromium.nix
     ./apps/google-chrome.nix
     ./apps/google-meet.nix
+    ./apps/google-calendar.nix
+    ./apps/gmail.nix
     ./apps/slack.nix
     ./apps/cursor.nix
     ./apps/swaylock.nix

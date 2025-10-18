@@ -23,5 +23,6 @@ in
   dotnix.desktop.hotkeys."Super+C" = {
     executable = "GoogleCalendar";
     focusClass = "chrome-calendar.google.com__-Default";
+    cmd = "google-calendar";
   };
 }

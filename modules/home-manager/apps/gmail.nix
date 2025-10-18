@@ -23,5 +23,6 @@ in
   dotnix.desktop.hotkeys."Super+M" = {
     executable = "Gmail";
     focusClass = "chrome-mail.google.com__-Default";
+    cmd = "gmail";
   };
 }

@@ -10,7 +10,7 @@ FETCH_INTERVAL_SECONDS = (ENV['WAYBAR_CAL_FETCH_SECONDS'] || '60').to_i
 DISPLAY_REFRESH_SECONDS = (ENV['WAYBAR_DISPLAY_REFRESH_SECONDS'] || '5').to_i
 SWITCH_LEAD_MINUTES = (ENV['WAYBAR_SWITCH_LEAD_MINUTES'] || '15').to_i
 LOOKAHEAD_DAYS = (ENV['WAYBAR_LOOKAHEAD_DAYS'] || '2').to_i
-CALENDAR_ID = ENV['WAYBAR_CALENDAR']
+CALENDAR_ID = ENV['WAYBAR_CALENDAR'] || "Meetings"
 GCALCLI_BIN = ENV['WAYBAR_GCALCLI_BIN'] || 'gcalcli'
 LEAD_SECONDS = SWITCH_LEAD_MINUTES * 60
 
@@ -67,6 +67,12 @@ class CalendarEvent
     (((start_time - now) / 60.0)).ceil
   end
 
+  def minutes_remaining(now = Time.now)
+    return 0 unless ongoing?(now)
+
+    (((end_time - now) / 60.0)).ceil
+  end
+
   def relative_label(now = Time.now)
     minutes = minutes_until(now)
     return 'Now' if minutes <= 0
@@ -76,6 +82,17 @@ class CalendarEvent
     parts << "#{hours}h" if hours.positive?
     parts << "#{mins}m" if mins.positive? || parts.empty?
     parts.join
+  end
+
+  def remaining_label(now = Time.now)
+    minutes = minutes_remaining(now)
+    return 'Done' if minutes <= 0
+
+    hours, mins = minutes.divmod(60)
+    parts = []
+    parts << "#{hours}h" if hours.positive?
+    parts << "#{mins}m" if mins.positive? || parts.empty?
+    parts.join + ' left'
   end
 
   def service
@@ -206,46 +223,112 @@ def urgency_classes(minutes)
   classes
 end
 
+def escape_markup(text)
+  text.to_s
+      .gsub('&', '&amp;')
+      .gsub('<', '&lt;')
+      .gsub('>', '&gt;')
+      .gsub('"', '&quot;')
+      .gsub("'", '&apos;')
+end
+
+def format_tooltip(now, events)
+  # Show all events for the next 2 days
+  end_time = now + (2 * 86_400)
+  upcoming_events = events.select { |event| event.start_time >= now && event.start_time < end_time }
+
+  return 'No upcoming events' if upcoming_events.empty?
+
+  lines = []
+  current_date = nil
+
+  upcoming_events.each do |event|
+    event_date = event.start_time.to_date
+
+    # Add date separator when date changes
+    if event_date != current_date
+      date_emoji = if event_date == now.to_date
+                     '📅'
+                   elsif event_date == (now + 86_400).to_date
+                     '📆'
+                   else
+                     '🗓️'
+                   end
+
+      date_label = if event_date == now.to_date
+                     'Today'
+                   elsif event_date == (now + 86_400).to_date
+                     'Tomorrow'
+                   else
+                     event_date.strftime('%A, %b %d')
+                   end
+
+      lines << '' unless lines.empty? # Add blank line before new date
+      lines << "─── #{date_emoji} #{date_label} ───"
+      current_date = event_date
+    end
+
+    safe_title = escape_markup(event.title)
+    lines << "#{event.start_time.strftime('%H:%M')} - #{safe_title}"
+  end
+
+  lines.join("\r")
+end
+
 def build_output(now, events, fetch_error)
   if fetch_error
     return {
-      text: 'calendar error',
+      icon: '📅',
+      text: 'error',
       class: ['error'],
       tooltip: fetch_error.message
     }
   end
 
   state, display_event, next_event = select_events(now, events)
-  agenda_lines = events.select { |event| event.start_time.to_date == now.to_date && event.end_time > now }
-                       .map { |event| "#{event.start_time.strftime('%H:%M')} - #{event.title}" }
-  agenda_tooltip = agenda_lines.empty? ? 'Free time' : agenda_lines.join("\r")
+  tooltip = format_tooltip(now, events)
 
   case state
   when :current
-    minutes = display_event.minutes_until(now)
-    text = "#{display_event.relative_label(now)} - #{display_event.title}"
+    minutes = display_event.minutes_remaining(now)
+    safe_title = escape_markup(display_event.title)
+    text = "#{display_event.remaining_label(now)} - #{safe_title}"
     classes = ['current', display_event.service] + urgency_classes(minutes)
     {
+      icon: '📅',
       text: text,
       alt: display_event.service,
       class: classes.uniq,
-      tooltip: agenda_tooltip
+      tooltip: tooltip
     }
   when :upcoming
     minutes = display_event.minutes_until(now)
-    text = "#{display_event.relative_label(now)} - #{display_event.title}"
+    # Hide text if more than 2 hours away, but keep icon
+    if minutes > 120
+      return {
+        icon: '📅',
+        text: '',
+        class: ['empty'],
+        tooltip: tooltip
+      }
+    end
+
+    safe_title = escape_markup(display_event.title)
+    text = "#{display_event.relative_label(now)} - #{safe_title}"
     classes = ['upcoming', display_event.service] + urgency_classes(minutes)
     {
+      icon: '📅',
       text: text,
       alt: display_event.service,
       class: classes.uniq,
-      tooltip: agenda_tooltip
+      tooltip: tooltip
     }
   else
     {
+      icon: '📅',
       text: '',
       class: ['empty'],
-      tooltip: agenda_tooltip
+      tooltip: tooltip
     }
   end
 end

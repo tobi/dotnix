@@ -1,6 +1,7 @@
 { config, lib, ... }:
 
 let
+  binDir = "${../../../../bin}";
   # Generate hotkey bindings from registered apps
   generateHotkeyBinds = hotkeys:
     let
@@ -11,12 +12,12 @@ let
             action.spawn =
               if cfg.focusClass != null
               then [
-                "~/dotnix/bin/open-or-focus"
-                cfg.executable
+                "${binDir}/open-or-focus"
                 cfg.focusClass
+                cfg.executable
               ]
               else [
-                "~/dotnix/bin/open"
+                "${binDir}/open"
                 cfg.executable
               ];
           }
@@ -32,7 +33,7 @@ let
           in
           lib.nameValuePair shiftKey {
             action.spawn = [
-              "~/dotnix/bin/open"
+              "${binDir}/open"
               cfg.executable
             ];
           }

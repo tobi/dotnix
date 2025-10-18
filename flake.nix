@@ -29,7 +29,6 @@
 
           extraOverlays = [
             inputs.niri.overlays.niri
-            inputs.ghostty.overlays.default
             # (import ./modules/overlays/ruby.nix)
           ];
         };
@@ -42,6 +41,9 @@
       nixosConfigurations = utils.mkMachines {
         inherit inputs;
         machinesPath = ./modules/machines;
+        extraOverlays = [
+          inputs.niri.overlays.niri
+        ];
       };
 
       # ------------------------------------------------------------
@@ -54,7 +56,6 @@
           pkgs = mkPkgs (builtins.currentSystem);
           extraSpecialArgs = { inherit inputs; };
           modules = [ ./modules/home-manager/home.nix ];
-          extraOverlays = [ inputs.ghostty.overlays.default ];
         };
       };
 

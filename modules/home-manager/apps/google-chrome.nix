@@ -42,7 +42,6 @@ in
   xdg.desktopEntries.google-chrome = {
     name = "Google Chrome";
     genericName = "Web Browser";
-    comment = "Access the Internet";
     exec = "${chromeScript} --class=google-chrome %U";
     terminal = false;
     icon = "google-chrome";
@@ -58,23 +57,12 @@ in
       "x-scheme-handler/http"
       "x-scheme-handler/https"
     ];
-    actions = {
-      new-window = {
-        name = "New Window";
-        exec = "${chromeScript} --class=google-chrome --new-window";
-      };
-      new-private-window = {
-        name = "New Incognito Window";
-        exec = "${chromeScript} --class=google-chrome --incognito";
-      };
-    };
   };
 
   # Desktop entry for Google Chrome (Shopify profile)
   xdg.desktopEntries.google-chrome-shopify = {
     name = "Google Chrome (Shopify)";
     genericName = "Web Browser";
-    comment = "Access the Internet with Shopify profile";
     exec = "${chromeScript} --user-data-dir=${config.home.homeDirectory}/Shopify/profile --class=google-chrome-shopify %U";
     terminal = false;
     icon = "google-chrome";
@@ -94,6 +82,7 @@ in
   dotnix.desktop.hotkeys."Super+N" = {
     executable = "google-chrome-shopify";
     focusClass = "google-chrome-shopify";
+    cmd = "google-chrome-shopify";
   };
 }
 

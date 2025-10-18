@@ -178,6 +178,7 @@ in
     sysz # System information tool
     yazi # Terminal file manager
 
+
     # ── Development tools ───────────────────────────────────────────────
     ast-grep # Fast structural search and replace
     comma # Runs programs without installing them
@@ -204,6 +205,7 @@ in
     # ── Nice-to-have utilities ───────────────────────────────────────────
     fastfetch # Fast system information tool
     gum # Tool for glamorous shell scripts
+    gcalcli # Google Calendar CLI
 
   ] ++ lib.optionals isLinux [
     nitch # Minimal system information tool
