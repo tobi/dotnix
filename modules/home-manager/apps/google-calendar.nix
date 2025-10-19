@@ -20,7 +20,7 @@ in
   };
 
   # Register hotkey for open-or-focus
-  dotnix.desktop.hotkeys."Super+C" = {
+  dotnix.desktop.hotkeys."Super+Shift+C" = {
     executable = "GoogleCalendar";
     focusClass = "chrome-calendar.google.com__-Default";
     cmd = "google-calendar";

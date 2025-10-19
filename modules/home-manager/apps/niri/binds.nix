@@ -4,43 +4,23 @@ let
   binDir = "${../../../../bin}";
   # Generate hotkey bindings from registered apps
   generateHotkeyBinds = hotkeys:
-    let
-      # For each hotkey, generate main bind (focus or open depending on focusClass)
-      mainBinds = lib.mapAttrs'
-        (key: cfg:
-          lib.nameValuePair key {
-            action.spawn =
-              if cfg.focusClass != null
-              then [
-                "${binDir}/open-or-focus"
-                cfg.focusClass
-                cfg.executable
-              ]
-              else [
-                "${binDir}/open"
-                cfg.executable
-              ];
-          }
-        )
-        hotkeys;
-
-      # For each hotkey, generate open bind (with Shift) - always forces new instance
-      openBinds = lib.mapAttrs'
-        (key: cfg:
-          let
-            # Convert "Super+X" to "Super+Shift+X"
-            shiftKey = lib.replaceStrings [ "Super+" ] [ "Super+Shift+" ] key;
-          in
-          lib.nameValuePair shiftKey {
-            action.spawn = [
+    lib.mapAttrs'
+      (key: cfg:
+        lib.nameValuePair key {
+          action.spawn =
+            if cfg.focusClass != null
+            then [
+              "${binDir}/open-or-focus"
+              cfg.focusClass
+              cfg.executable
+            ]
+            else [
               "${binDir}/open"
               cfg.executable
             ];
-          }
-        )
-        hotkeys;
-    in
-    mainBinds // openBinds;
+        }
+      )
+      hotkeys;
 in
 {
   programs.niri.settings.binds = (generateHotkeyBinds config.dotnix.desktop.hotkeys) // {
@@ -57,6 +37,14 @@ in
       action.spawn = [ "swaylock" ];
       hotkey-overlay.title = "Lock the Screen: swaylock";
     };
+
+    # ============================================================================
+    # Universal Clipboard (Super+C/V/X)
+    # ============================================================================
+
+    "Super+C".action.spawn = [ "wtype" "-M" "ctrl" "-P" "Insert" "-m" "ctrl" "-p" "Insert" ];
+    "Super+V".action.spawn = [ "wtype" "-M" "shift" "-P" "Insert" "-m" "shift" "-p" "Insert" ];
+    "Super+X".action.spawn = [ "wtype" "-M" "ctrl" "-P" "x" "-m" "ctrl" "-p" "x" ];
 
     # ============================================================================
     # Media Keys
@@ -239,8 +227,8 @@ in
     "Mod+Shift+Equal".action.set-window-height = "+10%";
 
     # Floating windows
-    "Mod+V".action.toggle-window-floating = { };
-    "Mod+Shift+V".action.switch-focus-between-floating-and-tiling = { };
+    "Mod+T".action.toggle-window-floating = { };
+    "Mod+Shift+T".action.switch-focus-between-floating-and-tiling = { };
 
     # ============================================================================
     # Screenshots
@@ -256,9 +244,6 @@ in
     # Session Management
     # ============================================================================
 
-    "Mod+Shift+E".action.quit = { };
     "Ctrl+Alt+Delete".action.quit = { };
-
-    "Mod+Shift+P".action.power-off-monitors = { };
   };
 }

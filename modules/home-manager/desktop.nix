@@ -5,6 +5,7 @@
     # Desktop environment and window management
     wbg # Wallpaper setter for Wayland
     xdg-desktop-portal-gtk # XDG desktop portal for GTK applications
+    wtype # Wayland typing simulation for clipboard shortcuts
 
     # Audio control
     pavucontrol # PulseAudio volume control GUI
@@ -64,7 +65,6 @@
     ./apps/waybar.nix
     ./apps/wireplumber.nix
     ./apps/ghostty.nix
-    ./apps/alacritty.nix
     ./apps/niri.nix
     ./apps/chatgpt.nix
     ./apps/claude.nix

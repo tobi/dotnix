@@ -20,7 +20,7 @@
   };
 
   # Register hotkey for open-or-focus
-  dotnix.desktop.hotkeys."Super+X" = {
+  dotnix.desktop.hotkeys."Super+Shift+X" = {
     executable = "Cursor";
     focusClass = "cursor";
     cmd = "cursor";
