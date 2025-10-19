@@ -17,6 +17,8 @@ shift
 
 # Function to focus window
 focus_window() {
+    echo -e "\e[32mOpen-or-Focus\e[0m: Found & Focusing Window: $1"
+
     local window_id="$1"
     niri msg action focus-window --id "$window_id"
 }
@@ -70,5 +72,4 @@ if [[ -n "$WINDOW_SEARCH" ]]; then
 fi
 
 # No window found - launch the application using open script
-echo ~/dotnix/bin/open "$APP_NAME" $@
 exec ~/dotnix/bin/open "$APP_NAME" $@

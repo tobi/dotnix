@@ -93,7 +93,6 @@ in
 
     # Editor and tools
     n = "nvim";
-    grep = "${pkgs.ripgrep}/bin/rg -uuu";
     lg = "${pkgs.lazygit}/bin/lazygit";
     gs = "${pkgs.git}/bin/git status";
     bat = "${pkgs.bat}/bin/bat";
@@ -155,6 +154,7 @@ in
     # ── Core utilities ──────────────────────────────────────────────────
     age # Simple, modern and secure file encryption
     bat # Cat clone with syntax highlighting
+    bc # Arbitrary precision calculator
     curl # Command line tool for transferring data
     eza # Modern replacement for ls
     fd # Simple, fast and user-friendly find

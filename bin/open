@@ -7,15 +7,17 @@
 # - From a TTY: start in background and return immediately
 # - From GUI/non-TTY: exec and let systemd manage the process
 
+this=$0
+
 desktop-run() {
-  # From a TTY, don't block the terminal: run as a transient service and return
+  echo -e "\e[32mOpen\e[0m: $@"
   if [ -t 1 ]; then
-    systemd-run --same-dir --user --scope --quiet --slice=apps.slice -- $@ &
-    disown
+    # Start the process with systemd-run, completely detaching and silencing all output
+    systemd-run --send-sighup --same-dir --user --scope --quiet --slice=apps.slice -- "$@" >/dev/null 2>&1 < /dev/null &
     exit 0
   else
     # From non-TTY contexts, replace the process and let systemd keep tracking it
-    exec systemd-run --same-dir --user --scope --quiet --slice=apps.slice -- $@
+    exec systemd-run --same-dir --user --scope --quiet --slice=apps.slice -- "$@" &>/dev/null
   fi
 }
 
@@ -56,20 +58,8 @@ fi
 resolve_app() {
 
   # if its an executable, run it directly
-  if [[ -x "$app" && ! -d "$app" ]]; then
-    cli=("$app")
-    return 0
-  fi
-
-  # if its a file or directory, use xdg-open to defer to the default desktop
-  if [ -e "$app" ] || [ -d "$app" ]; then
-    cli=("xdg-open" "$app")
-    return 0
-  fi
-
-  # if its a command, in $PATH it directly
-  if command -v "$app" >/dev/null 2>&1; then
-    cli=("$app")
+  if [[ -x "$app" && ! -d "$app" && "${realpath "$app"}" != "$this" ]]; then
+    exec "$app" "$@"
     return 0
   fi
 
@@ -82,7 +72,7 @@ resolve_app() {
     fi
 
     if [ -f "$dir/applications/$app.desktop" ]; then
-      cli=(dex "$dir/$app.desktop")
+      cli=(dex "$dir/applications/$app.desktop")
       return 0
     fi
 
