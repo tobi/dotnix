@@ -10,14 +10,15 @@ SWITCH_LEAD_MINUTES = (ENV['WAYBAR_SWITCH_LEAD_MINUTES'] || '15').to_i
 LEAD_SECONDS = SWITCH_LEAD_MINUTES * 60
 
 class CalendarEvent
-  attr_reader :start_time, :end_time, :title, :description, :conference_url, :service
+  attr_reader :start_time, :end_time, :title, :description, :conference_url, :calendar
 
-  def initialize(start_time:, end_time:, title:, description:, conference_url:, service:)
+  def initialize(start_time:, end_time:, title:, description:, conference_url:, calendar:, service:)
     @start_time = start_time
     @end_time = end_time
     @title = title
     @description = description
     @conference_url = conference_url
+    @calendar = calendar
     @service = service
   end
 
@@ -28,6 +29,7 @@ class CalendarEvent
       title: hash['title'],
       description: hash['description'],
       conference_url: hash['conference_url'],
+      calendar: hash['calendar'],
       service: hash['service']
     )
   end
@@ -156,7 +158,9 @@ def format_tooltip(now, events)
     end
 
     safe_title = escape_markup(event.title)
-    lines << "#{event.start_time.strftime('%H:%M')} - #{safe_title}"
+    safe_calendar = escape_markup(event.calendar)
+    calendar_prefix = safe_calendar.empty? ? '' : "[#{safe_calendar}] "
+    lines << "#{event.start_time.strftime('%H:%M')} - #{calendar_prefix}#{safe_title}"
   end
 
   lines.join("\r")
@@ -179,7 +183,9 @@ def build_output(now, events, fetch_error)
   when :current
     minutes = display_event.minutes_remaining(now)
     safe_title = escape_markup(display_event.title)
-    text = "#{display_event.remaining_label(now)} - #{safe_title}"
+    safe_calendar = escape_markup(display_event.calendar)
+    calendar_prefix = safe_calendar.empty? ? '' : "[#{safe_calendar}] "
+    text = "#{display_event.remaining_label(now)} - #{calendar_prefix}#{safe_title}"
     classes = ['current', display_event.service] + urgency_classes(minutes)
     {
       icon: '📅',
@@ -201,7 +207,9 @@ def build_output(now, events, fetch_error)
     end
 
     safe_title = escape_markup(display_event.title)
-    text = "in #{display_event.relative_label(now)}: #{safe_title}"
+    safe_calendar = escape_markup(display_event.calendar)
+    calendar_prefix = safe_calendar.empty? ? '' : "[#{safe_calendar}] "
+    text = "in #{display_event.relative_label(now)}: #{calendar_prefix}#{safe_title}"
     classes = ['upcoming', display_event.service] + urgency_classes(minutes)
     {
       icon: '📅',

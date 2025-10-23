@@ -9,7 +9,7 @@ require 'date'
 FETCH_INTERVAL_SECONDS = (ENV['WAYBAR_CAL_FETCH_SECONDS'] || '60').to_i
 DISPLAY_REFRESH_SECONDS = (ENV['WAYBAR_DISPLAY_REFRESH_SECONDS'] || '5').to_i
 SWITCH_LEAD_MINUTES = (ENV['WAYBAR_SWITCH_LEAD_MINUTES'] || '15').to_i
-LOOKAHEAD_DAYS = (ENV['WAYBAR_LOOKAHEAD_DAYS'] || '3').to_i
+LOOKAHEAD_DAYS = (ENV['WAYBAR_LOOKAHEAD_DAYS'] || '5').to_i
 CALENDAR_ID = ENV['WAYBAR_CALENDAR'] || 'Meetings'
 GCALCLI_BIN = ENV['WAYBAR_GCALCLI_BIN'] || 'gcalcli'
 LEAD_SECONDS = SWITCH_LEAD_MINUTES * 60
@@ -18,14 +18,15 @@ class FetchError < StandardError; end
 
 # Representation of a calendar event returned by gcalcli.
 class CalendarEvent
-  attr_reader :start_time, :end_time, :title, :description, :conference_url
+  attr_reader :start_time, :end_time, :title, :description, :conference_url, :calendar
 
-  def initialize(start_time:, end_time:, title:, description:, conference_url:)
+  def initialize(start_time:, end_time:, title:, description:, conference_url:, calendar:)
     @start_time = start_time
     @end_time = end_time
     @title = title
     @description = description
     @conference_url = conference_url
+    @calendar = calendar
   end
 
   def self.from_row(row)
@@ -47,7 +48,8 @@ class CalendarEvent
       end_time: end_time,
       title: row['title'].to_s.strip,
       description: row['description'].to_s.strip,
-      conference_url: conference_url
+      conference_url: conference_url,
+      calendar: row['calendar'].to_s.strip
     )
   rescue ArgumentError
     nil
@@ -175,8 +177,10 @@ class CalendarFetcher
       from,
       to,
       '--tsv',
+      '--nodeclined',
       '--details', 'conference',
-      '--details', 'description'
+      '--details', 'description',
+      '--details', 'calendar'
     ]
     args += ['--calendar', @calendar_id] if @calendar_id && !@calendar_id.empty?
 
@@ -358,6 +362,7 @@ if $PROGRAM_NAME == __FILE__
         title: event.title,
         description: event.description,
         conference_url: event.conference_url,
+        calendar: event.calendar,
         service: event.service
       }
     end,
