@@ -413,6 +413,8 @@ in
     services.agenda-fetch = {
       Unit = {
         Description = "Fetch calendar agenda data";
+        After = "network-online.target";
+        Wants = "network-online.target";
       };
       Service = {
         Type = "oneshot";
