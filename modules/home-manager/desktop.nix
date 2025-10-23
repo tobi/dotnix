@@ -80,7 +80,6 @@
     ./apps/steam.nix
     ./apps/mako.nix
     ./apps/gtk.nix
-    ./apps/fuzzel.nix
     ./apps/walker.nix
     ./apps/typora.nix
     ./apps/warp.nix

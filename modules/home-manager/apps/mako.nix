@@ -2,6 +2,7 @@
 {
   services.mako = {
     enable = true;
+
     settings = {
       default-timeout = 8000;
       actions = true; 
@@ -12,15 +13,19 @@
       border-radius = 6;
       background-color = "#${theme.palette.base00}";
       text-color = "#${theme.palette.base05}";
-      border-color = "#${theme.palette.base0D}";
-      progress-color = "over #${theme.palette.base02}";
+      border-color = "#${theme.palette.base04}";
+      progress-color = "over #${theme.palette.base0D}";
       anchor = "bottom-right";
       layer = "overlay";
 
-      font = "Inter 12";
-      padding = "15";
+      #font = "Inter 12";
+      padding = "10";
       margin = "10";
       markup = true;
+
+      format = "<b>%s</b>\\n%b";
+      sort = "-time";
+      group-by = "app-name";
 
       "urgency=low" = {
         border-color = "#${theme.palette.base03}";
@@ -31,7 +36,7 @@
       };
 
       "urgency=high" = {
-        border-color = "#FF0000";
+        border-color = "#${theme.red}";
         default-timeout = 0;
       };
 

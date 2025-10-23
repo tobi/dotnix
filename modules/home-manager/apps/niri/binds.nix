@@ -2,7 +2,7 @@
 
 let
   binDir = "${../../../../bin}";
-  launcherCmd = if config.dotnix.desktop.launcher == "walker" then "walker" else "fuzzel";
+  launcherCmd = "walker";
   # Generate hotkey bindings from registered apps
   generateHotkeyBinds = hotkeys:
     lib.mapAttrs'

@@ -150,7 +150,7 @@ in
       }
 
       #custom-next-event.now {
-        color: #${theme.white};
+        color: #ffffff;
         font-weight: bold;
         animation: pulse 3s ease-in-out infinite;
         background: #${theme.green}
@@ -335,7 +335,7 @@ in
           scroll-step = 3;
           on-click = "GTK_THEME=Adwaita-dark pavucontrol";
           tooltip-format = "Volume: {volume}%";
-          on-click-right = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+          on-click-right = "wpctl set-mute toggle";
           max-volume = 120;
           ignored-sinks = [ "Easy Effects Sink" ];
         };

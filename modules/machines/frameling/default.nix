@@ -21,7 +21,6 @@
   # Enable desktop environment
   dotnix.home.enable = true;
   dotnix.desktop.enable = true;
-  dotnix.desktop.launcher = "fuzzel";
 
   # Theme configuration
   dotnix.theme.name = "everforest";

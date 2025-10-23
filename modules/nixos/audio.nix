@@ -49,7 +49,10 @@
               actions = { "update-props" = { "priority.session" = 800; }; };
             }
             {
-              matches = [{"node.description" = "~.*Apple Display.*"; }];
+              matches = [
+                { "node.description" = "~.*Apple Display.*"; }
+                { "node.description" = "~.*Studio Display.*"; }
+              ];
               actions = { "update-props" = { "priority.session" = 700; }; };
             }
 
