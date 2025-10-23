@@ -77,8 +77,8 @@
   networking = {
     networkmanager.enable = true;
     firewall = {
-      allowedTCPPorts = [ 22 ]; # SSH
-      allowedUDPPorts = [ ];
+      allowedTCPPorts = [ 22 53317 ]; # SSH and LocalSend
+      allowedUDPPorts = [ 53317 ]; # LocalSend
     };
   };
 
