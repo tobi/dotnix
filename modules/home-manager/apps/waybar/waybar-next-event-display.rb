@@ -84,6 +84,18 @@ class CalendarEvent
     "#{start_time.strftime('%a %b %d %H:%M')} - #{end_time.strftime('%H:%M')}"
   end
 
+  def service
+    if conference_url&.match?(/meet\.google\.com/)
+      'google-meet'
+    elsif conference_url&.match?(/zoom\.us/)
+      'zoom'
+    elsif conference_url&.match?(/teams\.microsoft\.com/)
+      'teams'
+    else
+      'default'
+    end
+  end
+
   def <=>(other)
     start_time <=> other.start_time
   end
