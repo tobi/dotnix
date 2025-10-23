@@ -61,7 +61,7 @@ focused_index = entries.index { |e| e[:is_focused] } || 0
 input_list = entries.map { |e| e[:label] }.join("\n")
 
 # Use fuzzel in dmenu mode, return selected index, preselect the focused window
-stdout, _stderr, status = run_command("walker -d --index --active=#{focused_index} -p 'Find window'", stdin_data: input_list)
+stdout, _stderr, status = run_command("fuzzel -d --index --select-index=#{focused_index} -p 'Find window'", stdin_data: input_list)
 
 selection = stdout.strip
 exit 0 if !status.success? || selection.empty?
