@@ -3,7 +3,7 @@
 require 'json'
 require 'open3'
 
-# dotnix-find-windows: Interactive window finder using fuzzel with --index
+# dotnix-find-windows: Interactive window finder using walker
 
 def run_command(cmd, stdin_data: nil)
   stdout, stderr, status = Open3.capture3(cmd, stdin_data: stdin_data)
@@ -60,16 +60,13 @@ end
 focused_index = entries.index { |e| e[:is_focused] } || 0
 input_list = entries.map { |e| e[:label] }.join("\n")
 
-# Use fuzzel in dmenu mode, return selected index, preselect the focused window
-stdout, _stderr, status = run_command("fuzzel -d --index --select-index=#{focused_index} -p 'Find window'", stdin_data: input_list)
+# Use walker in dmenu mode, return selected label, preselect the focused window
+stdout, _stderr, status = run_command("walker -d -a #{focused_index} -p 'Find window'", stdin_data: input_list)
 
 selection = stdout.strip
 exit 0 if !status.success? || selection.empty?
 
-selected_index = Integer(selection) rescue nil
-exit 0 if selected_index.nil?
-
-chosen = entries[selected_index]
+chosen = entries.find { |e| e[:label] == selection }
 exit 0 if chosen.nil?
 
 system("niri msg action focus-window --id #{chosen[:id]}")
