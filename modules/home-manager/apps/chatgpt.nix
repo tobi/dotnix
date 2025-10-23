@@ -12,7 +12,7 @@ in
   xdg.desktopEntries.ChatGPT = {
     name = "ChatGPT";
     comment = "ChatGPT Web App";
-    exec = "${chromeScript} --new-window --app=https://chat.openai.com --name=ChatGPT --class=ChatGPT";
+    exec = "${chromeScript} --new-window --app=https://chat.openai.com --name=ChatGPT";
     icon = "${../../../config/icons/chatgpt.svg}";
     terminal = false;
     type = "Application";
@@ -21,7 +21,7 @@ in
   };
 
   # Register hotkey for open-or-focus
-  dotnix.desktop.hotkeys."Super+A" = {
+  dotnix.desktop.hotkeys."Super+Shift+A" = {
     executable = "ChatGPT";
     focusClass = "chrome-chat.openai.com__-Default";
   };

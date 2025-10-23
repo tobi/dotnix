@@ -25,7 +25,13 @@
   # Strategy: Both fingerprint and password available - whichever succeeds first
   security.pam.services = {
     # Sudo: fingerprint or password
-    sudo.fprintAuth = true;
+    sudo.fprintAuth = false;
+    swaylock.fprintAuth = false;
+
+    # text = ''
+    #   auth sufficient pam_fprintd.so max_tries=1 timeout=3
+    #   auth sufficient pam_unix.so try_first_pass nullok
+    # '';
 
     # Polkit: fingerprint or password
     polkit-1.fprintAuth = true;
@@ -42,7 +48,8 @@
     sddm-autologin.fprintAuth = lib.mkDefault false;
 
     # Screen lockers: fingerprint or password
-    swaylock.fprintAuth = lib.mkIf (config.programs.swaylock.enable or false) true;
     gtklock.fprintAuth = lib.mkIf (config.programs.gtklock.enable or false) true;
   };
+
+
 }

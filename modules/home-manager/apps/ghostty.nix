@@ -27,9 +27,14 @@ in
 
       theme = "dotnix";
 
-      # Keep shell integration but disable problematic features
-      # shell-integration = "detect";
-      # shell-integration-features = "no-cursor,no-sudo";
+      # Clipboard configuration
+      clipboard-read = "allow";
+      clipboard-write = "allow";
+      clipboard-paste-protection = false;
+
+      # Shell integration - enable but disable problematic features
+      shell-integration = "detect";
+      shell-integration-features = "no-cursor,no-sudo,no-title";
     };
     themes = {
       dotnix = {

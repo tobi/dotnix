@@ -35,19 +35,18 @@ in
   # Git configuration
   programs.git = {
     enable = true;
-    userName = "Tobi Lütke";
-    userEmail = "tobi@lutke.com";
-
     # SSH commit signing
     signing = {
       key = "~/.ssh/id_ed25519.pub";
       signByDefault = true;
     };
 
-    extraConfig = {
+    settings = {
       gpg.format = "ssh";
       gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
-      include.path = "~/.config/dev/gitconfig";
+      user.name = "Tobi Lütke";
+      user.email = "tobi@lutke.com";
+      include.path = [ "~/.config/dev/gitconfig" "~/.gitconfig" ];
     };
   };
 
@@ -70,15 +69,24 @@ in
   # Shell configuration
   programs.zsh = {
     enable = true;
+    enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
     history.size = 50000;
+    defaultKeymap = "emacs";
 
     # Interactive shell setup
     initContent = ''
-      # ── Ctrl-← / Ctrl-→ word jumps ────────────────────────────
-      bindkey '^A' beginning-of-line
-      bindkey '^E' end-of-line
+      # ── Terminal-specific keybindings ──────────────────────────
+      # Emacs mode provides most bindings (Ctrl+A/E, Ctrl+W, etc.)
+      # These map terminal-specific escape sequences to ZSH widgets
+
+      bindkey '^[[1;5C' forward-word      # Ctrl+Right
+      bindkey '^[[1;5D' backward-word     # Ctrl+Left
+      bindkey '^[[1;3C' forward-word      # Alt+Right (alternative)
+      bindkey '^[[1;3D' backward-word     # Alt+Left (alternative)
+      bindkey '^[[H' beginning-of-line    # Home key
+      bindkey '^[[F' end-of-line          # End key
 
       export PATH="$HOME/.local/bin:$DOTFILES/bin:$PATH"
 
@@ -201,6 +209,7 @@ in
     zlib.dev # Compression library
     zsync # File synchronization tool
     zellij # Terminal multiplexer
+    git-lfs # Git Large File Storage
 
     # ── Nice-to-have utilities ───────────────────────────────────────────
     fastfetch # Fast system information tool

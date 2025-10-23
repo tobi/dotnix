@@ -9,7 +9,7 @@ require 'date'
 FETCH_INTERVAL_SECONDS = (ENV['WAYBAR_CAL_FETCH_SECONDS'] || '60').to_i
 DISPLAY_REFRESH_SECONDS = (ENV['WAYBAR_DISPLAY_REFRESH_SECONDS'] || '5').to_i
 SWITCH_LEAD_MINUTES = (ENV['WAYBAR_SWITCH_LEAD_MINUTES'] || '15').to_i
-LOOKAHEAD_DAYS = (ENV['WAYBAR_LOOKAHEAD_DAYS'] || '2').to_i
+LOOKAHEAD_DAYS = (ENV['WAYBAR_LOOKAHEAD_DAYS'] || '3').to_i
 CALENDAR_ID = ENV['WAYBAR_CALENDAR'] || "Meetings"
 GCALCLI_BIN = ENV['WAYBAR_GCALCLI_BIN'] || 'gcalcli'
 LEAD_SECONDS = SWITCH_LEAD_MINUTES * 60
@@ -303,8 +303,8 @@ def build_output(now, events, fetch_error)
     }
   when :upcoming
     minutes = display_event.minutes_until(now)
-    # Hide text if more than 2 hours away, but keep icon
-    if minutes > 120
+    # Hide text if more than 8 hours away, but keep icon
+    if minutes > 480
       return {
         icon: '📅',
         text: '',
@@ -314,7 +314,7 @@ def build_output(now, events, fetch_error)
     end
 
     safe_title = escape_markup(display_event.title)
-    text = "#{display_event.relative_label(now)} - #{safe_title}"
+    text = "in #{display_event.relative_label(now)}: #{safe_title}"
     classes = ['upcoming', display_event.service] + urgency_classes(minutes)
     {
       icon: '📅',

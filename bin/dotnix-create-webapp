@@ -183,7 +183,7 @@ Version=1.0
 Type=Application
 Name=$APP_NAME
 Comment=$APP_NAME Web Application
-Exec=$CHROME_WRAPPER --new-window --app=$URL --name=$APP_NAME --class=$APP_NAME${CHROME_OPTS_STR}
+Exec=$CHROME_WRAPPER --new-window --app=$URL --name=$APP_NAME ${CHROME_OPTS_STR} %U
 Terminal=false
 StartupNotify=true
 Categories=Network;WebBrowser;

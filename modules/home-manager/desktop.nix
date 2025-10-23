@@ -63,7 +63,6 @@
   imports = [
     ./dotnix-options.nix
     ./apps/waybar.nix
-    ./apps/wireplumber.nix
     ./apps/ghostty.nix
     ./apps/niri.nix
     ./apps/chatgpt.nix
@@ -82,6 +81,7 @@
     ./apps/mako.nix
     ./apps/gtk.nix
     ./apps/fuzzel.nix
+    ./apps/walker.nix
     ./apps/typora.nix
     ./apps/warp.nix
     ./apps/mpv.nix

@@ -1,0 +1,75 @@
+#!/usr/bin/env ruby
+
+require 'json'
+require 'open3'
+
+# dotnix-find-windows: Interactive window finder using fuzzel with --index
+
+def run_command(cmd, stdin_data: nil)
+  stdout, stderr, status = Open3.capture3(cmd, stdin_data: stdin_data)
+  [stdout, stderr, status]
+end
+
+def fetch_windows
+  stdout, _stderr, _status = run_command('niri msg --json windows 2>/dev/null')
+  windows = JSON.parse(stdout)
+  windows.sort_by { |w| w['is_focused'] ? 0 : 1 }
+rescue
+  []
+end
+
+def pretty_title(w)
+  app_id = w['app_id'] || 'unknown'
+  title = w['title'] || 'Untitled'
+  desktop = w['desktop'] || 'unknown'
+
+  title = case app_id
+  when 'com.mitchellh.ghostty'
+    "Ghostty: #{title}"
+  when 'google-chrome', 'Google-chrome'
+    t = title.gsub(/ — Google Chrome$/, '')
+    "Chrome: #{t}"
+  when 'org.mozilla.firefox', 'firefox'
+    t = title.gsub(/ — Mozilla Firefox$/, '')
+    "Firefox: #{t}"
+  when 'com.github.alacritty'
+    "Alacritty: #{title}"
+  when 'unknown'
+    "Unknown: #{desktop}"
+  else
+    title
+  end
+
+  "#{title} - #{desktop}"
+end
+
+windows = fetch_windows
+if windows.empty?
+  warn 'No windows found'
+  exit 1
+end
+
+entries = windows.map do |w|
+  {
+    id: w['id'],
+    is_focused: w['is_focused'],
+    label: pretty_title(w)
+  }
+end
+
+focused_index = entries.index { |e| e[:is_focused] } || 0
+input_list = entries.map { |e| e[:label] }.join("\n")
+
+# Use fuzzel in dmenu mode, return selected index, preselect the focused window
+stdout, _stderr, status = run_command("fuzzel -d --index --select=#{focused_index} -p 'Find window'", stdin_data: input_list)
+
+selection = stdout.strip
+exit 0 if !status.success? || selection.empty?
+
+selected_index = Integer(selection) rescue nil
+exit 0 if selected_index.nil?
+
+chosen = entries[selected_index]
+exit 0 if chosen.nil?
+
+system("niri msg action focus-window --id #{chosen[:id]}")

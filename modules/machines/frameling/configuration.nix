@@ -1,10 +1,18 @@
 { pkgs, inputs, config, ... }:
 
-{
-  imports = [
-    ../../nixos/wifi-fixes.nix
-  ];
+# Framework Laptop 13 AMD AI 300 Series Configuration
+#
+# Hardware configuration inherited from nixos-hardware (inputs.nixos-hardware.nixosModules.framework-amd-ai-300-series):
+# - AMD GPU drivers (hardware.graphics.enable, hardware.amdgpu.initrd.enable)
+# - AMD P-State driver for better power management
+# - amdgpu.dcdebugmask=0x10 kernel parameter (disables panel self-refresh to prevent hangs)
+# - Power profiles daemon (services.power-profiles-daemon.enable)
+# - Latest kernel requirement (boot.kernelPackages = pkgs.linuxPackages_latest when kernel < 6.15)
+# - fwupd firmware updates (services.fwupd.enable)
+#
+# This file contains machine-specific overrides and additional configuration.
 
+{
   system.stateVersion = "25.11";
 
   time.timeZone = "America/Toronto";
@@ -36,7 +44,8 @@
       theme = "bgrt";
     };
 
-    # we need latest kernel to deal with power issues
+    # Latest kernel for power management and suspend fixes
+    # NOTE: Also set by nixos-hardware when kernel < 6.15, but we keep it explicit
     kernelPackages = pkgs.linuxPackages_latest;
 
     kernel.sysctl = {
@@ -50,10 +59,10 @@
       "rd.udev.log_level=3"
       "vt.global_cursor_default=0"
 
-      # Disable GPU debug mask
-      "amdgpu.dcdebugmask=0"
+      # NOTE: amdgpu.dcdebugmask=0x10 is set by nixos-hardware to prevent display hangs
+      # Do not override it here!
 
-      # Enable AMD P-State
+      # Enable AMD P-State (redundant with nixos-hardware but explicit for documentation)
       "amd_pstate=active"
 
       # Disable btusb autosuspend for WebAuthn BLE reliability
@@ -108,13 +117,13 @@
     # MediaTek MT7922 Bluetooth adapter for WebAuthn hybrid transport
     # Framework AMD laptop - allows Chrome/Chromium to use BLE for passkeys
     # Uses uaccess tag for systemd-logind dynamic ACLs (follows libfido2 pattern)
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0717", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+    # SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0717", TAG+="uaccess", GROUP="plugdev", MODE="0660"
 
     # Keep MediaTek BT awake, no autosuspend
-    ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0e8d", TEST=="power/control", ATTR{power/control}="on"
+    # ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0e8d", TEST=="power/control", ATTR{power/control}="on"
 
     # Disable PCIe port wakeups to prevent spurious wakes during s2idle
-    ACTION=="add", SUBSYSTEM=="pci", DRIVER=="pcieport", ATTR{power/wakeup}="disabled"
+    # ACTION=="add", SUBSYSTEM=="pci", DRIVER=="pcieport", ATTR{power/wakeup}="disabled"
   '';
 
   # Services
@@ -137,8 +146,7 @@
     chrony.enable = true;
     upower.enable = true;
     thermald.enable = true;
-    fwupd.enable = true;
-    hardware.bolt.enable = true;
+    hardware.bolt.enable = true; # Thunderbolt device authorization (needed for Apple Pro Display XDR)
 
     # Tailscale, this is needed for exit notes to to work
     tailscale.enable = true;

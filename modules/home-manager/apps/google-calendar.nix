@@ -12,7 +12,7 @@ in
   xdg.desktopEntries.GoogleCalendar = {
     name = "Google Calendar";
     comment = "Google Calendar";
-    exec = "${chromeScript} --user-data-dir=${config.home.homeDirectory}/Shopify/profile --new-window --app=https://calendar.google.com --name=GoogleCalendar --class=GoogleCalendar";
+    exec = "${chromeScript} --user-data-dir=${config.home.homeDirectory}/Shopify/profile --new-window --app=https://calendar.google.com --name=GoogleCalendar %U";
     icon = "${../../../config/icons/google-calendar.svg}";
     terminal = false;
     type = "Application";

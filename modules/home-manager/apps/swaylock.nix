@@ -14,6 +14,8 @@ in
     sway-audio-idle-inhibit
   ];
 
+
+
   programs.swaylock = {
     enable = true;
     package = pkgs.swaylock-effects;

@@ -31,7 +31,7 @@
 
       character = {
         success_symbol = "[❯](bold #A5D6A7)[❯](bold #FFF59D)[❯](bold #FFAB91)";
-        error_symbol = "[✗](bold red)";
+        error_symbol = "[  ✗](bold red)";
       };
 
       # Disable unused modules

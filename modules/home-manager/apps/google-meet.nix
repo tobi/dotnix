@@ -12,7 +12,7 @@ in
   xdg.desktopEntries.GoogleMeet = {
     name = "Google Meet";
     comment = "Google Meet Video Conferencing";
-    exec = "${chromeScript} --user-data-dir=${config.home.homeDirectory}/Shopify/profile --new-window --app=https://meet.google.com --name=GoogleMeet --class=GoogleMeet";
+    exec = "${chromeScript} --user-data-dir=${config.home.homeDirectory}/Shopify/profile --new-window --app=https://meet.google.com --name=GoogleMeet %U";
     icon = "${../../../config/icons/google-meet.svg}";
     terminal = false;
     type = "Application";
@@ -20,7 +20,7 @@ in
   };
 
   # Register hotkey for open-or-focus
-  dotnix.desktop.hotkeys."Super+E" = {
+  dotnix.desktop.hotkeys."Super+Shift+E" = {
     executable = "GoogleMeet";
     focusClass = "chrome-meet.google.com__-Default";
     cmd = "google-meet";

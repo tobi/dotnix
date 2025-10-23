@@ -10,6 +10,8 @@
     ../../nixos/niri.nix
     ../../nixos/warp.nix
     ../../nixos/authentication.nix
+    ../../nixos/audio.nix
+
     inputs.nixos-hardware.nixosModules.framework-amd-ai-300-series
   ];
 
@@ -19,6 +21,7 @@
   # Enable desktop environment
   dotnix.home.enable = true;
   dotnix.desktop.enable = true;
+  dotnix.desktop.launcher = "fuzzel";
 
   # Theme configuration
   dotnix.theme.name = "everforest";

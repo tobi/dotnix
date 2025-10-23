@@ -1,4 +1,4 @@
-{ config, lib, pkgs, inputs, ... }:
+{ lib, inputs, ... }:
 {
   imports = [
     inputs.niri.nixosModules.niri
@@ -25,14 +25,6 @@
     dbus.enable = true;
     gnome.gnome-keyring.enable = true;
     power-profiles-daemon.enable = true;
-    pulseaudio.enable = false;
-    pipewire = {
-      enable = true;
-      alsa.enable = true;
-      pulse.enable = true;
-      jack.enable = true;
-      wireplumber.enable = true;
-    };
   };
 
   dotnix.desktop.enable = lib.mkDefault true;

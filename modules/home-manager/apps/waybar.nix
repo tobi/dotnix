@@ -46,9 +46,10 @@ in
 
       #workspaces button.active {
         color: #${palette.base0D};
-        border-radius: 6px;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
         background: rgba(0, 0, 0, 0.2);
-        min-width: 40px;
+        min-width: 30px;
       }
 
       #workspaces button:hover {
@@ -69,22 +70,14 @@ in
         min-width: 15px;
       }
 
-      #tray {
-        margin: 0 10px;
-        padding: 0 5px;
-      }
-
-      #tray > * {
-        min-width: 15px;
-        -gtk-icon-effect: dim;
-      }
-
-      #tray > .passive {
-        -gtk-icon-effect: dim;
+      *:hover {
+        font-weight: bold;
+        transition: color 0.3s, opacity 0.3s, font-weight 0.3s;
       }
 
       #tray > .needs-attention {
         -gtk-icon-effect: highlight;
+        animation: pulse 1s ease-in-out infinite;
       }
 
       #cpu, #memory, #battery, #wireplumber {
@@ -121,15 +114,16 @@ in
       }
 
       #mpris {
-        padding: 0 20px;
+        animation: none;
+
       }
 
       #mpris.playing {
-        color: #${palette.base0B};
+        animation: pulse 1s ease-in-out infinite;
       }
 
       #mpris.paused {
-        color: #${palette.base0A};
+
       }
 
       #mpris.stopped {
@@ -138,6 +132,10 @@ in
 
       #custom-next-event {
         padding: 0 15px;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
+        background: rgba(0, 0, 0, 0.2);
+        transition: background-color 3.0s;
       }
 
       #custom-next-event.empty {
@@ -146,25 +144,20 @@ in
         min-width: 0;
       }
 
-      #custom-next-event.current {
-        color: #${palette.base05};
-      }
-
-      #custom-next-event.upcoming {
-        color: #${palette.base05};
-      }
-
       #custom-next-event.soon {
-        color: #${palette.base0A};
+        color: #${theme.white};
+        animation: pulse 3s ease-in-out infinite;
       }
 
       #custom-next-event.now {
-        color: #${palette.base08};
-        animation: pulse 2s ease-in-out infinite;
+        color: #${theme.white};
+        font-weight: bold;
+        animation: pulse 3s ease-in-out infinite;
+        background: #${theme.green}
       }
 
       #custom-next-event.error {
-        color: #${palette.base08};
+        color: #${theme.red};
       }
 
       @keyframes pulse {
@@ -173,17 +166,31 @@ in
         100% { opacity: 1; }
       }
 
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+          margin-top: -10px;
+        }
+        to {
+          opacity: 1;
+          margin-top: 0;
+        }
+      }
+
       tooltip {
-        background: #${palette.base00};
+        margin-top: 0;
+        background: rgba(0, 0, 0, 0.2);
+        animation: fade-in 0.35s cubic-bezier(0.4,0,0.2,1) both;
         color: #${palette.base05};
-        border: 1px solid #${palette.base01};
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
         border-radius: 6px;
         padding: 15px 10px;
       }
-
       tooltip label {
         padding: 5px;
       }
+
     '';
     settings = [
       {
@@ -192,21 +199,21 @@ in
         spacing = 0;
         height = 22;
         modules-left = [
-          "niri/workspaces"
           "power-profiles-daemon"
-          "mpris"
+          "niri/workspaces"
         ];
         modules-center = [
           "custom/next-event"
-          "clock"
         ];
         modules-right = [
+          "mpris"
           "wireplumber"
           "network"
           "bluetooth"
           "custom/tailscale"
           "custom/warp"
           "tray"
+          "clock"
           "battery"
         ];
         "niri/workspaces" = {
@@ -226,9 +233,9 @@ in
             active = "󱓻";
           };
           persistent-workspaces = {
-            "1" = [ "Default" ];
-            "2" = [ "Dev" ];
-            "3" = [ "Steam" ];
+            "1" = [ ];
+            "2" = [ ];
+            "3" = [ ];
             "4" = [ ];
             "5" = [ ];
           };
@@ -236,12 +243,14 @@ in
 
         mpris = {
           interval = 1;
-          format = "{player_icon} {status_icon} {dynamic}";
-          format-paused = "{player_icon} {status_icon} <i>{dynamic}</i>";
+          format = "{player_icon} {dynamic} {status_icon}";
+          format-paused = "{player_icon} <i>{dynamic}</i> {status_icon}";
           format-stopped = "";
-          tooltip-format = "{player_icon} {status_icon}\n{dynamic}\nLength: {length}";
+          tooltip-format = "{player_icon} {status_icon}\n{dynamic} - {title}\nLength: {length}";
           player-icons = {
             default = "♪";
+            google-chrome = "󰀹";
+            google-chrome-shopify = "󰀹";
             spotify_player = "󰓇";
           };
           status-icons = {
@@ -249,17 +258,17 @@ in
             playing = "󰐊";
             stopped = "󰙦";
           };
-          dynamic-len = 30;
-          dynamic-order = [ "title" "artist" ];
-          dynamic-separator = " - ";
+          dynamic-len = 10;
+          dynamic-order = [ "artist" ];
+          dynamic-separator = " • ";
           on-click = "playerctl play-pause";
           on-click-right = "playerctl next";
           on-click-middle = "playerctl previous";
         };
         clock = {
-          format = "{:%A %d %B - %I:%M%p}";
+          format = "{:%a %d - %I:%M%p}";
           format-alt = "{:%d %B W%V %Y}";
-          tooltip = false;
+          tooltip = true;
         };
         network = {
           format-icons = [ "󰤯" "󰤟" "󰤢" "󰤥" "󰤨" ];
@@ -344,7 +353,7 @@ in
           tooltip-format = "CPU: {usage}%\nLoad: {load}";
         };
         power-profiles-daemon = {
-          format = "{icon} {profile}";
+          format = "{icon}";
           tooltip-format = "Power profile: {profile}";
           tooltip = true;
           format-icons = {
@@ -384,11 +393,14 @@ in
           return-type = "json";
           exec = "${pkgs.ruby}/bin/ruby ${./waybar/waybar-next-event.rb}";
           tooltip = true;
+          hide-when-empty = true;
         };
 
         tray = {
-          icon-size = 14;
-          spacing = 6;
+          icon-size = 12;
+          smooth-scrolling-threshold = 2;
+          show-passive-items = false;
+          spacing = 10;
         };
 
       }

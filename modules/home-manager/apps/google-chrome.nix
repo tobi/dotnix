@@ -63,7 +63,7 @@ in
   xdg.desktopEntries.google-chrome-shopify = {
     name = "Google Chrome (Shopify)";
     genericName = "Web Browser";
-    exec = "${chromeScript} --user-data-dir=${config.home.homeDirectory}/Shopify/profile --class=google-chrome-shopify %U";
+    exec = "${chromeScript} --new-window --user-data-dir=${config.home.homeDirectory}/Shopify/profile --class=google-chrome-shopify %U";
     terminal = false;
     icon = "google-chrome";
     type = "Application";
@@ -74,12 +74,12 @@ in
   };
 
   # Register hotkeys for open-or-focus
-  dotnix.desktop.hotkeys."Super+B" = {
+  dotnix.desktop.hotkeys."Super+Shift+B" = {
     executable = "google-chrome";
     focusClass = "google-chrome";
   };
 
-  dotnix.desktop.hotkeys."Super+N" = {
+  dotnix.desktop.hotkeys."Super+Shift+N" = {
     executable = "google-chrome-shopify";
     focusClass = "google-chrome-shopify";
     cmd = "google-chrome-shopify";

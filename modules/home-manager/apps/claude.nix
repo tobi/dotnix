@@ -12,7 +12,7 @@ in
   xdg.desktopEntries.Claude = {
     name = "Claude";
     comment = "Claude AI Assistant Web App";
-    exec = "${chromeScript} --new-window --ozone-platform=wayland --app=https://claude.ai --name=Claude --class=Claude";
+    exec = "${chromeScript} --new-window --ozone-platform=wayland --app=https://claude.ai --name=Claude";
     icon = "${../../../config/icons/claude.svg}";
     terminal = false;
     type = "Application";

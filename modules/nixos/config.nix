@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ lib, pkgs, ... }:
 
 {
   imports = [
@@ -26,6 +26,12 @@
         (lib.hm.assertions.assertPlatform "dotnix.desktop only works on Linux" pkgs lib.platforms.linux)
       ];
 
+      launcher = lib.mkOption {
+        type = lib.types.enum [ "fuzzel" "walker" ];
+        default = "walker";
+        description = "Default application launcher for desktop keybindings";
+      };
+
       hotkeys = lib.mkOption {
         type = lib.types.attrsOf (lib.types.submodule {
           options = {
@@ -40,7 +46,7 @@
             };
           };
         });
-        default = {};
+        default = { };
         description = "Application hotkey bindings for open-or-focus functionality";
         example = lib.literalExpression ''
           {

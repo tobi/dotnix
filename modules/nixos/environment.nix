@@ -25,8 +25,8 @@
       # Wayland-specific settings
       NIXOS_OZONE_WL = "1";
       MOZ_ENABLE_WAYLAND = "1";
-      SDL_VIDEODRIVER = "wayland";
-      WAYLAND_DISPLAY = "wayland-1";
+      # SDL_VIDEODRIVER = "wayland";
+      # WAYLAND_DISPLAY = "wayland-1";
       OZONE_PLATFORM = "wayland";
       ELECTRON_OZONE_PLATFORM_HINT = "wayland";
 
@@ -37,7 +37,6 @@
     (lib.mkIf config.dotnix.home.enable {
       # Global environment variables
       DOTFILES = "$HOME/dotnix";
-      MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     })
   ];
 

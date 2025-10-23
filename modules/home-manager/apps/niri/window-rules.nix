@@ -16,9 +16,11 @@
     # Google Chrome window
     {
       matches = [
-        { app-id = "^google-chrome"; }
+        { app-id = "^google-chrome.*"; }
+        { app-id = "^chrome-.*"; }
       ];
-      default-column-width.proportion = 0.66;
+      # default-column-width.proportion = 0.66;
+      open-focused = true;
     }
 
     {
@@ -27,15 +29,6 @@
       }];
       open-focused = true;
       default-column-width.proportion = 0.99;
-
-    }
-
-    {
-      matches = [
-        { app-id = "^chrome-app.slack.com__client-Default$"; }
-      ];
-      open-focused = true;
-      default-column-width.proportion = 0.66;
     }
 
     # Global corner radius for all windows

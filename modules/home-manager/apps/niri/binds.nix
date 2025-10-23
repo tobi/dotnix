@@ -2,6 +2,7 @@
 
 let
   binDir = "${../../../../bin}";
+  launcherCmd = if config.dotnix.desktop.launcher == "walker" then "walker" else "fuzzel";
   # Generate hotkey bindings from registered apps
   generateHotkeyBinds = hotkeys:
     lib.mapAttrs'
@@ -29,8 +30,8 @@ in
     # ============================================================================
 
     "Mod+D" = {
-      action.spawn = [ "fuzzel" ];
-      hotkey-overlay.title = "Run an Application: fuzzel";
+      action.spawn = [ launcherCmd ];
+      hotkey-overlay.title = "Run an Application: ${launcherCmd}";
     };
 
     "Super+Alt+L" = {
@@ -81,6 +82,12 @@ in
     # ============================================================================
 
     "Mod+O" = {
+      action.toggle-overview = { };
+      repeat = false;
+    };
+
+    # Toggle overview with middle mouse button
+    "MouseMiddle" = {
       action.toggle-overview = { };
       repeat = false;
     };
@@ -192,16 +199,36 @@ in
     "Mod+Shift+9".action.move-column-to-workspace = 9;
 
     # ============================================================================
+    # Multiple monitor
+    # ============================================================================
+    "Super+Shift+Ctrl+Left".action.move-window-to-monitor-left = { };
+    "Super+Shift+Ctrl+Right".action.move-window-to-monitor-right = { };
+
+    "Super+F1".action.focus-monitor-right = { };
+    "Super+F2".action.focus-monitor-left = { };
+
+    "Super+Shift+Left".action.focus-monitor-left = { };
+    "Super+Shift+Right".action.focus-monitor-right = { };
+
+    "Super+Slash".action.focus-monitor-next = { };
+    "Super+Shift+Slash".action.move-window-to-monitor-next = { };
+    # ============================================================================
     # Application Launchers
     # ============================================================================
 
-    "Alt+Space".action.spawn = [ "fuzzel" ];
+    "Alt+Space" = {
+      action.spawn = [ launcherCmd ];
+      hotkey-overlay.title = "Run an Application: ${launcherCmd}";
+    };
     "Super+Return".action.spawn = [ "ghostty" ];
 
     # Application-specific keybindings are now registered in individual app modules
     # via dotnix.desktop.hotkeys and generated above
 
-    "Mod+Tab".action.focus-workspace-previous = { };
+    "Mod+Tab" = {
+      action.spawn = [ "${binDir}/dotnix-find-windows" ];
+      hotkey-overlay.title = "Find Window";
+    };
 
     # ============================================================================
     # Window Layout & Sizing

@@ -83,6 +83,8 @@
     bluez-tools
     pcsclite
     libfido2
+    iw
+    wirelesstools
   ];
 
   # Common programs

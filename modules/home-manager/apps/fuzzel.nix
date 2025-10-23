@@ -1,8 +1,8 @@
-{ theme, ... }:
+{ theme, lib, config, ... }:
 let
   palette = theme.palette;
 in
-{
+lib.mkIf (config.dotnix.desktop.launcher == "fuzzel") {
   programs.fuzzel = {
     enable = true;
     settings = {
