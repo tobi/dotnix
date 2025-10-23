@@ -391,7 +391,8 @@ in
         "custom/next-event" = {
           format = "󰸗 {text}";
           return-type = "json";
-          exec = "${pkgs.ruby}/bin/ruby ${./waybar/waybar-next-event.rb}";
+          exec = "${pkgs.ruby}/bin/ruby ${./waybar/waybar-next-event-display.rb}";
+          interval = 60; # Refresh every minute
           tooltip = true;
           hide-when-empty = true;
         };
@@ -405,6 +406,37 @@ in
 
       }
     ];
+  };
+
+  # Systemd user services for calendar agenda fetching
+  systemd.user = {
+    services.agenda-fetch = {
+      Unit = {
+        Description = "Fetch calendar agenda data";
+      };
+      Service = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.ruby}/bin/ruby ${./waybar/waybar-next-event.rb}";
+        Environment = [
+          "WAYBAR_CALENDAR=Meetings"
+          "WAYBAR_LOOKAHEAD_DAYS=3"
+        ];
+      };
+    };
+
+    timers.agenda-fetch = {
+      Unit = {
+        Description = "Fetch calendar agenda data every 5 minutes";
+      };
+      Timer = {
+        OnBootSec = "1min";
+        OnUnitActiveSec = "5min";
+        Unit = "agenda-fetch.service";
+      };
+      Install = {
+        WantedBy = ["timers.target"];
+      };
+    };
   };
 }
 
