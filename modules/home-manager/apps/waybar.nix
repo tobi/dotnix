@@ -266,9 +266,8 @@ in
           on-click-middle = "playerctl previous";
         };
         clock = {
-          format = "{:%a %d - %I:%M%p}";
-          format-alt = "{:%d %B W%V %Y}";
-          tooltip = true;
+          format = "{:%I:%M%p}";
+          tooltip-format = "{:%A, %B %d, %Y (Week %V)}";
         };
         network = {
           format-icons = [ "󰤯" "󰤟" "󰤢" "󰤥" "󰤨" ];
