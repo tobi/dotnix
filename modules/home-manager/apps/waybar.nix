@@ -131,7 +131,7 @@ in
       }
 
       #custom-next-event {
-        padding: 0 15px;
+        padding: 0 20px;
         border-bottom-left-radius: 6px;
         border-bottom-right-radius: 6px;
         background: rgba(0, 0, 0, 0.2);
@@ -213,7 +213,6 @@ in
           "custom/tailscale"
           "custom/warp"
           "tray"
-          "custom/year-progress"
           "clock"
           "battery"
         ];
@@ -395,13 +394,6 @@ in
           interval = 60; # Refresh every minute
           tooltip = true;
           hide-when-empty = true;
-        };
-        "custom/year-progress" = {
-          format = "📅 {text}";
-          return-type = "json";
-          exec = "${pkgs.ruby}/bin/ruby ${./waybar/waybar-year-progress.rb}";
-          interval = 3600; # Refresh every hour
-          tooltip = true;
         };
 
         tray = {
