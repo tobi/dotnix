@@ -213,6 +213,7 @@ in
           "custom/tailscale"
           "custom/warp"
           "tray"
+          "custom/year-progress"
           "clock"
           "battery"
         ];
@@ -394,6 +395,13 @@ in
           interval = 60; # Refresh every minute
           tooltip = true;
           hide-when-empty = true;
+        };
+        "custom/year-progress" = {
+          format = "📅 {text}";
+          return-type = "json";
+          exec = "${pkgs.ruby}/bin/ruby ${./waybar/waybar-year-progress.rb}";
+          interval = 3600; # Refresh every hour
+          tooltip = true;
         };
 
         tray = {
