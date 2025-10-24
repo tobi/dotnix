@@ -208,11 +208,15 @@ def build_output(now, events, fetch_error)
     }
   when :upcoming
     minutes = display_event.minutes_until(now)
-    # Hide text if more than 8 hours away, but keep icon
-    if minutes > 480
+    event_date = display_event.start_time.to_date
+    today = now.to_date
+    tomorrow = (now + 86_400).to_date
+
+    # If event is today but more than 8 hours away, or tomorrow, show "No more events today!"
+    if (event_date == today && minutes > 480) || event_date == tomorrow
       return {
         icon: '📅',
-        text: '',
+        text: 'No more events today!',
         class: ['empty'],
         tooltip: tooltip
       }
