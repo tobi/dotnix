@@ -6,8 +6,6 @@ require 'time'
 require 'date'
 
 # Configuration via environment variables to keep the script self-contained.
-FETCH_INTERVAL_SECONDS = (ENV['WAYBAR_CAL_FETCH_SECONDS'] || '60').to_i
-DISPLAY_REFRESH_SECONDS = (ENV['WAYBAR_DISPLAY_REFRESH_SECONDS'] || '5').to_i
 SWITCH_LEAD_MINUTES = (ENV['WAYBAR_SWITCH_LEAD_MINUTES'] || '15').to_i
 LOOKAHEAD_DAYS = (ENV['WAYBAR_LOOKAHEAD_DAYS'] || '5').to_i
 CALENDAR_ID = ENV['WAYBAR_CALENDAR'] || 'Meetings'
@@ -349,26 +347,28 @@ if $PROGRAM_NAME == __FILE__
     events = []
   end
 
-  # Write agenda data to cache file
-  cache_dir = File.expand_path('~/.cache')
-  FileUtils.mkdir_p(cache_dir)
-  cache_file = File.join(cache_dir, 'agenda.json')
+  # Write agenda data to cache file only on successful fetch
+  if fetch_error.nil?
+    cache_dir = File.expand_path('~/.cache')
+    FileUtils.mkdir_p(cache_dir)
+    cache_file = File.join(cache_dir, 'agenda.json')
 
-  agenda_data = {
-    events: events.map do |event|
-      {
-        start_time: event.start_time.iso8601,
-        end_time: event.end_time.iso8601,
-        title: event.title,
-        description: event.description,
-        conference_url: event.conference_url,
-        calendar: event.calendar,
-        service: event.service
-      }
-    end,
-    fetched_at: Time.now.iso8601,
-    error: fetch_error&.message
-  }
+    agenda_data = {
+      events: events.map do |event|
+        {
+          start_time: event.start_time.iso8601,
+          end_time: event.end_time.iso8601,
+          title: event.title,
+          description: event.description,
+          conference_url: event.conference_url,
+          calendar: event.calendar,
+          service: event.service
+        }
+      end,
+      fetched_at: Time.now.iso8601,
+      error: nil
+    }
 
-  File.write(cache_file, JSON.generate(agenda_data))
+    File.write(cache_file, JSON.generate(agenda_data))
+  end
 end
