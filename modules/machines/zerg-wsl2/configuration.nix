@@ -72,6 +72,7 @@
       libraries = with pkgs; [
         # Standard libraries for dynamic linking
         stdenv.cc.cc.lib
+        stdenv.cc.cc
         zlib
         freeglut
         libGL
