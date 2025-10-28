@@ -119,7 +119,13 @@ in
   };
 
   # Programs
-  programs.nix-ld.enable = true;
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      stdenv.cc.cc.lib
+      stdenv.cc.cc
+    ];
+  };
   programs.fuse.userAllowOther = true;
   programs.appimage.enable = true;
   programs.appimage.binfmt = true;
