@@ -14,7 +14,7 @@ in
   home = {
     stateVersion = "25.05";
     enableNixpkgsReleaseCheck = false;
-    username = username;
+    inherit username;
     homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
 
     # Global environment variables

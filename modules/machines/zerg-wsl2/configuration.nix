@@ -11,15 +11,17 @@
   networking.hostName = "zerg-wsl2";
 
   # ───── WSL Configuration ────────────────────────────────────────────────
-  wsl.enable = true;
-  wsl.defaultUser = "tobi";
-  wsl.startMenuLaunchers = true;
+  wsl = {
+    enable = true;
+    defaultUser = "tobi";
+    startMenuLaunchers = true;
 
-  # WSL configuration options
-  wsl.wslConf = {
-    automount.root = "/mnt";
-    network.generateHosts = false;
-    user.default = "tobi";
+    # WSL configuration options
+    wslConf = {
+      automount.root = "/mnt";
+      network.generateHosts = false;
+      user.default = "tobi";
+    };
   };
 
   # Set timezone to fix warnings
@@ -55,31 +57,34 @@
     CUDA_PATH = "/usr/lib/wsl";
   };
 
-  # Add nvidia-smi alias for easy access
-  programs.bash.shellAliases = {
-    nvidia-smi = "/usr/lib/wsl/lib/nvidia-smi";
-  };
-  programs.zsh.shellAliases = {
-    nvidia-smi = "/usr/lib/wsl/lib/nvidia-smi";
-  };
+  # Programs
+  programs = {
+    # Add nvidia-smi alias for easy access
+    bash.shellAliases = {
+      nvidia-smi = "/usr/lib/wsl/lib/nvidia-smi";
+    };
+    zsh.shellAliases = {
+      nvidia-smi = "/usr/lib/wsl/lib/nvidia-smi";
+    };
 
-  # ───── Fallback libs for binary blobs ──────────────────────────────────
-  programs.nix-ld = {
-    libraries = with pkgs; [
-      # Standard libraries for dynamic linking
-      stdenv.cc.cc.lib
-      zlib
-      freeglut
-      libGL
-      libGLU
-      xorg.libX11
-      xorg.libXext
-      xorg.libXi
-      xorg.libXrandr
-      xorg.libXrender
-      xorg.libXxf86vm
-      # WSL2 provides NVIDIA libraries at /usr/lib/wsl/lib
-    ];
+    # ───── Fallback libs for binary blobs ──────────────────────────────────
+    nix-ld = {
+      libraries = with pkgs; [
+        # Standard libraries for dynamic linking
+        stdenv.cc.cc.lib
+        zlib
+        freeglut
+        libGL
+        libGLU
+        xorg.libX11
+        xorg.libXext
+        xorg.libXi
+        xorg.libXrandr
+        xorg.libXrender
+        xorg.libXxf86vm
+        # WSL2 provides NVIDIA libraries at /usr/lib/wsl/lib
+      ];
+    };
   };
 
   # This value determines the NixOS release from which the default

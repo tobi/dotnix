@@ -127,26 +127,28 @@ in
   # Create plugdev group for U2F/FIDO2 devices
   users.groups.plugdev = { };
 
-  # FIDO2/WebAuthn and Bluetooth device access
-  services.udev.packages = [
-    pkgs.libfido2
-    pkgs.bolt
-  ];
-  services.udev.extraRules = ''
-    # MediaTek MT7922 Bluetooth adapter for WebAuthn hybrid transport
-    # Framework AMD laptop - allows Chrome/Chromium to use BLE for passkeys
-    # Uses uaccess tag for systemd-logind dynamic ACLs (follows libfido2 pattern)
-    # SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0717", TAG+="uaccess", GROUP="plugdev", MODE="0660"
-
-    # Keep MediaTek BT awake, no autosuspend
-    # ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0e8d", TEST=="power/control", ATTR{power/control}="on"
-
-    # Disable PCIe port wakeups to prevent spurious wakes during s2idle
-    # ACTION=="add", SUBSYSTEM=="pci", DRIVER=="pcieport", ATTR{power/wakeup}="disabled"
-  '';
-
   # Services
   services = {
+    # FIDO2/WebAuthn and Bluetooth device access
+    udev = {
+      packages = [
+        pkgs.libfido2
+        pkgs.bolt
+      ];
+      extraRules = ''
+        # MediaTek MT7922 Bluetooth adapter for WebAuthn hybrid transport
+        # Framework AMD laptop - allows Chrome/Chromium to use BLE for passkeys
+        # Uses uaccess tag for systemd-logind dynamic ACLs (follows libfido2 pattern)
+        # SUBSYSTEM=="usb", ATTRS{idVendor}=="0e8d", ATTRS{idProduct}=="0717", TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+        # Keep MediaTek BT awake, no autosuspend
+        # ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0e8d", TEST=="power/control", ATTR{power/control}="on"
+
+        # Disable PCIe port wakeups to prevent spurious wakes during s2idle
+        # ACTION=="add", SUBSYSTEM=="pci", DRIVER=="pcieport", ATTR{power/wakeup}="disabled"
+      '';
+    };
+
     flatpak.enable = true;
     blueman.enable = true;
     seatd.enable = true;
@@ -177,6 +179,9 @@ in
     # Tailscale, this is needed for exit notes to to work
     tailscale.enable = true;
     tailscale.useRoutingFeatures = "client";
+
+    # Udisks2 for automounting USB devices
+    udisks2.enable = true;
   };
 
   # Virtualization
@@ -185,15 +190,28 @@ in
     enableOnBoot = true;
   };
 
-  # Fix NTP startup dependencies
-  systemd.services.chronyd = {
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
+  # Systemd configuration
+  systemd = {
+    # Fix NTP startup dependencies
+    services = {
+      chronyd = {
+        after = [ "network-online.target" ];
+        wants = [ "network-online.target" ];
+      };
+      bluetooth.serviceConfig.ExecStart = [
+        ""
+        "${pkgs.bluez}/libexec/bluetooth/bluetoothd -f /etc/bluetooth/main.conf --experimental"
+      ];
+    };
+
+    # Systemd sleep configuration - use suspend-then-hibernate
+    sleep.extraConfig = ''
+      # Hibernate after 2 hours of suspend to prevent battery drain
+      HibernateDelaySec=2h
+      AllowHybridSleep=yes
+      AllowSuspendThenHibernate=yes
+    '';
   };
-  systemd.services.bluetooth.serviceConfig.ExecStart = [
-    ""
-    "${pkgs.bluez}/libexec/bluetooth/bluetoothd -f /etc/bluetooth/main.conf --experimental"
-  ];
 
   # Disable zram - using real swap file for hibernation support
   zramSwap.enable = lib.mkForce false;
@@ -208,14 +226,6 @@ in
       echo "$(date): System resumed from suspend" >> /var/log/suspend-resume.log
     '';
   };
-
-  # Systemd sleep configuration - use suspend-then-hibernate
-  systemd.sleep.extraConfig = ''
-    # Hibernate after 2 hours of suspend to prevent battery drain
-    HibernateDelaySec=2h
-    AllowHybridSleep=yes
-    AllowSuspendThenHibernate=yes
-  '';
 
   # Security
   security = {
@@ -355,9 +365,6 @@ in
     # Tailscale
     tailscale
   ];
-
-  # Udisks2 for automounting USB devices
-  services.udisks2.enable = true;
 
   # Fonts
   fonts.packages = with pkgs; [

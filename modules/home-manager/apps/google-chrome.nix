@@ -28,49 +28,53 @@ in
     executable = true;
   };
 
-  # Set default applications for Google Chrome
-  xdg.mimeApps.defaultApplications = {
-    "text/html" = "google-chrome-shopify.desktop";
-    "x-www-browser" = "google-chrome-shopify.desktop";
-    "x-scheme-handler/http" = "google-chrome-shopify.desktop";
-    "x-scheme-handler/https" = "google-chrome-shopify.desktop";
-    "x-scheme-handler/pdf" = "google-chrome-shopify.desktop";
-    "application/pdf" = "google-chrome-shopify.desktop";
-  };
+  # XDG configuration
+  xdg = {
+    # Set default applications for Google Chrome
+    mimeApps.defaultApplications = {
+      "text/html" = "google-chrome-shopify.desktop";
+      "x-www-browser" = "google-chrome-shopify.desktop";
+      "x-scheme-handler/http" = "google-chrome-shopify.desktop";
+      "x-scheme-handler/https" = "google-chrome-shopify.desktop";
+      "x-scheme-handler/pdf" = "google-chrome-shopify.desktop";
+      "application/pdf" = "google-chrome-shopify.desktop";
+    };
 
-  # Desktop entry for Google Chrome
-  xdg.desktopEntries.google-chrome = {
-    name = "Google Chrome";
-    genericName = "Web Browser";
-    exec = "${chromeScript} --class=google-chrome %U";
-    terminal = false;
-    icon = "google-chrome";
-    type = "Application";
-    categories = [
-      "Network"
-      "WebBrowser"
-    ];
-    mimeType = [
-      "text/html"
-      "text/xml"
-      "application/xhtml_xml"
-      "x-scheme-handler/http"
-      "x-scheme-handler/https"
-    ];
-  };
+    # Desktop entries
+    desktopEntries = {
+      google-chrome = {
+        name = "Google Chrome";
+        genericName = "Web Browser";
+        exec = "${chromeScript} --class=google-chrome %U";
+        terminal = false;
+        icon = "google-chrome";
+        type = "Application";
+        categories = [
+          "Network"
+          "WebBrowser"
+        ];
+        mimeType = [
+          "text/html"
+          "text/xml"
+          "application/xhtml_xml"
+          "x-scheme-handler/http"
+          "x-scheme-handler/https"
+        ];
+      };
 
-  # Desktop entry for Google Chrome (Shopify profile)
-  xdg.desktopEntries.google-chrome-shopify = {
-    name = "Google Chrome (Shopify)";
-    genericName = "Web Browser";
-    exec = "${chromeScript} --new-window --user-data-dir=${config.home.homeDirectory}/Shopify/profile --class=google-chrome-shopify %U";
-    terminal = false;
-    icon = "google-chrome";
-    type = "Application";
-    categories = [
-      "Network"
-      "WebBrowser"
-    ];
+      google-chrome-shopify = {
+        name = "Google Chrome (Shopify)";
+        genericName = "Web Browser";
+        exec = "${chromeScript} --new-window --user-data-dir=${config.home.homeDirectory}/Shopify/profile --class=google-chrome-shopify %U";
+        terminal = false;
+        icon = "google-chrome";
+        type = "Application";
+        categories = [
+          "Network"
+          "WebBrowser"
+        ];
+      };
+    };
   };
 
   # Register hotkeys for open-or-focus
