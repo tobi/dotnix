@@ -1,4 +1,8 @@
-{ theme, ... }:
+{
+  pkgs,
+  theme,
+  ...
+}:
 {
   dconf.settings = {
     "org/gnome/desktop/interface" = {
