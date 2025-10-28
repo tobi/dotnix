@@ -1,4 +1,4 @@
-{ pkgs, inputs, config, ... }:
+{ pkgs, inputs, config, lib, ... }:
 
 # Framework Laptop 13 AMD AI 300 Series Configuration
 #
@@ -12,6 +12,9 @@
 #
 # This file contains machine-specific overrides and additional configuration.
 
+let
+  resumeOffset = 3250851;
+in
 {
   system.stateVersion = "25.11";
 
@@ -52,27 +55,35 @@
       "kernel.dmesg_restrict" = 0; # Allow non-root dmesg access
     };
 
-    kernelParams = [
-      "quiet"
-      "boot.shell_on_fail"
-      "rd.systemd.show_status=auto"
-      "rd.udev.log_level=3"
-      "vt.global_cursor_default=0"
+    # Resume from the decrypted btrfs device (not the LUKS container)
+    resumeDevice = "/dev/disk/by-uuid/8fa74c8c-9891-4a7e-9b48-b5dfa6016a32";
 
-      # NOTE: amdgpu.dcdebugmask=0x10 is set by nixos-hardware to prevent display hangs
-      # Do not override it here!
+    # Enable hibernation (Plymouth adds nohibernate by default)
+    kernelParams =
+      [
+        "quiet"
+        "boot.shell_on_fail"
+        "rd.systemd.show_status=auto"
+        "rd.udev.log_level=3"
+        "vt.global_cursor_default=0"
 
-      # Enable AMD P-State (redundant with nixos-hardware but explicit for documentation)
-      "amd_pstate=active"
+        # NOTE: amdgpu.dcdebugmask=0x10 is set by nixos-hardware to prevent display hangs
+        # Do not override it here!
 
-      # Disable btusb autosuspend for WebAuthn BLE reliability
-      "btusb.enable_autosuspend=0"
+        # Enable AMD P-State (redundant with nixos-hardware but explicit for documentation)
+        "amd_pstate=active"
 
-      # Apple Pro Display XDR - ignore broken HID interfaces
-      # The display has malformed HID descriptors causing disconnect loop
-      # HID_QUIRK_IGNORE (0x00000004) tells kernel to ignore HID, display still works
-      "usbhid.quirks=0x05ac:0x9243:0x00000004"
-    ];
+        # Disable btusb autosuspend for WebAuthn BLE reliability
+        "btusb.enable_autosuspend=0"
+
+        # Apple Pro Display XDR - ignore broken HID interfaces
+        # The display has malformed HID descriptors causing disconnect loop
+        # HID_QUIRK_IGNORE (0x00000004) tells kernel to ignore HID, display still works
+        "usbhid.quirks=0x05ac:0x9243:0x00000004"
+
+        # Hibernation support - resume offset for btrfs swap file
+        "resume_offset=${toString (resumeOffset + 0)}"
+      ];
 
     # Configure initrd for smoother LUKS prompt
     initrd = {
@@ -131,6 +142,14 @@
     flatpak.enable = true;
     blueman.enable = true;
     seatd.enable = true;
+    logind = {
+      extraConfig = ''
+        HandlePowerKey=suspend-then-hibernate
+        HandleLidSwitch=suspend-then-hibernate
+        HandleLidSwitchExternalPower=suspend-then-hibernate
+        HibernateDelaySec=2h
+      '';
+    };
 
     # SSH with security hardening
     openssh = {
@@ -169,6 +188,9 @@
     "${pkgs.bluez}/libexec/bluetooth/bluetoothd -f /etc/bluetooth/main.conf --experimental"
   ];
 
+  # Disable zram - using real swap file for hibernation support
+  zramSwap.enable = lib.mkForce false;
+
   # Power Management - Optimized for Framework AMD s2idle
   powerManagement = {
     enable = true;
@@ -194,6 +216,10 @@
 
     # Enable apparmor
     apparmor.enable = true;
+
+    # Disable protectKernelImage to allow hibernation
+    # NOTE: This security feature prevents kernel replacement but blocks hibernation
+    protectKernelImage = lib.mkForce false;
   };
 
   # Steam
@@ -290,6 +316,7 @@
     zip
     p7zip
     nss.tools
+    e2fsprogs
     openssl
     bzip2
     netcat-openbsd
@@ -332,4 +359,3 @@
     nerd-fonts.symbols-only
   ];
 }
-
