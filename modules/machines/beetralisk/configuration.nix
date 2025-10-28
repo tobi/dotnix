@@ -23,12 +23,13 @@
     # Plymouth for graphical boot
     plymouth = {
       enable = true;
-      theme = "cuts";
+      theme = "hexagon_dots_alt";
       themePackages = with pkgs; [
         (adi1090x-plymouth-themes.override {
           selected_themes = [
             "cuts"
-            "hexagon_dots"
+            "hexagon_dots_alt"
+            "deus_ex"
           ];
         })
       ];
