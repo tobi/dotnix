@@ -3,18 +3,19 @@
 {
   programs.niri.settings = {
     layout = {
-      gaps = 10;
+      gaps = 8;
       background-color = "transparent";
       always-center-single-column = true;
 
       preset-column-widths = [
-        { proportion = 1. / 3.; }
-        { proportion = 1. / 2.; }
-        { proportion = 2. / 3.; }
+        { proportion = 0.66; }
+        { proportion = 0.33; }
+        { proportion = 0.50; }
       ];
 
       default-column-width = {
-        # fixed = 726; # let windows decide
+        fixed = 726; # let windows decide
+        #proportion = 0.5;
       };
 
       focus-ring = {
@@ -43,13 +44,13 @@
 
       shadow = {
         enable = true;
-        softness = 10.0;
+        softness = 20.0;
         spread = 1;
         offset = {
-          x = 1.5;
-          y = 1.5;
+          x = 2;
+          y = 2;
         };
-        color = "#000000";
+        color = "#222222";
       };
 
       struts = {

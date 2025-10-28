@@ -210,8 +210,6 @@ in
     "Super+Shift+Left".action.focus-monitor-left = { };
     "Super+Shift+Right".action.focus-monitor-right = { };
 
-    "Super+Slash".action.focus-monitor-next = { };
-    "Super+Shift+Slash".action.move-window-to-monitor-next = { };
     # ============================================================================
     # Application Launchers
     # ============================================================================
@@ -225,7 +223,7 @@ in
     # Application-specific keybindings are now registered in individual app modules
     # via dotnix.desktop.hotkeys and generated above
 
-    "Mod+Tab" = {
+    "Super+Slash" = {
       action.spawn = [ "${binDir}/dotnix-find-windows" ];
       hotkey-overlay.title = "Find Window";
     };
