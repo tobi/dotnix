@@ -155,7 +155,6 @@ in
         HandlePowerKey=suspend-then-hibernate
         HandleLidSwitch=suspend-then-hibernate
         HandleLidSwitchExternalPower=suspend-then-hibernate
-        HibernateDelaySec=2h
       '';
     };
 

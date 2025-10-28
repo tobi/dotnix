@@ -89,8 +89,8 @@ in
         command = "${pkgs.libnotify}/bin/notify-send 'Locking in 5 seconds' -t 5000";
       }
       {
-        timeout = 360; # 6 minutes - suspend
-        command = "systemctl suspend";
+        timeout = 360; # 6 minutes - suspend-then-hibernate
+        command = "systemctl suspend-then-hibernate";
       }
     ];
     events = [
