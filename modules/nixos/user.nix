@@ -50,8 +50,8 @@
     ];
 
     extraSpecialArgs = {
-      theme = config.dotnix.theme;
       inherit inputs;
+      inherit (config.dotnix) theme;
     };
   };
 

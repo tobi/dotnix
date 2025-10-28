@@ -4,7 +4,7 @@
   ...
 }:
 let
-  palette = theme.palette;
+  inherit (theme) palette;
   terminal = "${pkgs.ghostty}/bin/ghostty";
 in
 {

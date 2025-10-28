@@ -9,7 +9,7 @@
 
 { theme, ... }:
 let
-  palette = theme.palette;
+  inherit (theme) palette;
 in
 {
   programs.ghostty = {

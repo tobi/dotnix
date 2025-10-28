@@ -1,4 +1,4 @@
-{ ... }:
+_:
 
 {
   # Enable Chromium with Wayland support

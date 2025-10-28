@@ -18,11 +18,13 @@
   # Machine identity
   networking.hostName = "frameling";
 
-  # Enable desktop environment
-  dotnix.home.enable = true;
-  dotnix.desktop.enable = true;
-
-  # Theme configuration
-  dotnix.theme.name = "everforest";
-  dotnix.theme.variant = "dark";
+  # Enable desktop environment with theme configuration
+  dotnix = {
+    home.enable = true;
+    desktop.enable = true;
+    theme = {
+      name = "everforest";
+      variant = "dark";
+    };
+  };
 }

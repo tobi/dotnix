@@ -7,7 +7,7 @@
 
 let
   cfg = config.dotnix.theme;
-  nix-colors = inputs.nix-colors;
+  inherit (inputs) nix-colors;
 in
 {
   options.dotnix.theme = {
@@ -166,8 +166,8 @@ in
     in
     {
       dotnix.theme = {
-        colorScheme = colorScheme;
-        palette = colorScheme.palette;
+        inherit colorScheme;
+        inherit (colorScheme) palette;
         systemFont = cfg.font;
 
         # Named color aliases

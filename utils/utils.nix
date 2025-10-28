@@ -12,7 +12,7 @@ let
       inherit system;
       config.allowUnfree = true;
       overlays = extraOverlays;
-      extraOverlays = extraOverlays;
+      inherit extraOverlays;
     };
 
 in
@@ -36,13 +36,13 @@ in
     in
     builtins.listToAttrs (
       map (name: {
-        name = name;
+        inherit name;
         value = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           inherit pkgs;
           specialArgs = {
             inherit inputs;
-            home-manager = inputs.home-manager;
+            inherit (inputs) home-manager;
           };
           modules = [
             inputs.determinate.nixosModules.default

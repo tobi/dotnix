@@ -19,10 +19,12 @@
   # Machine identity
   networking.hostName = "beetralisk";
 
-  # Enable desktop environment
-  dotnix.desktop.enable = true;
-
-  # Theme configuration
-  dotnix.theme.name = "everforest";
-  dotnix.theme.variant = "dark";
+  # Enable desktop environment with theme configuration
+  dotnix = {
+    desktop.enable = true;
+    theme = {
+      name = "everforest";
+      variant = "dark";
+    };
+  };
 }

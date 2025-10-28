@@ -6,76 +6,81 @@
 }:
 let
   username = "tobi";
-  isDarwin = pkgs.stdenv.isDarwin;
-  isLinux = pkgs.stdenv.isLinux;
+  inherit (pkgs.stdenv) isDarwin;
+  inherit (pkgs.stdenv) isLinux;
 in
 {
   # Basic home configuration
-  programs.home-manager.enable = true;
+  home = {
+    stateVersion = "25.05";
+    enableNixpkgsReleaseCheck = false;
+    username = username;
+    homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
 
-  home.stateVersion = "25.05";
-  home.enableNixpkgsReleaseCheck = false;
-  home.username = username;
-  home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
+    # Global environment variables
+    sessionVariables = {
+      DOTFILES = "$HOME/dotnix";
+      EDITOR = "nvim";
+    };
+  };
 
   # Allow application launchers to discover apps in ~/Applications
   xdg.systemDirs.data = lib.optionals isLinux [
     "${config.home.homeDirectory}/Applications"
   ];
 
-  # Global environment variables
-  home.sessionVariables = {
-    DOTFILES = "$HOME/dotnix";
-    EDITOR = "nvim";
-  };
+  programs = {
+    home-manager.enable = true;
 
-  programs.bat = {
-    enable = true;
-    config.theme = "OneHalfDark";
-  };
-
-  # Git configuration
-  programs.git = {
-    enable = true;
-    # SSH commit signing
-    signing = {
-      key = "~/.ssh/id_ed25519.pub";
-      signByDefault = true;
+    bat = {
+      enable = true;
+      config.theme = "OneHalfDark";
     };
 
-    settings = {
-      gpg.format = "ssh";
-      gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
-      user.name = "Tobi Lütke";
-      user.email = "tobi@lutke.com";
-      include.path = [
-        "~/.config/dev/gitconfig"
-        "~/.gitconfig"
+    # Git configuration
+    git = {
+      enable = true;
+      # SSH commit signing
+      signing = {
+        key = "~/.ssh/id_ed25519.pub";
+        signByDefault = true;
+      };
+
+      settings = {
+        gpg.format = "ssh";
+        gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
+        user.name = "Tobi Lütke";
+        user.email = "tobi@lutke.com";
+        include.path = [
+          "~/.config/dev/gitconfig"
+          "~/.gitconfig"
+        ];
+      };
+    };
+
+    micro = {
+      enable = true;
+      settings = {
+        clipboard = "terminal";
+        tabsize = 2;
+        tabstospaces = true;
+      };
+    };
+
+    fzf = {
+      enable = true;
+      defaultCommand = "fd --type f --hidden --follow --exclude .git";
+      defaultOptions = [
+        "--height 75%"
+        "--border"
       ];
+      fileWidgetCommand = "fd --type f";
+      changeDirWidgetCommand = "fd --type d";
+      changeDirWidgetOptions = [ "--preview 'tree -C {} | head -200'" ];
     };
-  };
 
-  programs.micro = {
-    enable = true;
-    settings.clipboard = "terminal";
-    settings.tabsize = 2;
-    settings.tabstospaces = true;
-  };
-
-  programs.fzf = {
-    enable = true;
-    defaultCommand = "fd --type f --hidden --follow --exclude .git";
-    defaultOptions = [
-      "--height 75%"
-      "--border"
-    ];
-    fileWidgetCommand = "fd --type f";
-    changeDirWidgetCommand = "fd --type d";
-    changeDirWidgetOptions = [ "--preview 'tree -C {} | head -200'" ];
-  };
-
-  # Shell configuration
-  programs.zsh = {
+    # Shell configuration
+    zsh = {
     enable = true;
     enableCompletion = true;
     autosuggestion.enable = true;
@@ -101,6 +106,7 @@ in
       # -- Local zshrc ────────────────────────────────────────────
       [ -f ~/.zshrc.local ] && source ~/.zshrc.local
     '';
+    };
   };
 
   home.shellAliases = {

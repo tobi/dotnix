@@ -23,12 +23,14 @@
   # Machine identity
   networking.hostName = "nixos-live";
 
-  # Enable desktop environment for live USB
-  dotnix.desktop.enable = true;
-
-  # Theme configuration
-  dotnix.theme.name = "everforest";
-  dotnix.theme.variant = "dark";
+  # Enable desktop environment for live USB with theme configuration
+  dotnix = {
+    desktop.enable = true;
+    theme = {
+      name = "everforest";
+      variant = "dark";
+    };
+  };
 
   # Auto-login configuration for live environment
   services.greetd = {
