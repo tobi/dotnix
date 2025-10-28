@@ -1,5 +1,5 @@
 # overlays/ruby-jemalloc-auto.nix
-final: prev:
+_final: prev:
 let
   lib = prev.lib;
   enable =

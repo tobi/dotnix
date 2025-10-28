@@ -1,10 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  theme,
-  ...
-}:
+{ theme, ... }:
 {
   dconf.settings = {
     "org/gnome/desktop/interface" = {

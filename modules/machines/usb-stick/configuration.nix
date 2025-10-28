@@ -1,10 +1,6 @@
 {
-  config,
   pkgs,
   lib,
-  home-manager,
-  modulesPath,
-  inputs,
   ...
 }:
 

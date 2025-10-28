@@ -1,9 +1,4 @@
-{
-  pkgs,
-  lib,
-  config,
-  ...
-}:
+{ pkgs, ... }:
 {
   # Install the walker launcher when selected
   home.packages = [ pkgs.walker ];

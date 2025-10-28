@@ -3,11 +3,8 @@
 
   outputs =
     {
-      self,
       nixpkgs,
       home-manager,
-      nix-colors,
-      determinate,
       ...
     }@inputs:
     let

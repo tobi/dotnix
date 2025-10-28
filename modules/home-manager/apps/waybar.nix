@@ -1,5 +1,4 @@
 {
-  config,
   theme,
   pkgs,
   ...

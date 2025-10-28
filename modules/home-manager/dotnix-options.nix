@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 
@@ -10,7 +9,7 @@ let
   generateCmdScripts =
     hotkeys:
     lib.mapAttrs' (
-      key: cfg:
+      _key: cfg:
       lib.nameValuePair ".local/bin/${cfg.cmd}" {
         text =
           if cfg.focusClass != null then
@@ -25,7 +24,7 @@ let
             '';
         executable = true;
       }
-    ) (lib.filterAttrs (key: cfg: cfg.cmd != null) hotkeys);
+    ) (lib.filterAttrs (_key: cfg: cfg.cmd != null) hotkeys);
 in
 {
   options.dotnix.desktop.hotkeys = lib.mkOption {

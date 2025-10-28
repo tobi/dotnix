@@ -1,11 +1,4 @@
-{
-  theme,
-  pkgs,
-  ...
-}:
-let
-  palette = theme.palette;
-in
+{ pkgs, ... }:
 {
   # Nix-native configuration for niri using sodiboo/niri-flake
   # This generates config.kdl from structured Nix settings with type safety

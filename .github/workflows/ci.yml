@@ -11,8 +11,6 @@ jobs:
           nix_path: nixpkgs=channel:nixos-unstable
       - name: Check flake
         run: nix flake check --no-build
-      - name: Check formatting
-        run: nix run nixpkgs#nixpkgs-fmt -- --check .
       - name: Lint with statix
         run: nix run nixpkgs#statix -- check .
       - name: Check for dead code

@@ -1,9 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ config, ... }:
 
 let
   chromeScript = "${config.home.homeDirectory}/.local/bin/chrome";

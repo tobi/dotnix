@@ -1,12 +1,5 @@
 # WSL2 Development Environment
-{
-  inputs,
-  pkgs,
-  home-manager,
-  config,
-  lib,
-  ...
-}:
+{ inputs, ... }:
 
 {
   imports = [

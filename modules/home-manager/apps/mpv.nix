@@ -7,10 +7,7 @@
   - MIME type associations for all common video formats
 */
 
-{ pkgs, theme, ... }:
-let
-  palette = theme.palette;
-in
+{ theme, ... }:
 {
   programs.mpv = {
     enable = true;

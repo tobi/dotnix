@@ -1,10 +1,6 @@
 # Live USB Installer Configuration
 {
   inputs,
-  pkgs,
-  home-manager,
-  config,
-  lib,
   modulesPath,
   ...
 }:
