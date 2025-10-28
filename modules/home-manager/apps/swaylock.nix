@@ -1,8 +1,9 @@
-{ config
-, lib
-, pkgs
-, theme
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  theme,
+  ...
 }:
 let
   opacity = rgb: "${rgb}AA";
@@ -13,8 +14,6 @@ in
     swaylock-effects
     sway-audio-idle-inhibit
   ];
-
-
 
   programs.swaylock = {
     enable = true;
@@ -116,4 +115,3 @@ in
     # extraArgs = [ "-w" ]; # Wait for lock command to finish before continuing
   };
 }
-

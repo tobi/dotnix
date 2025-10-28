@@ -1,7 +1,8 @@
-{ config
-, theme
-, pkgs
-, ...
+{
+  config,
+  theme,
+  pkgs,
+  ...
 }:
 let
   palette = theme.palette;
@@ -270,7 +271,13 @@ in
           tooltip-format = "{:%A, %B %d, %Y (Week %V)}";
         };
         network = {
-          format-icons = [ "󰤯" "󰤟" "󰤢" "󰤥" "󰤨" ];
+          format-icons = [
+            "󰤯"
+            "󰤟"
+            "󰤢"
+            "󰤥"
+            "󰤨"
+          ];
           format = "{icon}";
           format-wifi = "{icon}";
           format-ethernet = "󰀂";
@@ -440,4 +447,3 @@ in
     };
   };
 }
-

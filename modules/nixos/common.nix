@@ -11,12 +11,20 @@
   and helps reduce duplication across machine-specific configurations.
 */
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   # Nix Settings - Common across all machines
   nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
     auto-optimise-store = true;
 
     # Performance optimizations
@@ -45,47 +53,50 @@
   };
 
   # Common system packages
-  environment.systemPackages = with pkgs; [
-    # Core utilities
-    git
-    curl
-    wget
-    htop
-    tree
-    file
-    which
-    rsync
-    lsof
-    iotop
-    sysz
-    dust
-    mprocs
-    pv
-    killall
+  environment.systemPackages =
+    with pkgs;
+    [
+      # Core utilities
+      git
+      curl
+      wget
+      htop
+      tree
+      file
+      which
+      rsync
+      lsof
+      iotop
+      sysz
+      dust
+      mprocs
+      pv
+      killall
 
-    # System tools
-    vim
-    nano
-    pciutils
-    usbutils
-    bind.dnsutils
-    nmap
-    traceroute
-    iperf3
-  ] ++ lib.optionals config.dotnix.desktop.enable [
-    # Desktop-specific packages
-    pavucontrol
-    wireplumber
-    v4l-utils
-    cheese
-    pipewire
-    bluez
-    bluez-tools
-    pcsclite
-    libfido2
-    iw
-    wirelesstools
-  ];
+      # System tools
+      vim
+      nano
+      pciutils
+      usbutils
+      bind.dnsutils
+      nmap
+      traceroute
+      iperf3
+    ]
+    ++ lib.optionals config.dotnix.desktop.enable [
+      # Desktop-specific packages
+      pavucontrol
+      wireplumber
+      v4l-utils
+      cheese
+      pipewire
+      bluez
+      bluez-tools
+      pcsclite
+      libfido2
+      iw
+      wirelesstools
+    ];
 
   # Common programs
   programs.nix-ld.enable = true;
@@ -103,17 +114,20 @@
   };
 
   # Common fonts - only needed for desktop environments
-  fonts.packages = lib.mkIf config.dotnix.desktop.enable (with pkgs; [
-    inter
-    noto-fonts
-    noto-fonts-emoji
-    noto-fonts-cjk-sans
-    freetype
-    nerd-fonts.fira-code
-    nerd-fonts.droid-sans-mono
-    nerd-fonts.caskaydia-mono
-    nerd-fonts.symbols-only
-  ]);
+  fonts.packages = lib.mkIf config.dotnix.desktop.enable (
+    with pkgs;
+    [
+      inter
+      noto-fonts
+      noto-fonts-emoji
+      noto-fonts-cjk-sans
+      freetype
+      nerd-fonts.fira-code
+      nerd-fonts.droid-sans-mono
+      nerd-fonts.caskaydia-mono
+      nerd-fonts.symbols-only
+    ]
+  );
 
   # Common security settings
   security = {

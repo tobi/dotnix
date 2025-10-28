@@ -1,4 +1,10 @@
-{ pkgs, inputs, config, lib, ... }:
+{
+  pkgs,
+  inputs,
+  config,
+  lib,
+  ...
+}:
 
 # Framework Laptop 13 AMD AI 300 Series Configuration
 #
@@ -24,7 +30,10 @@ in
   networking = {
     networkmanager.enable = true;
     firewall = {
-      allowedTCPPorts = [ 22 53317 ]; # SSH and LocalSend
+      allowedTCPPorts = [
+        22
+        53317
+      ]; # SSH and LocalSend
       allowedUDPPorts = [ 53317 ]; # LocalSend
     };
   };
@@ -59,31 +68,30 @@ in
     resumeDevice = "/dev/disk/by-uuid/8fa74c8c-9891-4a7e-9b48-b5dfa6016a32";
 
     # Enable hibernation (Plymouth adds nohibernate by default)
-    kernelParams =
-      [
-        "quiet"
-        "boot.shell_on_fail"
-        "rd.systemd.show_status=auto"
-        "rd.udev.log_level=3"
-        "vt.global_cursor_default=0"
+    kernelParams = [
+      "quiet"
+      "boot.shell_on_fail"
+      "rd.systemd.show_status=auto"
+      "rd.udev.log_level=3"
+      "vt.global_cursor_default=0"
 
-        # NOTE: amdgpu.dcdebugmask=0x10 is set by nixos-hardware to prevent display hangs
-        # Do not override it here!
+      # NOTE: amdgpu.dcdebugmask=0x10 is set by nixos-hardware to prevent display hangs
+      # Do not override it here!
 
-        # Enable AMD P-State (redundant with nixos-hardware but explicit for documentation)
-        "amd_pstate=active"
+      # Enable AMD P-State (redundant with nixos-hardware but explicit for documentation)
+      "amd_pstate=active"
 
-        # Disable btusb autosuspend for WebAuthn BLE reliability
-        "btusb.enable_autosuspend=0"
+      # Disable btusb autosuspend for WebAuthn BLE reliability
+      "btusb.enable_autosuspend=0"
 
-        # Apple Pro Display XDR - ignore broken HID interfaces
-        # The display has malformed HID descriptors causing disconnect loop
-        # HID_QUIRK_IGNORE (0x00000004) tells kernel to ignore HID, display still works
-        "usbhid.quirks=0x05ac:0x9243:0x00000004"
+      # Apple Pro Display XDR - ignore broken HID interfaces
+      # The display has malformed HID descriptors causing disconnect loop
+      # HID_QUIRK_IGNORE (0x00000004) tells kernel to ignore HID, display still works
+      "usbhid.quirks=0x05ac:0x9243:0x00000004"
 
-        # Hibernation support - resume offset for btrfs swap file
-        "resume_offset=${toString (resumeOffset + 0)}"
-      ];
+      # Hibernation support - resume offset for btrfs swap file
+      "resume_offset=${toString (resumeOffset + 0)}"
+    ];
 
     # Configure initrd for smoother LUKS prompt
     initrd = {
@@ -112,7 +120,6 @@ in
     enableRedistributableFirmware = true;
   };
 
-
   # Programs
   programs.nix-ld.enable = true;
   programs.fuse.userAllowOther = true;
@@ -123,7 +130,10 @@ in
   users.groups.plugdev = { };
 
   # FIDO2/WebAuthn and Bluetooth device access
-  services.udev.packages = [ pkgs.libfido2 pkgs.bolt ];
+  services.udev.packages = [
+    pkgs.libfido2
+    pkgs.bolt
+  ];
   services.udev.extraRules = ''
     # MediaTek MT7922 Bluetooth adapter for WebAuthn hybrid transport
     # Framework AMD laptop - allows Chrome/Chromium to use BLE for passkeys
@@ -269,10 +279,16 @@ in
     ];
     config = {
       common = {
-        default = [ "wlr" "gtk" ];
+        default = [
+          "wlr"
+          "gtk"
+        ];
       };
       niri = {
-        default = [ "wlr" "gtk" ];
+        default = [
+          "wlr"
+          "gtk"
+        ];
         "org.freedesktop.impl.portal.Camera" = [ "gtk" ];
         "org.freedesktop.impl.portal.Screenshot" = [ "wlr" ];
         "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ];

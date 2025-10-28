@@ -1,5 +1,12 @@
 # Beetralisk Configuration
-{ inputs, pkgs, home-manager, config, lib, ... }:
+{
+  inputs,
+  pkgs,
+  home-manager,
+  config,
+  lib,
+  ...
+}:
 
 {
   imports = [

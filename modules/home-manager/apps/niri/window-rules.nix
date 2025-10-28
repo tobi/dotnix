@@ -24,9 +24,11 @@
     }
 
     {
-      matches = [{
-        app-id = "^chrome-meet.google.com__-Default$";
-      }];
+      matches = [
+        {
+          app-id = "^chrome-meet.google.com__-Default$";
+        }
+      ];
       open-focused = true;
       default-column-width.proportion = 0.99;
     }

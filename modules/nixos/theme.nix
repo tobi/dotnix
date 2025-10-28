@@ -1,4 +1,10 @@
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 let
   cfg = config.dotnix.theme;
@@ -21,7 +27,10 @@ in
     };
 
     variant = lib.mkOption {
-      type = lib.types.enum [ "dark" "light" ];
+      type = lib.types.enum [
+        "dark"
+        "light"
+      ];
       default = "light";
       description = "The variant of the theme to use";
       example = "dark";

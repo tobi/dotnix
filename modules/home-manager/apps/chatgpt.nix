@@ -1,7 +1,8 @@
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 
 let
@@ -26,4 +27,3 @@ in
     focusClass = "chrome-chat.openai.com__-Default";
   };
 }
-

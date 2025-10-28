@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   # Sudo configuration
@@ -50,6 +55,5 @@
     # Screen lockers: fingerprint or password
     gtklock.fprintAuth = lib.mkIf (config.programs.gtklock.enable or false) true;
   };
-
 
 }

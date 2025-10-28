@@ -5,7 +5,7 @@
 
     settings = {
       default-timeout = 8000;
-      actions = true; 
+      actions = true;
       width = 350;
       height = 150;
       icons = true;
@@ -47,4 +47,3 @@
     };
   };
 }
-

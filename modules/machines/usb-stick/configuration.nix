@@ -1,4 +1,12 @@
-{ config, pkgs, lib, home-manager, modulesPath, inputs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  home-manager,
+  modulesPath,
+  inputs,
+  ...
+}:
 
 {
 
@@ -31,7 +39,6 @@
   '';
 
   boot.blacklistedKernelModules = [ "snd_pcsp" ];
-
 
   # Enable dotnix desktop features
   dotnix.desktop.enable = true;
@@ -102,4 +109,3 @@
   # Set the NixOS release version
   system.stateVersion = "25.11";
 }
-

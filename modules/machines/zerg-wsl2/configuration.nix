@@ -5,12 +5,16 @@
 # NixOS-WSL specific options are documented on the NixOS-WSL repository:
 # https://github.com/nix-community/NixOS-WSL
 
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 {
 
   networking.hostName = "zerg-wsl2";
-
-
 
   # ───── WSL Configuration ────────────────────────────────────────────────
   wsl.enable = true;
@@ -92,5 +96,3 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.05"; # Did you read the comment?
 }
-
-

@@ -2,13 +2,14 @@
   description = "Tobi's nixworld";
 
   outputs =
-    { self
-    , nixpkgs
-    , home-manager
-    , nix-colors
-    , determinate
-    , ...
-    } @inputs:
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      nix-colors,
+      determinate,
+      ...
+    }@inputs:
     let
       # Support both Linux and Darwin
       systems = [
@@ -23,7 +24,8 @@
       utils = import ./utils/utils.nix { inherit nixpkgs; };
 
       # Generate pkgs for home-manager using centralized overlay system
-      mkPkgs = system:
+      mkPkgs =
+        system:
         utils.mkPkgs {
           inherit system;
 
@@ -34,6 +36,8 @@
         };
     in
     {
+
+      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-tree;
 
       # ------------------------------------------------------------
       # NixOS configurations
@@ -59,16 +63,17 @@
         };
       };
 
-
       # ------------------------------------------------------------
       # Development shell (nix develop .)
       # ------------------------------------------------------------
       # Development shells for both systems
-      devShells = forEachSystem
-        (system:
-          let devConfig = import ./devshell.nix { inherit nixpkgs system; };
-          in devConfig.devShells.${system}
-        );
+      devShells = forEachSystem (
+        system:
+        let
+          devConfig = import ./devshell.nix { inherit nixpkgs system; };
+        in
+        devConfig.devShells.${system}
+      );
 
     };
 
@@ -99,4 +104,3 @@
   };
 
 }
-

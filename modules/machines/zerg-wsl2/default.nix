@@ -1,5 +1,12 @@
 # WSL2 Development Environment
-{ inputs, pkgs, home-manager, config, lib, ... }:
+{
+  inputs,
+  pkgs,
+  home-manager,
+  config,
+  lib,
+  ...
+}:
 
 {
   imports = [
@@ -20,6 +27,4 @@
   dotnix.home.enable = true;
   dotnix.desktop.enable = false;
 
-
 }
-

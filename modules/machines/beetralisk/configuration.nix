@@ -1,4 +1,9 @@
-{ pkgs, inputs, config, ... }:
+{
+  pkgs,
+  inputs,
+  config,
+  ...
+}:
 
 {
 
@@ -8,8 +13,6 @@
 
   # Networking
   networking.hostName = "beetralisk";
-
-
 
   # Boot Configuration
   boot = {
@@ -28,7 +31,10 @@
       theme = "cuts";
       themePackages = with pkgs; [
         (adi1090x-plymouth-themes.override {
-          selected_themes = [ "cuts" "hexagon_dots" ];
+          selected_themes = [
+            "cuts"
+            "hexagon_dots"
+          ];
         })
       ];
     };
@@ -77,7 +83,10 @@
   networking = {
     networkmanager.enable = true;
     firewall = {
-      allowedTCPPorts = [ 22 53317 ]; # SSH and LocalSend
+      allowedTCPPorts = [
+        22
+        53317
+      ]; # SSH and LocalSend
       allowedUDPPorts = [ 53317 ]; # LocalSend
     };
   };
@@ -88,9 +97,6 @@
     algorithm = "zstd";
     memoryPercent = 40;
   };
-
-
-
 
   # Create plugdev group for U2F/FIDO2 devices
   users.groups.plugdev = { };
@@ -115,14 +121,10 @@
     tailscale.useRoutingFeatures = "client";
   };
 
-
-
   # Security
   security = {
     pam.services.greetd.enableGnomeKeyring = true;
   };
-
-
 
   # Steam
   programs.steam = {
@@ -167,10 +169,16 @@
     ];
     config = {
       common = {
-        default = [ "wlr" "gtk" ];
+        default = [
+          "wlr"
+          "gtk"
+        ];
       };
       niri = {
-        default = [ "wlr" "gtk" ];
+        default = [
+          "wlr"
+          "gtk"
+        ];
         "org.freedesktop.impl.portal.Camera" = [ "gtk" ];
         "org.freedesktop.impl.portal.Screenshot" = [ "wlr" ];
         "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ];
@@ -239,6 +247,4 @@
     tailscale
   ];
 
-
 }
-

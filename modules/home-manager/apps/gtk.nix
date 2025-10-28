@@ -1,4 +1,10 @@
-{ config, lib, pkgs, theme, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  theme,
+  ...
+}:
 {
   dconf.settings = {
     "org/gnome/desktop/interface" = {
@@ -24,4 +30,3 @@
     };
   };
 }
-

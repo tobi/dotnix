@@ -1,7 +1,8 @@
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 
 let
@@ -85,4 +86,3 @@ in
     cmd = "google-chrome-shopify";
   };
 }
-

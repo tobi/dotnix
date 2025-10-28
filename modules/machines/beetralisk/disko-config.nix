@@ -15,7 +15,12 @@
                 type = "filesystem";
                 format = "vfat";
                 mountpoint = "/boot";
-                mountOptions = [ "fmask=0077" "dmask=0077" "uid=0" "gid=0" ];
+                mountOptions = [
+                  "fmask=0077"
+                  "dmask=0077"
+                  "uid=0"
+                  "gid=0"
+                ];
               };
             };
             luks = {
@@ -36,7 +41,10 @@
                     };
                     "/safe" = {
                       mountpoint = "/home";
-                      mountOptions = [ "compress=zstd" "noatime" ];
+                      mountOptions = [
+                        "compress=zstd"
+                        "noatime"
+                      ];
                     };
                   };
                 };
@@ -48,4 +56,3 @@
     };
   };
 }
-

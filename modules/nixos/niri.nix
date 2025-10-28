@@ -29,4 +29,3 @@
 
   dotnix.desktop.enable = lib.mkDefault true;
 }
-

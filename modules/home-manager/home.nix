@@ -1,4 +1,10 @@
-{ config, pkgs, lib, inputs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
+}:
 let
   username = "tobi";
   isDarwin = pkgs.stdenv.isDarwin;
@@ -11,10 +17,7 @@ in
   home.stateVersion = "25.05";
   home.enableNixpkgsReleaseCheck = false;
   home.username = username;
-  home.homeDirectory =
-    if pkgs.stdenv.isDarwin
-    then "/Users/${username}"
-    else "/home/${username}";
+  home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
 
   # Allow application launchers to discover apps in ~/Applications
   xdg.systemDirs.data = lib.optionals isLinux [
@@ -46,7 +49,10 @@ in
       gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
       user.name = "Tobi Lütke";
       user.email = "tobi@lutke.com";
-      include.path = [ "~/.config/dev/gitconfig" "~/.gitconfig" ];
+      include.path = [
+        "~/.config/dev/gitconfig"
+        "~/.gitconfig"
+      ];
     };
   };
 
@@ -60,7 +66,10 @@ in
   programs.fzf = {
     enable = true;
     defaultCommand = "fd --type f --hidden --follow --exclude .git";
-    defaultOptions = [ "--height 75%" "--border" ];
+    defaultOptions = [
+      "--height 75%"
+      "--border"
+    ];
     fileWidgetCommand = "fd --type f";
     changeDirWidgetCommand = "fd --type d";
     changeDirWidgetOptions = [ "--preview 'tree -C {} | head -200'" ];
@@ -119,7 +128,8 @@ in
     c = "pbcopy";
     v = "pbpaste";
 
-  } // lib.optionalAttrs pkgs.stdenv.isLinux {
+  }
+  // lib.optionalAttrs pkgs.stdenv.isLinux {
     # Clipboard (macOS compatibility on Linux)
     pbcopy = "${pkgs.wl-clipboard}/bin/wl-copy";
     pbpaste = "${pkgs.wl-clipboard}/bin/wl-paste";
@@ -158,70 +168,72 @@ in
   ];
 
   # Essential packages organized by category
-  home.packages = with pkgs; [
-    # ── Core utilities ──────────────────────────────────────────────────
-    age # Simple, modern and secure file encryption
-    bat # Cat clone with syntax highlighting
-    bc # Arbitrary precision calculator
-    curl # Command line tool for transferring data
-    eza # Modern replacement for ls
-    fd # Simple, fast and user-friendly find
-    fswatch # File change monitor
-    fzf # General-purpose command-line fuzzy finder
-    gh # GitHub CLI tool
-    jq # Lightweight and flexible JSON processor
-    ripgrep # Fast text search tool
-    wget # Network utility to retrieve files
-    zstd # Fast compression algorithm
+  home.packages =
+    with pkgs;
+    [
+      # ── Core utilities ──────────────────────────────────────────────────
+      age # Simple, modern and secure file encryption
+      bat # Cat clone with syntax highlighting
+      bc # Arbitrary precision calculator
+      curl # Command line tool for transferring data
+      eza # Modern replacement for ls
+      fd # Simple, fast and user-friendly find
+      fswatch # File change monitor
+      fzf # General-purpose command-line fuzzy finder
+      gh # GitHub CLI tool
+      jq # Lightweight and flexible JSON processor
+      ripgrep # Fast text search tool
+      wget # Network utility to retrieve files
+      zstd # Fast compression algorithm
 
-    # ── System tools ────────────────────────────────────────────────────
-    dust # More intuitive version of du
-    htop # Interactive process viewer
-    killall # Kill processes by name
-    mask # CLI task runner defined by a simple markdown file
-    mprocs # Run multiple commands in parallel
-    mtr # Network diagnostic tool
-    procs # Modern replacement for ps
-    pv # Terminal-based tool for monitoring data
-    sysz # System information tool
-    yazi # Terminal file manager
+      # ── System tools ────────────────────────────────────────────────────
+      dust # More intuitive version of du
+      htop # Interactive process viewer
+      killall # Kill processes by name
+      mask # CLI task runner defined by a simple markdown file
+      mprocs # Run multiple commands in parallel
+      mtr # Network diagnostic tool
+      procs # Modern replacement for ps
+      pv # Terminal-based tool for monitoring data
+      sysz # System information tool
+      yazi # Terminal file manager
 
+      # ── Development tools ───────────────────────────────────────────────
+      ast-grep # Fast structural search and replace
+      comma # Runs programs without installing them
+      duckdb # Analytical database
+      envsubst # Substitute environment variables in shell format
+      ffmpeg # Multimedia framework
+      gnumake # GNU make utility
+      hyperfine # Command-line benchmarking tool
+      lazygit # Simple terminal UI for git
+      libffi.dev # Foreign function interface library
+      nixfmt-rfc-style # Nix code formatter (RFC style)
+      nixfmt-tree # Nix code formatter (tree style)
+      nixpkgs-fmt # Nix code formatter
+      openssl.dev # Cryptography and SSL/TLS toolkit
+      pkg-config # Helper tool for compiling applications
+      sqlite # SQL database engine
+      stdenv.cc # C/C++ compiler toolchain
+      tokei # Count your code, quickly
+      unzip # ZIP archive extraction utility
+      zlib.dev # Compression library
+      zsync # File synchronization tool
+      zellij # Terminal multiplexer
+      git-lfs # Git Large File Storage
 
-    # ── Development tools ───────────────────────────────────────────────
-    ast-grep # Fast structural search and replace
-    comma # Runs programs without installing them
-    duckdb # Analytical database
-    envsubst # Substitute environment variables in shell format
-    ffmpeg # Multimedia framework
-    gnumake # GNU make utility
-    hyperfine # Command-line benchmarking tool
-    lazygit # Simple terminal UI for git
-    libffi.dev # Foreign function interface library
-    nixfmt-rfc-style # Nix code formatter (RFC style)
-    nixfmt-tree # Nix code formatter (tree style)
-    nixpkgs-fmt # Nix code formatter
-    openssl.dev # Cryptography and SSL/TLS toolkit
-    pkg-config # Helper tool for compiling applications
-    sqlite # SQL database engine
-    stdenv.cc # C/C++ compiler toolchain
-    tokei # Count your code, quickly
-    unzip # ZIP archive extraction utility
-    zlib.dev # Compression library
-    zsync # File synchronization tool
-    zellij # Terminal multiplexer
-    git-lfs # Git Large File Storage
+      # ── Nice-to-have utilities ───────────────────────────────────────────
+      fastfetch # Fast system information tool
+      gum # Tool for glamorous shell scripts
+      gcalcli # Google Calendar CLI
 
-    # ── Nice-to-have utilities ───────────────────────────────────────────
-    fastfetch # Fast system information tool
-    gum # Tool for glamorous shell scripts
-    gcalcli # Google Calendar CLI
-
-  ] ++ lib.optionals isLinux [
-    nitch # Minimal system information tool
-    sysz # System information tool
-  ] ++ lib.optionals isDarwin [
-  ];
-
+    ]
+    ++ lib.optionals isLinux [
+      nitch # Minimal system information tool
+      sysz # System information tool
+    ]
+    ++ lib.optionals isDarwin [
+    ];
 
   programs.try = {
     enable = true;

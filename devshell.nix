@@ -53,7 +53,7 @@ in
       else
         eval "$(starship init bash)"
       fi
-      
+
       echo "Ruby version: $(ruby --version)"
       echo "Python version: $(python --version)"
       echo "🚀 Development shell activated, you can now compile things"
@@ -64,4 +64,3 @@ in
     shell = "${pkgs.zsh}/bin/zsh";
   };
 }
-

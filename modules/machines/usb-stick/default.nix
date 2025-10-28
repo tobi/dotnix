@@ -1,5 +1,13 @@
 # Live USB Installer Configuration
-{ inputs, pkgs, home-manager, config, lib, modulesPath, ... }:
+{
+  inputs,
+  pkgs,
+  home-manager,
+  config,
+  lib,
+  modulesPath,
+  ...
+}:
 
 {
   imports = [
@@ -37,4 +45,3 @@
     };
   };
 }
-

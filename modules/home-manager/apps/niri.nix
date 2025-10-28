@@ -1,6 +1,7 @@
-{ theme
-, pkgs
-, ...
+{
+  theme,
+  pkgs,
+  ...
 }:
 let
   palette = theme.palette;
@@ -31,4 +32,3 @@ in
     numix-cursor-theme
   ];
 }
-

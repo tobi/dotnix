@@ -4,24 +4,25 @@ let
   binDir = "${../../../../bin}";
   launcherCmd = "walker";
   # Generate hotkey bindings from registered apps
-  generateHotkeyBinds = hotkeys:
-    lib.mapAttrs'
-      (key: cfg:
-        lib.nameValuePair key {
-          action.spawn =
-            if cfg.focusClass != null
-            then [
+  generateHotkeyBinds =
+    hotkeys:
+    lib.mapAttrs' (
+      key: cfg:
+      lib.nameValuePair key {
+        action.spawn =
+          if cfg.focusClass != null then
+            [
               "${binDir}/open-or-focus"
               cfg.focusClass
               cfg.executable
             ]
-            else [
+          else
+            [
               "${binDir}/open"
               cfg.executable
             ];
-        }
-      )
-      hotkeys;
+      }
+    ) hotkeys;
 in
 {
   programs.niri.settings.binds = (generateHotkeyBinds config.dotnix.desktop.hotkeys) // {
@@ -43,37 +44,95 @@ in
     # Universal Clipboard (Super+C/V/X)
     # ============================================================================
 
-    "Super+C".action.spawn = [ "wtype" "-M" "ctrl" "-P" "Insert" "-m" "ctrl" "-p" "Insert" ];
-    "Super+V".action.spawn = [ "wtype" "-M" "shift" "-P" "Insert" "-m" "shift" "-p" "Insert" ];
-    "Super+X".action.spawn = [ "wtype" "-M" "ctrl" "-P" "x" "-m" "ctrl" "-p" "x" ];
+    "Super+C".action.spawn = [
+      "wtype"
+      "-M"
+      "ctrl"
+      "-P"
+      "Insert"
+      "-m"
+      "ctrl"
+      "-p"
+      "Insert"
+    ];
+    "Super+V".action.spawn = [
+      "wtype"
+      "-M"
+      "shift"
+      "-P"
+      "Insert"
+      "-m"
+      "shift"
+      "-p"
+      "Insert"
+    ];
+    "Super+X".action.spawn = [
+      "wtype"
+      "-M"
+      "ctrl"
+      "-P"
+      "x"
+      "-m"
+      "ctrl"
+      "-p"
+      "x"
+    ];
 
     # ============================================================================
     # Media Keys
     # ============================================================================
 
     "XF86AudioRaiseVolume" = {
-      action.spawn = [ "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+" ];
+      action.spawn = [
+        "wpctl"
+        "set-volume"
+        "@DEFAULT_AUDIO_SINK@"
+        "0.1+"
+      ];
       allow-when-locked = true;
     };
     "XF86AudioLowerVolume" = {
-      action.spawn = [ "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-" ];
+      action.spawn = [
+        "wpctl"
+        "set-volume"
+        "@DEFAULT_AUDIO_SINK@"
+        "0.1-"
+      ];
       allow-when-locked = true;
     };
     "XF86AudioMute" = {
-      action.spawn = [ "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle" ];
+      action.spawn = [
+        "wpctl"
+        "set-mute"
+        "@DEFAULT_AUDIO_SINK@"
+        "toggle"
+      ];
       allow-when-locked = true;
     };
     "XF86AudioMicMute" = {
-      action.spawn = [ "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle" ];
+      action.spawn = [
+        "wpctl"
+        "set-mute"
+        "@DEFAULT_AUDIO_SOURCE@"
+        "toggle"
+      ];
       allow-when-locked = true;
     };
 
     "XF86MonBrightnessDown" = {
-      action.spawn = [ "brightnessctl" "set" "5%-" ];
+      action.spawn = [
+        "brightnessctl"
+        "set"
+        "5%-"
+      ];
       allow-when-locked = true;
     };
     "XF86MonBrightnessUp" = {
-      action.spawn = [ "brightnessctl" "set" "5%+" ];
+      action.spawn = [
+        "brightnessctl"
+        "set"
+        "5%+"
+      ];
       allow-when-locked = true;
     };
 

@@ -26,4 +26,3 @@
   dotnix.theme.name = "everforest";
   dotnix.theme.variant = "dark";
 }
-

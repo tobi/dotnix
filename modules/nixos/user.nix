@@ -1,4 +1,11 @@
-{ pkgs, home-manager, inputs, config, lib, ... }:
+{
+  pkgs,
+  home-manager,
+  inputs,
+  config,
+  lib,
+  ...
+}:
 
 {
   imports = [
@@ -11,7 +18,19 @@
   users.users.tobi = {
     isNormalUser = true;
     shell = pkgs.zsh;
-    extraGroups = [ "wheel" "networkmanager" "video" "audio" "docker" "render" "input" "gamemode" "bluetooth" "plugdev" "libvirtd" ];
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+      "video"
+      "audio"
+      "docker"
+      "render"
+      "input"
+      "gamemode"
+      "bluetooth"
+      "plugdev"
+      "libvirtd"
+    ];
     description = "Tobi Lutke";
   };
 
@@ -22,9 +41,11 @@
 
     users.tobi.imports = [
       inputs.nix-colors.homeManagerModules.default
-    ] ++ lib.optionals config.dotnix.home.enable [
+    ]
+    ++ lib.optionals config.dotnix.home.enable [
       ../home-manager/home.nix
-    ] ++ lib.optionals config.dotnix.desktop.enable [
+    ]
+    ++ lib.optionals config.dotnix.desktop.enable [
       ../home-manager/desktop.nix
     ];
 
@@ -45,4 +66,3 @@
     Defaults env_keep += "DISPLAY WAYLAND_DISPLAY XDG_RUNTIME_DIR XDG_SESSION_TYPE GDK_BACKEND QT_QPA_PLATFORM"
   '';
 }
-
