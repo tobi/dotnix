@@ -2,6 +2,15 @@
 
 Run comprehensive code quality checks and apply automated fixes to the NixOS configuration.
 
+## Required Permissions
+
+This command requires the following tools to be allowed in `.claude/settings.local.json`:
+- `Bash(nix run:*)` - to run statix and deadnix linters
+- `Bash(nix flake check:*)` - to verify configuration validity
+- `Bash(git add:*)` - to stage changes
+- `Bash(git commit:*)` - to commit improvements
+- `SlashCommand(/nix-lint)` - to enable this command
+
 ## Your Task
 
 1. **Run Initial Checks**
