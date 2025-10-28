@@ -68,6 +68,7 @@
     ./apps/chatgpt.nix
     ./apps/claude.nix
     ./apps/logseq.nix
+    ./apps/localsend.nix
     ./apps/neurotracker.nix
     ./apps/chromium.nix
     ./apps/google-chrome.nix

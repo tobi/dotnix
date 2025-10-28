@@ -181,8 +181,7 @@ end
 def build_output(now, events, fetch_error)
   if fetch_error
     return {
-      icon: '📅',
-      text: 'error',
+      text: '󰸗 error',
       class: ['error'],
       tooltip: fetch_error
     }
@@ -197,10 +196,9 @@ def build_output(now, events, fetch_error)
     safe_title = escape_markup(display_event.title)
     safe_calendar = escape_markup(display_event.calendar)
     calendar_prefix = safe_calendar.empty? ? '' : "[#{safe_calendar}] "
-    text = "#{display_event.remaining_label(now)} - #{calendar_prefix}#{safe_title}"
+    text = "󰸗 #{display_event.remaining_label(now)} - #{calendar_prefix}#{safe_title}"
     classes = ['current', display_event.service] + urgency_classes(minutes)
     {
-      icon: '📅',
       text: text,
       alt: display_event.service,
       class: classes.uniq,
@@ -212,11 +210,10 @@ def build_output(now, events, fetch_error)
     today = now.to_date
     tomorrow = (now + 86_400).to_date
 
-    # If event is today but more than 8 hours away, or tomorrow, show "No more events today!"
+    # If event is today but more than 8 hours away, or tomorrow, hide module
     if (event_date == today && minutes > 480) || event_date == tomorrow
       return {
-        icon: '📅',
-        text: 'No more events today!',
+        text: '',
         class: ['empty'],
         tooltip: tooltip
       }
@@ -225,10 +222,9 @@ def build_output(now, events, fetch_error)
     safe_title = escape_markup(display_event.title)
     safe_calendar = escape_markup(display_event.calendar)
     calendar_prefix = safe_calendar.empty? ? '' : "[#{safe_calendar}] "
-    text = "in #{display_event.relative_label(now)}: #{calendar_prefix}#{safe_title}"
+    text = "󰸗 in #{display_event.relative_label(now)}: #{calendar_prefix}#{safe_title}"
     classes = ['upcoming', display_event.service] + urgency_classes(minutes)
     {
-      icon: '📅',
       text: text,
       alt: display_event.service,
       class: classes.uniq,
@@ -236,7 +232,6 @@ def build_output(now, events, fetch_error)
     }
   else
     {
-      icon: '📅',
       text: '',
       class: ['empty'],
       tooltip: tooltip

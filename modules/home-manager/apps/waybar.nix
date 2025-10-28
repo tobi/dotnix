@@ -213,8 +213,8 @@ in
           "custom/tailscale"
           "custom/warp"
           "tray"
-          "clock"
           "battery"
+          "clock"
         ];
         "niri/workspaces" = {
           on-click = "activate";
@@ -388,7 +388,7 @@ in
           tooltip = true;
         };
         "custom/next-event" = {
-          format = "󰸗 {text}";
+          format = "{text}";
           return-type = "json";
           exec = "${pkgs.ruby}/bin/ruby ${./waybar/waybar-next-event-display.rb}";
           interval = 60; # Refresh every minute
@@ -397,10 +397,10 @@ in
         };
 
         tray = {
-          icon-size = 12;
+          icon-size = 10;
           smooth-scrolling-threshold = 2;
           show-passive-items = false;
-          spacing = 10;
+          spacing = 12;
         };
 
       }
@@ -435,7 +435,7 @@ in
         Unit = "agenda-fetch.service";
       };
       Install = {
-        WantedBy = ["timers.target"];
+        WantedBy = [ "timers.target" ];
       };
     };
   };
