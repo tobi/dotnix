@@ -217,6 +217,7 @@ in
       nixfmt-tree # Nix code formatter (tree style)
       nixpkgs-fmt # Nix code formatter
       openssl.dev # Cryptography and SSL/TLS toolkit
+      shellcheck # Static analysis tool for shell scripts
       pkg-config # Helper tool for compiling applications
       sqlite # SQL database engine
       stdenv.cc # C/C++ compiler toolchain

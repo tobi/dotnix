@@ -11,7 +11,7 @@ _:
 
     touchpad = {
       tap = true;
-      dwt = true;
+      #  dwt = true;
       natural-scroll = false;
       accel-profile = "flat";
       click-method = "clickfinger";

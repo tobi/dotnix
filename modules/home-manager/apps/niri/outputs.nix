@@ -11,7 +11,7 @@ _:
     };
 
     "Apple Computer Inc ProDisplayXDR 0x06141305" = {
-      scale = 2.2;
+      scale = 2.0;
       mode = {
         width = 6016;
         height = 3384;

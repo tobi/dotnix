@@ -1,72 +1,190 @@
-#!/usr/bin/env ruby
-
-require 'json'
-require 'open3'
-
+#!/usr/bin/env bash
 # dotnix-find-windows: Interactive window finder using walker
 
-def run_command(cmd, stdin_data: nil)
-  stdout, stderr, status = Open3.capture3(cmd, stdin_data: stdin_data)
-  [stdout, stderr, status]
-end
+set -euo pipefail
 
-def fetch_windows
-  stdout, _stderr, _status = run_command('niri msg --json windows 2>/dev/null')
-  windows = JSON.parse(stdout)
-  windows.sort_by { |w| w['is_focused'] ? 0 : 1 }
-rescue
-  []
-end
+[[ "${DEBUG:-}" == "1" ]] && set -x
 
-def pretty_title(w)
-  app_id = w['app_id'] || 'unknown'
-  title = w['title'] || 'Untitled'
-  desktop = w['desktop'] || 'unknown'
+error() {
+    echo "dotnix-find-windows: $1" >&2
+}
 
-  title = case app_id
-  when 'com.mitchellh.ghostty'
-    "Ghostty: #{title}"
-  when 'google-chrome', 'Google-chrome'
-    t = title.gsub(/ — Google Chrome$/, '')
-    "Chrome: #{t}"
-  when 'org.mozilla.firefox', 'firefox'
-    t = title.gsub(/ — Mozilla Firefox$/, '')
-    "Firefox: #{t}"
-  when 'com.github.alacritty'
-    "Alacritty: #{title}"
-  when 'unknown'
-    "Unknown: #{desktop}"
-  else
-    title
-  end
+cleanup() {
+    for tmp in "${tmp_files[@]-}"; do
+        [[ -n "$tmp" && -f "$tmp" ]] && rm -f "$tmp"
+    done
+}
 
-  "#{title} - #{desktop}"
-end
+trap cleanup EXIT
 
-windows = fetch_windows
-if windows.empty?
-  warn 'No windows found'
-  exit 1
-end
+tmp_files=()
 
-entries = windows.map do |w|
-  {
-    id: w['id'],
-    is_focused: w['is_focused'],
-    label: pretty_title(w)
-  }
-end
+require_cmd() {
+    if ! command -v "$1" >/dev/null 2>&1; then
+        error "Missing required command '$1'"
+        exit 1
+    fi
+}
 
-focused_index = entries.index { |e| e[:is_focused] } || 0
-input_list = entries.map { |e| e[:label] }.join("\n")
+require_cmd niri
+require_cmd jq
+require_cmd walker
 
-# Use walker in dmenu mode, return selected label, preselect the focused window
-stdout, _stderr, status = run_command("walker -d -a #{focused_index} -p 'Find window'", stdin_data: input_list)
+pretty_title() {
+    local app_id="$1"
+    local title="$2"
+    local desktop="$3"
 
-selection = stdout.strip
-exit 0 if !status.success? || selection.empty?
+    case "$app_id" in
+        com.mitchellh.ghostty)
+            echo "Ghostty: ${title} - ${desktop}"
+            ;;
+        google-chrome|Google-chrome)
+            local clean_title="${title% — Google Chrome}"
+            echo "Chrome: ${clean_title} - ${desktop}"
+            ;;
+        org.mozilla.firefox|firefox)
+            local clean_title="${title% — Mozilla Firefox}"
+            echo "Firefox: ${clean_title} - ${desktop}"
+            ;;
+        com.github.alacritty)
+            echo "Alacritty: ${title} - ${desktop}"
+            ;;
+        unknown|null)
+            echo "Unknown: ${desktop}"
+            ;;
+        *)
+            echo "${title} - ${desktop}"
+            ;;
+    esac
+}
 
-chosen = entries.find { |e| e[:label] == selection }
-exit 0 if chosen.nil?
+tmp_err=$(mktemp -t dotnix-find-windows.niri.XXXXXX)
+tmp_files+=("$tmp_err")
 
-system("niri msg action focus-window --id #{chosen[:id]}")
+if ! windows_json=$(niri msg --json windows 2>"$tmp_err"); then
+    error "Failed to fetch windows from niri"
+    if [[ -s "$tmp_err" ]]; then
+        while IFS= read -r line; do
+            error "$line"
+        done <"$tmp_err"
+    fi
+    exit 1
+fi
+
+if [[ -z "$windows_json" || "$windows_json" == "[]" ]]; then
+    error "No windows found"
+    exit 1
+fi
+
+if ! echo "$windows_json" | jq empty >/dev/null 2>&1; then
+    error "Invalid JSON received from niri"
+    echo "$windows_json" >&2
+    exit 1
+fi
+
+jq_program='sort_by(.is_focused) | reverse | map([(.id | tostring), (.is_focused | tostring), (.app_id // "unknown"), (.title // "Untitled"), (.workspace_id // "unknown")]) | .[] | @tsv'
+
+if ! sorted_lines=$(echo "$windows_json" | jq -r "$jq_program" 2>"$tmp_err"); then
+    error "Failed to parse windows JSON"
+    if [[ -s "$tmp_err" ]]; then
+        while IFS= read -r line; do
+            error "$line"
+        done <"$tmp_err"
+    fi
+    exit 1
+fi
+
+if [[ -z "$sorted_lines" ]]; then
+    error "No windows available after parsing"
+    exit 1
+fi
+
+mapfile -t window_rows <<<"$sorted_lines"
+
+declare -a entries=()
+declare -a window_ids=()
+
+focused_index=0
+windows_processed=0
+index=0
+focused_found=0
+
+for row in "${window_rows[@]}"; do
+    IFS=$'\t' read -r window_id is_focused app_id title desktop <<<"$row"
+
+    [[ -z "$window_id" ]] && continue
+
+    label=$(pretty_title "$app_id" "$title" "$desktop")
+    display_label="$label [#${window_id}]"
+
+    entries+=("$display_label")
+    window_ids+=("$window_id")
+
+    if [[ "$is_focused" == "true" && $focused_found -eq 0 ]]; then
+        focused_index=$index
+        focused_found=1
+    fi
+
+    ((windows_processed += 1))
+    ((index += 1))
+done
+
+if (( windows_processed == 0 )); then
+    error "No windows found after processing"
+    exit 1
+fi
+
+selection=""
+
+if [[ "${DOTNIX_FIND_WINDOWS_AUTO_SELECT:-}" == "1" ]]; then
+    selection="${entries[$focused_index]}"
+else
+    input_list=$(printf '%s\n' "${entries[@]}")
+    walker_err=$(mktemp -t dotnix-find-windows.walker.XXXXXX)
+    tmp_files+=("$walker_err")
+
+    selection=$(echo "$input_list" | walker -d -a "$focused_index" -p 'Find window' 2>"$walker_err")
+    walker_exit_code=$?
+    walker_errors=""
+    if [[ -f "$walker_err" ]]; then
+        walker_errors=$(<"$walker_err")
+    fi
+
+    if [[ $walker_exit_code -ne 0 && $walker_exit_code -ne 1 ]]; then
+        error "walker failed (exit code $walker_exit_code)"
+        if [[ -n "$walker_errors" ]]; then
+            echo "$walker_errors" >&2
+        fi
+        exit 1
+    fi
+
+    if [[ $walker_exit_code -eq 1 || -z "$selection" ]]; then
+        exit 0
+    fi
+fi
+
+: >"$tmp_err"
+
+for i in "${!entries[@]}"; do
+    if [[ "${entries[$i]}" == "$selection" ]]; then
+        if ! niri msg action focus-window --id "${window_ids[$i]}" 2>"$tmp_err"; then
+            error "Failed to focus window ${window_ids[$i]}"
+            if [[ -s "$tmp_err" ]]; then
+                while IFS= read -r line; do
+                    error "$line"
+                done <"$tmp_err"
+            fi
+            exit 1
+        fi
+        exit 0
+    fi
+done
+
+error "Selected window did not match any known entry"
+error "Selection: $selection"
+error "Entries available: ${#entries[@]}"
+for i in "${!entries[@]}"; do
+    echo "  [${window_ids[$i]}] ${entries[$i]}" >&2
+done
+exit 1

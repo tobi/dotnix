@@ -6,23 +6,25 @@ let
   # Generate hotkey bindings from registered apps
   generateHotkeyBinds =
     hotkeys:
-    lib.mapAttrs' (
-      key: cfg:
-      lib.nameValuePair key {
-        action.spawn =
-          if cfg.focusClass != null then
-            [
-              "${binDir}/open-or-focus"
-              cfg.focusClass
-              cfg.executable
-            ]
-          else
-            [
-              "${binDir}/open"
-              cfg.executable
-            ];
-      }
-    ) hotkeys;
+    lib.mapAttrs'
+      (
+        key: cfg:
+        lib.nameValuePair key {
+          action.spawn =
+            if cfg.focusClass != null then
+              [
+                "${binDir}/open-or-focus"
+                cfg.focusClass
+                cfg.executable
+              ]
+            else
+              [
+                "${binDir}/open"
+                cfg.executable
+              ];
+        }
+      )
+      hotkeys;
 in
 {
   programs.niri.settings.binds = (generateHotkeyBinds config.dotnix.desktop.hotkeys) // {
@@ -30,10 +32,10 @@ in
     # System & Utility
     # ============================================================================
 
-    "Mod+D" = {
-      action.spawn = [ launcherCmd ];
-      hotkey-overlay.title = "Run an Application: ${launcherCmd}";
-    };
+    # "Mod+D" = {
+    #   action.spawn = [ launcherCmd ];
+    #   hotkey-overlay.title = "Run an Application: ${launcherCmd}";
+    # };
 
     "Super+Alt+L" = {
       action.spawn = [ "swaylock" ];
@@ -282,7 +284,8 @@ in
     # Application-specific keybindings are now registered in individual app modules
     # via dotnix.desktop.hotkeys and generated above
 
-    "Super+Slash" = {
+    "Super+D".action.spawn = [ "${binDir}/dotnix-find-windows" ];
+    "Mod+Slash" = {
       action.spawn = [ "${binDir}/dotnix-find-windows" ];
       hotkey-overlay.title = "Find Window";
     };

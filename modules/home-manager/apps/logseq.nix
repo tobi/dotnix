@@ -13,5 +13,6 @@ in
     terminal = false;
     type = "Application";
     startupNotify = true;
+    mimeType = [ "x-scheme-handler/logseq" ];
   };
 }
