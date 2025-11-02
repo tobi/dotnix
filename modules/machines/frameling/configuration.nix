@@ -179,7 +179,7 @@ in
     printing.enable = true;
     chrony.enable = true;
     upower.enable = true;
-    thermald.enable = true;
+    # thermald.enable = true;  # Disabled: AMD AI 300 series not supported by thermald
     hardware.bolt.enable = true; # Thunderbolt device authorization (needed for Apple Pro Display XDR)
 
     # Tailscale, this is needed for exit notes to to work
@@ -225,7 +225,7 @@ in
   # Power Management - Optimized for Framework AMD s2idle
   powerManagement = {
     enable = true;
-    scsiLinkPolicy = "med_power_with_dipm";
+    # scsiLinkPolicy = "med_power_with_dipm";  # Disabled: too aggressive, causing excess heat
 
     resumeCommands = ''
       # Log resume events for debugging
