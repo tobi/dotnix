@@ -14,7 +14,7 @@ in
     text = ''
       #!/usr/bin/env bash
       exec ${pkgs.google-chrome}/bin/google-chrome-stable \
-        --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable,DesktopPWAsLinkCapturing,DesktopPWAsWithoutExtensions,WebRTCPipeWireCapturer \
+        --enable-features=UseOzonePlatform,WebAuthenticationRemoteDesktopSupport,WebAuthenticationCable,DesktopPWAsLinkCapturing,DesktopPWAsWithoutExtensions,WebRTCPipeWireCapturer,VaapiVideoDecodeLinuxGL,VaapiVideoEncoder,Vulkan \
         --disable-features=WebAuthenticationChromeOSAuthenticator \
         --ozone-platform=wayland \
         --enable-wayland-ime \
@@ -23,6 +23,10 @@ in
         --enable-bluetooth-serial-communication \
         --enable-experimental-web-platform-features \
         --password-store=gnome-libsecret \
+        --use-vulkan \
+        --enable-gpu-rasterization \
+        --enable-zero-copy \
+        --disable-font-subpixel-positioning \
         "$@"
     '';
     executable = true;

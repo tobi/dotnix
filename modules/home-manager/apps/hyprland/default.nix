@@ -1,4 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
+let
+  sys = pkgs.stdenv.hostPlatform.system;
+in
 
 {
   imports = [
@@ -11,12 +14,11 @@
     ./window-rules.nix
   ];
 
+
   wayland.windowManager.hyprland = {
     enable = true;
-    systemd.enable = true;
-    # plugins = [
-    #   # hyprtrails disabled - incompatible with Hyprland 0.49.0
-    # ];
+    package = inputs.hyprland.packages.${sys}.hyprland;
+    portalPackage = inputs.hyprland.packages.${sys}.xdg-desktop-portal-hyprland;
   };
 
   services.hyprpolkitagent.enable = true;

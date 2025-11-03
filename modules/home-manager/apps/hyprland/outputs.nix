@@ -16,7 +16,7 @@ _:
       "Unknown Unknown Unknown,disable"
 
       # Auto-configure any other monitors
-      ",preferred,auto,1"
+      ",preferred,auto,1.8"
     ];
   };
 }

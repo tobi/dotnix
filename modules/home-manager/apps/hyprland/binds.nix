@@ -21,21 +21,24 @@ let
       convertedMods = map convertMod modifiers;
       modString = lib.concatStringsSep " " convertedMods;
     in
-      "${modString}, ${actualKey}";
+    "${modString}, ${actualKey}";
 
   # Generate hotkey bindings from registered apps
   # Converts dotnix.desktop.hotkeys to Hyprland bind format
   generateHotkeyBinds = hotkeys:
-    lib.mapAttrsToList (key: cfg:
-      let
-        command = if cfg.focusClass != null then
-          "${binDir}/open-or-focus ${cfg.focusClass} ${cfg.executable}"
-        else
-          "${binDir}/open ${cfg.executable}";
-        hyprKey = convertKey key;
-      in
+    lib.mapAttrsToList
+      (key: cfg:
+        let
+          command =
+            if cfg.focusClass != null then
+              "${binDir}/open-or-focus ${cfg.focusClass} ${cfg.executable}"
+            else
+              "${binDir}/open ${cfg.executable}";
+          hyprKey = convertKey key;
+        in
         "${hyprKey}, exec, ${command}"
-    ) hotkeys;
+      )
+      hotkeys;
 in
 {
   wayland.windowManager.hyprland.settings = {
@@ -57,9 +60,9 @@ in
       # Universal Clipboard (Super+C/V/X)
       # ============================================================================
 
-      "$mod, C, exec, wtype -M ctrl -P Insert -m ctrl -p Insert"
-      "$mod, V, exec, wtype -M shift -P Insert -m shift -p Insert"
-      "$mod, X, exec, wtype -M ctrl -P x -m ctrl -p x"
+      "$mod, C, sendshortcut, CTRL, Insert,"
+      "$mod, V, sendshortcut, SHIFT, Insert,"
+      "$mod, X, sendshortcut, CTRL, X,"
 
       # ============================================================================
       # Window Management
@@ -84,6 +87,12 @@ in
       "$mod SHIFT, right, swapwindow, r"
       "$mod SHIFT, up, swapwindow, u"
       "$mod SHIFT, down, swapwindow, d"
+
+      # Merge windows into groups
+      "$mod CTRL, left, moveintogroup, l"
+      "$mod CTRL, right, moveintogroup, r"
+      "$mod CTRL, up, moveintogroup, u"
+      "$mod CTRL, down, moveintogroup, d"
 
       # Resize active window (like omarchy)
       "$mod, minus, resizeactive, -100 0"

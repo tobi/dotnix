@@ -4,7 +4,6 @@
   home.packages = with pkgs; ([
     # Desktop environment and window management
     xdg-desktop-portal-gtk # XDG desktop portal for GTK applications
-    wtype # Wayland typing simulation for clipboard shortcuts
 
     # Audio control
     pavucontrol # PulseAudio volume control GUI
@@ -33,6 +32,7 @@
     wine # Windows compatibility layer
   ] ++ lib.optionals (wm == "niri") [
     wbg # Wallpaper setter for Wayland (niri only)
+    wtype # Wayland typing simulation for clipboard shortcuts (niri needs this)
   ]);
 
   # probably should go to home

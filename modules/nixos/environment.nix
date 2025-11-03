@@ -31,7 +31,7 @@
       ELECTRON_OZONE_PLATFORM_HINT = "wayland";
 
       # XWayland for Steam and other X11 apps
-      DISPLAY = ":0";
+      # DISPLAY = ":0";
     })
 
     (lib.mkIf config.dotnix.home.enable {
