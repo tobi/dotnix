@@ -33,6 +33,9 @@
   ] ++ lib.optionals (wm == "niri") [
     wbg # Wallpaper setter for Wayland (niri only)
     wtype # Wayland typing simulation for clipboard shortcuts (niri needs this)
+  ] ++ lib.optionals (wm == "hyprland") [
+    grimblast # Screenshot tool for Hyprland
+    satty # Screenshot annotation tool
   ]);
 
   # probably should go to home
