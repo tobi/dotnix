@@ -2,10 +2,9 @@
   description = "Tobi's nixworld";
 
   outputs =
-    {
-      nixpkgs,
-      home-manager,
-      ...
+    { nixpkgs
+    , home-manager
+    , ...
     }@inputs:
     let
       # Support both Linux and Darwin
@@ -75,8 +74,11 @@
     };
 
   inputs = {
-    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
-    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0";
+    # determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+    # nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0";
+
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
 
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
