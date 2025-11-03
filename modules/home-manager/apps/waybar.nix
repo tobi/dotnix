@@ -181,11 +181,11 @@ in
 
       tooltip {
         margin-top: 0;
-        background: rgba(0, 0, 0, 0.2);
+        background: rgba(0, 0, 0, 0.85);
         animation: fade-in 0.35s cubic-bezier(0.4,0,0.2,1) both;
         color: #${palette.base05};
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
         border-radius: 6px;
         padding: 15px 10px;
       }

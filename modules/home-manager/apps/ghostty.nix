@@ -23,7 +23,7 @@ in
       window-decoration = "none";
 
       font-family = "FiraCode Nerd Font";
-      font-size = 11;
+      font-size = 10;
 
       theme = "dotnix";
 
