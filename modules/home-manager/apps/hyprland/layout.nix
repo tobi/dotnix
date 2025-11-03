@@ -4,16 +4,16 @@ let
   # Helper to convert hex color to rgba with alpha
   hexToRgba = hex: alpha: "rgba(${hex}${alpha})";
 
-  # Theme-based colors
-  activeBorder = hexToRgba theme.palette.base0D "aa";
-  inactiveBorder = hexToRgba theme.palette.base03 "aa";
+  # Theme-based colors - increased contrast for better focus visibility
+  activeBorder = hexToRgba theme.palette.base0D "ff";
+  inactiveBorder = hexToRgba theme.palette.base03 "66";
 in
 {
   wayland.windowManager.hyprland.settings = {
     general = {
       gaps_in = 4;
       gaps_out = 5;
-      border_size = 1;
+      border_size = 2;
       "col.active_border" = activeBorder;
       "col.inactive_border" = inactiveBorder;
       layout = "dwindle";
@@ -64,8 +64,7 @@ in
     dwindle = {
       pseudotile = true;
       preserve_split = true;
-      # Note: dwindle doesn't support centering single windows with max width
-      # Consider using master layout if you want that behavior
+      force_split = 2; # Always split on the right (omarchy-style)
       split_width_multiplier = 1.0;
     };
 
@@ -85,6 +84,33 @@ in
       vrr = 1;
       mouse_move_enables_dpms = true;
       key_press_enables_dpms = true;
+    };
+
+    # Window grouping configuration (omarchy-style)
+    group = {
+      "col.border_active" = activeBorder;
+      "col.border_inactive" = inactiveBorder;
+      "col.border_locked_active" = activeBorder;
+      "col.border_locked_inactive" = inactiveBorder;
+
+      groupbar = {
+        font_size = 11;
+        font_family = "monospace";
+        height = 24;
+        stacked = false;
+        priority = 3;
+        render_titles = true;
+        scrolling = true;
+
+        # Better contrast and definition
+        text_color = hexToRgba theme.palette.base07 "ff";
+        "col.active" = hexToRgba theme.palette.base0D "dd";
+        "col.inactive" = hexToRgba theme.palette.base01 "aa";
+        "col.locked_active" = hexToRgba theme.palette.base0E "dd";
+        "col.locked_inactive" = hexToRgba theme.palette.base02 "aa";
+
+        gradients = false;
+      };
     };
   };
 }

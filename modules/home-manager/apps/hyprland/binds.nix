@@ -57,6 +57,19 @@ in
       "ALT, SPACE, exec, walker"
 
       # ============================================================================
+      # Screenshots
+      # ============================================================================
+
+      # Interactive area selection → annotate with satty
+      ", F12, exec, grimblast --notify copysave area - | satty --filename - --fullscreen --output-filename ~/Pictures/Screenshots/$(date '+%Y-%m-%d_%H-%M-%S').png"
+
+      # Quick screenshots (no annotation)
+      ", Print, exec, grimblast --notify --cursor copysave area ~/Pictures/Screenshots/$(date '+%Y-%m-%d_%H-%M-%S').png"
+      "SHIFT, Print, exec, grimblast --notify --cursor copysave output ~/Pictures/Screenshots/$(date '+%Y-%m-%d_%H-%M-%S').png"
+      "CTRL, Print, exec, grimblast --notify --cursor copysave screen ~/Pictures/Screenshots/$(date '+%Y-%m-%d_%H-%M-%S').png"
+      "ALT, Print, exec, grimblast --notify --cursor copysave active ~/Pictures/Screenshots/$(date '+%Y-%m-%d_%H-%M-%S').png"
+
+      # ============================================================================
       # Universal Clipboard (Super+C/V/X)
       # ============================================================================
 
@@ -88,17 +101,51 @@ in
       "$mod SHIFT, up, swapwindow, u"
       "$mod SHIFT, down, swapwindow, d"
 
-      # Merge windows into groups
-      "$mod CTRL, left, moveintogroup, l"
-      "$mod CTRL, right, moveintogroup, r"
-      "$mod CTRL, up, moveintogroup, u"
-      "$mod CTRL, down, moveintogroup, d"
+      # ============================================================================
+      # Window Grouping (omarchy-style)
+      # ============================================================================
 
-      # Resize active window (like omarchy)
+      # Toggle group mode & move out of group
+      "$mod, G, togglegroup"
+      "$mod ALT, G, moveoutofgroup"
+
+      # Join adjacent groups (move window into group)
+      "$mod ALT, left, moveintogroup, l"
+      "$mod ALT, right, moveintogroup, r"
+      "$mod ALT, up, moveintogroup, u"
+      "$mod ALT, down, moveintogroup, d"
+
+      # Navigate within group (tab through grouped windows)
+      "$mod ALT, TAB, changegroupactive, f"
+      "$mod ALT SHIFT, TAB, changegroupactive, b"
+
+      # Direct selection of grouped windows
+      "$mod ALT, 1, changegroupactive, 1"
+      "$mod ALT, 2, changegroupactive, 2"
+      "$mod ALT, 3, changegroupactive, 3"
+      "$mod ALT, 4, changegroupactive, 4"
+      "$mod ALT, 5, changegroupactive, 5"
+
+      # ============================================================================
+      # Window Resizing (omarchy-style)
+      # ============================================================================
+
       "$mod, minus, resizeactive, -100 0"
       "$mod, equal, resizeactive, 100 0"
       "$mod SHIFT, minus, resizeactive, 0 -100"
       "$mod SHIFT, equal, resizeactive, 0 100"
+
+      # ============================================================================
+      # Advanced Window Features
+      # ============================================================================
+
+      # Fullscreen variants
+      "$mod CTRL, F, fullscreenstate, 0 2" # Tiled fullscreen
+      "$mod ALT, F, fullscreen, 1"          # Full width
+
+      # Scratchpad (omarchy-style)
+      "$mod, S, togglespecialworkspace, scratchpad"
+      "$mod ALT, S, movetoworkspacesilent, special:scratchpad"
 
       # ============================================================================
       # Workspace Management
@@ -140,7 +187,7 @@ in
       "$mod CTRL SHIFT, down, movetoworkspace, e+1"
       "$mod CTRL SHIFT, up, movetoworkspace, e-1"
 
-      # Special workspace (scratchpad)
+      # Special workspaces (multiple scratchpads)
       "$mod, tilde, togglespecialworkspace, magic"
       "$mod SHIFT, tilde, movetoworkspace, special:magic"
 
@@ -159,6 +206,18 @@ in
 
       "$mod SHIFT, R, exec, hyprctl reload"
       "CTRL ALT, Delete, exit"
+
+      # ============================================================================
+      # Mouse Wheel Navigation
+      # ============================================================================
+
+      # Scroll through workspaces with Super + mouse wheel
+      "$mod, mouse_down, workspace, e+1"
+      "$mod, mouse_up, workspace, e-1"
+
+      # Scroll through grouped windows with Super+Alt + mouse wheel
+      "$mod ALT, mouse_down, changegroupactive, f"
+      "$mod ALT, mouse_up, changegroupactive, b"
     ];
 
     # Repeatable bindings for volume and brightness
