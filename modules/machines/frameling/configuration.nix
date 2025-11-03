@@ -50,10 +50,23 @@ in
     # Quiet boot configuration
     consoleLogLevel = 3;
 
-    # Plymouth for graphical boot
+    # Plymouth for graphical boot - only show on errors or ESC key
     plymouth = {
       enable = true;
-      theme = "bgrt";
+      theme = "hexagon_dots_alt";
+      themePackages = with pkgs; [
+        (adi1090x-plymouth-themes.override {
+          selected_themes = [
+            "cuts"
+            "hexagon_dots_alt"
+            "deus_ex"
+          ];
+        })
+      ];
+      extraConfig = ''
+        DeviceScale=2
+        ShowDelay=0
+      '';
     };
 
     # Latest kernel for power management and suspend fixes
@@ -70,10 +83,12 @@ in
     # Enable hibernation (Plymouth adds nohibernate by default)
     kernelParams = [
       "quiet"
+      "splash"
       "boot.shell_on_fail"
       "rd.systemd.show_status=auto"
       "rd.udev.log_level=3"
       "vt.global_cursor_default=0"
+      "plymouth.ignore-serial-consoles"
 
       # NOTE: amdgpu.dcdebugmask=0x10 is set by nixos-hardware to prevent display hangs
       # Do not override it here!
