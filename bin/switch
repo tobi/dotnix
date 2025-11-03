@@ -126,11 +126,16 @@ main() {
     local env_type
     env_type=$(detect_environment)
 
+    # Create temporary log file
+    local log_file
+    log_file=$(mktemp /tmp/nixos-rebuild.XXXXXX.log)
+
     if [[ "$QUIET" != "true" ]]; then
         echo -e "${BLUE}🔄 Switching configuration...${NC}"
         echo -e "${BLUE}Environment: ${env_type}${NC}"
         echo -e "${BLUE}Flake: ${FLAKE_PATH}${NC}"
         echo -e "${BLUE}Force Nixpkgs: ${FORCE_NIXPKGS}${NC}"
+        echo -e "${BLUE}Log file: ${log_file}${NC}"
         echo
     fi
 
@@ -170,14 +175,22 @@ main() {
         exit 0
     fi
 
-    # Execute command
-    if eval "$cmd"; then
+    # Execute command with tee to log file
+    if eval "$cmd 2>&1 | tee '$log_file'"; then
         log_success "Switch completed successfully!"
         if [[ "$QUIET" != "true" ]]; then
             echo -e "${GREEN}You may need to restart your shell or log out/in for changes to take effect.${NC}"
         fi
+        # Clean up log file on success
+        rm -f "$log_file"
     else
         log_error "Switch failed!"
+        echo
+        echo -e "${YELLOW}To debug with Claude Code, run:${NC}"
+        echo -e "${GREEN}claude code \"I got the following error when running switch. Please read the log and fix it: \$(tail -100 '$log_file')\"${NC}"
+        echo
+        echo -e "${YELLOW}Or view the full log:${NC}"
+        echo -e "${GREEN}less '$log_file'${NC}"
         exit 1
     fi
 }

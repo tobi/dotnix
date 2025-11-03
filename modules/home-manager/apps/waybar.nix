@@ -1,11 +1,13 @@
 {
   theme,
   pkgs,
+  wm,
   ...
 }:
 let
   inherit (theme) palette;
   terminal = "${pkgs.ghostty}/bin/ghostty";
+  workspaceModule = if wm == "hyprland" then "hyprland/workspaces" else "niri/workspaces";
 in
 {
   programs.waybar = {
@@ -200,7 +202,7 @@ in
         height = 22;
         modules-left = [
           "power-profiles-daemon"
-          "niri/workspaces"
+          workspaceModule
         ];
         modules-center = [
           "custom/next-event"
@@ -216,11 +218,11 @@ in
           "battery"
           "clock"
         ];
-        "niri/workspaces" = {
+        "${workspaceModule}" = {
           on-click = "activate";
           format = "{icon}";
           format-icons = {
-            default = "";
+            default = "•";
             "1" = "1";
             "2" = "2";
             "3" = "3";

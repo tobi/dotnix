@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dotnix-find-windows: Interactive window finder using walker
+# dotnix-find-windows: Interactive window finder using walker (supports niri and hyprland)
 
 set -euo pipefail
 
@@ -26,9 +26,24 @@ require_cmd() {
     fi
 }
 
-require_cmd niri
 require_cmd jq
 require_cmd walker
+
+detect_compositor() {
+    if command -v niri >/dev/null 2>&1 && pgrep -x niri >/dev/null 2>&1; then
+        echo "niri"
+    elif command -v hyprctl >/dev/null 2>&1 && pgrep -x Hyprland >/dev/null 2>&1; then
+        echo "hyprland"
+    else
+        return 1
+    fi
+}
+
+COMPOSITOR=$(detect_compositor)
+if [[ -z "$COMPOSITOR" ]]; then
+    error "No supported compositor (niri/hyprland) is running"
+    exit 1
+fi
 
 pretty_title() {
     local app_id="$1"
@@ -59,40 +74,87 @@ pretty_title() {
     esac
 }
 
-tmp_err=$(mktemp -t dotnix-find-windows.niri.XXXXXX)
+tmp_err=$(mktemp -t dotnix-find-windows.XXXXXX)
 tmp_files+=("$tmp_err")
 
-if ! windows_json=$(niri msg --json windows 2>"$tmp_err"); then
-    error "Failed to fetch windows from niri"
-    if [[ -s "$tmp_err" ]]; then
-        while IFS= read -r line; do
-            error "$line"
-        done <"$tmp_err"
+fetch_niri_windows() {
+    if ! windows_json=$(niri msg --json windows 2>"$tmp_err"); then
+        error "Failed to fetch windows from niri"
+        if [[ -s "$tmp_err" ]]; then
+            while IFS= read -r line; do
+                error "$line"
+            done <"$tmp_err"
+        fi
+        exit 1
     fi
-    exit 1
-fi
 
-if [[ -z "$windows_json" || "$windows_json" == "[]" ]]; then
-    error "No windows found"
-    exit 1
-fi
-
-if ! echo "$windows_json" | jq empty >/dev/null 2>&1; then
-    error "Invalid JSON received from niri"
-    echo "$windows_json" >&2
-    exit 1
-fi
-
-jq_program='sort_by(.is_focused) | reverse | map([(.id | tostring), (.is_focused | tostring), (.app_id // "unknown"), (.title // "Untitled"), (.workspace_id // "unknown")]) | .[] | @tsv'
-
-if ! sorted_lines=$(echo "$windows_json" | jq -r "$jq_program" 2>"$tmp_err"); then
-    error "Failed to parse windows JSON"
-    if [[ -s "$tmp_err" ]]; then
-        while IFS= read -r line; do
-            error "$line"
-        done <"$tmp_err"
+    if [[ -z "$windows_json" || "$windows_json" == "[]" ]]; then
+        error "No windows found"
+        exit 1
     fi
-    exit 1
+
+    if ! echo "$windows_json" | jq empty >/dev/null 2>&1; then
+        error "Invalid JSON received from niri"
+        echo "$windows_json" >&2
+        exit 1
+    fi
+
+    jq_program='sort_by(.is_focused) | reverse | map([(.id | tostring), (.is_focused | tostring), (.app_id // "unknown"), (.title // "Untitled"), (.workspace_id // "unknown")]) | .[] | @tsv'
+
+    if ! sorted_lines=$(echo "$windows_json" | jq -r "$jq_program" 2>"$tmp_err"); then
+        error "Failed to parse windows JSON"
+        if [[ -s "$tmp_err" ]]; then
+            while IFS= read -r line; do
+                error "$line"
+            done <"$tmp_err"
+        fi
+        exit 1
+    fi
+
+    echo "$sorted_lines"
+}
+
+fetch_hyprland_windows() {
+    if ! windows_json=$(hyprctl clients -j 2>"$tmp_err"); then
+        error "Failed to fetch windows from hyprland"
+        if [[ -s "$tmp_err" ]]; then
+            while IFS= read -r line; do
+                error "$line"
+            done <"$tmp_err"
+        fi
+        exit 1
+    fi
+
+    if [[ -z "$windows_json" || "$windows_json" == "[]" ]]; then
+        error "No windows found"
+        exit 1
+    fi
+
+    if ! echo "$windows_json" | jq empty >/dev/null 2>&1; then
+        error "Invalid JSON received from hyprland"
+        echo "$windows_json" >&2
+        exit 1
+    fi
+
+    jq_program='sort_by(.focusHistoryID) | map([(.address[2:]), (.focusHistoryID == 0 | tostring), (.class // "unknown"), (.title // "Untitled"), (.workspace.id | tostring)]) | .[] | @tsv'
+
+    if ! sorted_lines=$(echo "$windows_json" | jq -r "$jq_program" 2>"$tmp_err"); then
+        error "Failed to parse windows JSON"
+        if [[ -s "$tmp_err" ]]; then
+            while IFS= read -r line; do
+                error "$line"
+            done <"$tmp_err"
+        fi
+        exit 1
+    fi
+
+    echo "$sorted_lines"
+}
+
+if [[ "$COMPOSITOR" == "niri" ]]; then
+    sorted_lines=$(fetch_niri_windows)
+else
+    sorted_lines=$(fetch_hyprland_windows)
 fi
 
 if [[ -z "$sorted_lines" ]]; then
@@ -166,10 +228,12 @@ fi
 
 : >"$tmp_err"
 
-for i in "${!entries[@]}"; do
-    if [[ "${entries[$i]}" == "$selection" ]]; then
-        if ! niri msg action focus-window --id "${window_ids[$i]}" 2>"$tmp_err"; then
-            error "Failed to focus window ${window_ids[$i]}"
+focus_window() {
+    local window_id="$1"
+
+    if [[ "$COMPOSITOR" == "niri" ]]; then
+        if ! niri msg action focus-window --id "$window_id" 2>"$tmp_err"; then
+            error "Failed to focus window $window_id"
             if [[ -s "$tmp_err" ]]; then
                 while IFS= read -r line; do
                     error "$line"
@@ -177,6 +241,22 @@ for i in "${!entries[@]}"; do
             fi
             exit 1
         fi
+    else
+        if ! hyprctl dispatch focuswindow "address:0x$window_id" 2>"$tmp_err"; then
+            error "Failed to focus window $window_id"
+            if [[ -s "$tmp_err" ]]; then
+                while IFS= read -r line; do
+                    error "$line"
+                done <"$tmp_err"
+            fi
+            exit 1
+        fi
+    fi
+}
+
+for i in "${!entries[@]}"; do
+    if [[ "${entries[$i]}" == "$selection" ]]; then
+        focus_window "${window_ids[$i]}"
         exit 0
     fi
 done

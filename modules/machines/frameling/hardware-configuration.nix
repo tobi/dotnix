@@ -32,46 +32,48 @@
   boot.initrd.luks.devices."cryptroot".device =
     "/dev/disk/by-uuid/95d1bea6-669c-4317-a952-9d6a09ba0272";
 
-  fileSystems."/" = {
-    device = "/dev/disk/by-uuid/8fa74c8c-9891-4a7e-9b48-b5dfa6016a32";
-    fsType = "btrfs";
-    options = [
-      "subvol=local"
-      "noatime"
-    ];
-  };
+  fileSystems = {
+    "/" = {
+      device = "/dev/disk/by-uuid/8fa74c8c-9891-4a7e-9b48-b5dfa6016a32";
+      fsType = "btrfs";
+      options = [
+        "subvol=local"
+        "noatime"
+      ];
+    };
 
-  fileSystems."/home" = {
-    device = "/dev/disk/by-uuid/8fa74c8c-9891-4a7e-9b48-b5dfa6016a32";
-    fsType = "btrfs";
-    options = [
-      "subvol=safe"
-      "compress=zstd"
-      "noatime"
-    ];
-  };
+    "/home" = {
+      device = "/dev/disk/by-uuid/8fa74c8c-9891-4a7e-9b48-b5dfa6016a32";
+      fsType = "btrfs";
+      options = [
+        "subvol=safe"
+        "compress=zstd"
+        "noatime"
+      ];
+    };
 
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/8059-DDE9";
-    fsType = "vfat";
-    options = [
-      "fmask=0077"
-      "dmask=0077"
-      "uid=0"
-      "gid=0"
-    ];
-  };
+    "/boot" = {
+      device = "/dev/disk/by-uuid/8059-DDE9";
+      fsType = "vfat";
+      options = [
+        "fmask=0077"
+        "dmask=0077"
+        "uid=0"
+        "gid=0"
+      ];
+    };
 
-  fileSystems."/swap" = {
-    device = "/dev/disk/by-uuid/8fa74c8c-9891-4a7e-9b48-b5dfa6016a32";
-    fsType = "btrfs";
-    options = [
-      "subvol=swap"
-      "noatime"
-      "compress=none"
-      "nodatacow"
-    ];
-    neededForBoot = true;
+    "/swap" = {
+      device = "/dev/disk/by-uuid/8fa74c8c-9891-4a7e-9b48-b5dfa6016a32";
+      fsType = "btrfs";
+      options = [
+        "subvol=swap"
+        "noatime"
+        "compress=none"
+        "nodatacow"
+      ];
+      neededForBoot = true;
+    };
   };
 
   swapDevices = [

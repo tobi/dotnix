@@ -52,6 +52,7 @@
     extraSpecialArgs = {
       inherit inputs;
       inherit (config.dotnix) theme;
+      inherit (config.dotnix.desktop) wm;
     };
   };
 

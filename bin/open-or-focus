@@ -10,39 +10,72 @@ set -euo pipefail
 WINDOW_SEARCH="$1"
 shift
 
-
-
 APP_NAME="$1"
 shift
 
-# Function to focus window
+# Detect window manager
+if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] || pgrep -x Hyprland >/dev/null 2>&1; then
+    WM="hyprland"
+elif pgrep -x niri >/dev/null 2>&1; then
+    WM="niri"
+else
+    echo -e "\e[31mError\e[0m: No supported window manager detected"
+    exec ~/dotnix/bin/open "$APP_NAME" "$@"
+fi
+
+# WM-specific functions
 focus_window() {
     echo -e "\e[32mOpen-or-Focus\e[0m: Found & Focusing Window: $1"
-
     local window_id="$1"
-    niri msg action focus-window --id "$window_id"
+
+    if [[ "$WM" == "hyprland" ]]; then
+        hyprctl dispatch focuswindow "address:$window_id"
+    else
+        niri msg action focus-window --id "$window_id"
+    fi
+}
+
+get_focused_window() {
+    if [[ "$WM" == "hyprland" ]]; then
+        hyprctl activewindow -j 2>/dev/null | jq -r '.address // empty' || echo ""
+    else
+        niri msg --json windows 2>/dev/null | jq -r '.[] | select(.is_focused == true) | .id // empty' || echo ""
+    fi
+}
+
+get_matching_windows() {
+    local search="$1"
+
+    if [[ "$WM" == "hyprland" ]]; then
+        # For Hyprland, get all clients and filter by class
+        hyprctl clients -j 2>/dev/null | jq -r --arg class "$search" '
+          map(select(
+            (.class == $class) and
+            (.class != "com.mitchellh.ghostty") and
+            (.class != "Alacritty")
+          )) | sort_by(.address) | .[] | .address
+        ' || echo ""
+    else
+        # For niri, get windows and filter by app_id
+        WINDOWS=$(niri msg --json windows 2>/dev/null | jq -r "
+          map(select(
+            (.app_id != \"com.mitchellh.ghostty\") and
+            (.app_id != \"com.github.alacritty\")
+          ))
+        " || echo "[]")
+
+        echo "$WINDOWS" | jq -r --arg appid "$search" '
+          map(select(.app_id == $appid)) | sort_by(.id) | .[] | .id
+        ' || echo ""
+    fi
 }
 
 # Get current focused window
-FOCUSED_WINDOW=$(niri msg --json windows 2>/dev/null | jq -r '.[] | select(.is_focused == true) | .id // empty' || echo "")
+FOCUSED_WINDOW=$(get_focused_window)
 
 # Look for existing windows
 if [[ -n "$WINDOW_SEARCH" ]]; then
-    # Get all windows, filter out terminals
-    WINDOWS=$(niri msg --json windows 2>/dev/null | jq -r "
-      map(select(
-        (.app_id != \"com.mitchellh.ghostty\") and
-        (.app_id != \"com.github.alacritty\")
-      ))
-    " || echo "[]")
-
-    # Find matching windows by exact app_id only
-    MATCHING_WINDOWS=$(echo "$WINDOWS" | jq -r --arg appid "$WINDOW_SEARCH" '
-      map(select(.app_id == $appid)) | sort_by(.id)
-    ' || echo "[]")
-
-    # Get array of just the window IDs
-    WINDOW_IDS=$(echo "$MATCHING_WINDOWS" | jq -r '.[] | .id' || echo "")
+    WINDOW_IDS=$(get_matching_windows "$WINDOW_SEARCH")
 
     if [[ -n "$WINDOW_IDS" ]]; then
         # Convert to array
@@ -72,4 +105,4 @@ if [[ -n "$WINDOW_SEARCH" ]]; then
 fi
 
 # No window found - launch the application using open script
-exec ~/dotnix/bin/open "$APP_NAME" $@
+exec ~/dotnix/bin/open "$APP_NAME" "$@"

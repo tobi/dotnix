@@ -1,9 +1,8 @@
-{ pkgs, theme, ... }:
+{ pkgs, theme, wm, lib, ... }:
 {
 
-  home.packages = with pkgs; [
+  home.packages = with pkgs; ([
     # Desktop environment and window management
-    wbg # Wallpaper setter for Wayland
     xdg-desktop-portal-gtk # XDG desktop portal for GTK applications
     wtype # Wayland typing simulation for clipboard shortcuts
 
@@ -32,7 +31,9 @@
     # Applications
     rustdesk # Remote desktop client
     wine # Windows compatibility layer
-  ];
+  ] ++ lib.optionals (wm == "niri") [
+    wbg # Wallpaper setter for Wayland (niri only)
+  ]);
 
   # probably should go to home
   programs.gh = {
@@ -64,7 +65,6 @@
     ./dotnix-options.nix
     ./apps/waybar.nix
     ./apps/ghostty.nix
-    ./apps/niri.nix
     ./apps/chatgpt.nix
     ./apps/claude.nix
     ./apps/logseq.nix
@@ -77,7 +77,6 @@
     ./apps/gmail.nix
     ./apps/slack.nix
     ./apps/cursor.nix
-    ./apps/swaylock.nix
     ./apps/steam.nix
     ./apps/mako.nix
     ./apps/gtk.nix
@@ -85,5 +84,15 @@
     ./apps/typora.nix
     ./apps/warp.nix
     ./apps/mpv.nix
+  ]
+  ++ lib.optionals (wm == "niri") [
+    ./apps/niri.nix
+    ./apps/swaylock.nix
+  ]
+  ++ lib.optionals (wm == "hyprland") [
+    ./apps/hyprland.nix
+    ./apps/hyprlock.nix
+    ./apps/hypridle.nix
+    ./apps/hyprpaper.nix
   ];
 }

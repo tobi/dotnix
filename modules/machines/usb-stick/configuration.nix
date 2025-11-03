@@ -19,22 +19,26 @@
   ];
 
   # Basic system settings
-  networking.hostName = "nixos-live";
-  networking.networkmanager.enable = true;
-  networking.wireless.enable = lib.mkForce false;
+  networking = {
+    hostName = "nixos-live";
+    networkmanager.enable = true;
+    wireless.enable = lib.mkForce false;
+  };
   time.timeZone = "America/New_York";
 
   # Boot configuration for maximum hardware compatibility
-  boot.kernelParams = [
-    "snd_hda_intel.probe_mask=1"
-    "snd_hda_intel.power_save=0"
-  ];
+  boot = {
+    kernelParams = [
+      "snd_hda_intel.probe_mask=1"
+      "snd_hda_intel.power_save=0"
+    ];
 
-  boot.extraModprobeConfig = ''
-    options snd_hda_intel model=auto
-  '';
+    extraModprobeConfig = ''
+      options snd_hda_intel model=auto
+    '';
 
-  boot.blacklistedKernelModules = [ "snd_pcsp" ];
+    blacklistedKernelModules = [ "snd_pcsp" ];
+  };
 
   # Enable dotnix desktop features
   dotnix.desktop.enable = true;

@@ -99,10 +99,14 @@
     ];
 
   # Common programs
-  programs.nix-ld.enable = true;
-  programs.fuse.userAllowOther = lib.mkIf config.dotnix.desktop.enable true;
-  programs.appimage.enable = lib.mkIf config.dotnix.desktop.enable true;
-  programs.appimage.binfmt = lib.mkIf config.dotnix.desktop.enable true;
+  programs = {
+    nix-ld.enable = true;
+    fuse.userAllowOther = lib.mkIf config.dotnix.desktop.enable true;
+    appimage = {
+      enable = lib.mkIf config.dotnix.desktop.enable true;
+      binfmt = lib.mkIf config.dotnix.desktop.enable true;
+    };
+  };
 
   # Common services
   services.chrony.enable = true;
