@@ -13,24 +13,27 @@
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
-  boot.initrd.availableKernelModules = [
-    "nvme"
-    "xhci_pci"
-    "usb_storage"
-    "uas"
-    "sd_mod"
-  ];
-  boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [
-    "kvm-amd"
-    "typec"
-    "ucsi_acpi"
-    "thunderbolt"
-  ];
-  boot.extraModulePackages = [ ];
-
-  boot.initrd.luks.devices."cryptroot".device =
-    "/dev/disk/by-uuid/95d1bea6-669c-4317-a952-9d6a09ba0272";
+  boot = {
+    initrd = {
+      availableKernelModules = [
+        "nvme"
+        "xhci_pci"
+        "usb_storage"
+        "uas"
+        "sd_mod"
+      ];
+      kernelModules = [ ];
+      luks.devices."cryptroot".device =
+        "/dev/disk/by-uuid/95d1bea6-669c-4317-a952-9d6a09ba0272";
+    };
+    kernelModules = [
+      "kvm-amd"
+      "typec"
+      "ucsi_acpi"
+      "thunderbolt"
+    ];
+    extraModulePackages = [ ];
+  };
 
   fileSystems = {
     "/" = {

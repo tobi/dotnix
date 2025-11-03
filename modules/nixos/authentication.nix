@@ -22,9 +22,13 @@
   };
 
   # Enable fingerprint authentication
-  services.fprintd.enable = true;
-  services.fprintd.tod.enable = true;
-  services.fprintd.tod.driver = pkgs.libfprint-2-tod1-goodix;
+  services.fprintd = {
+    enable = true;
+    tod = {
+      enable = true;
+      driver = pkgs.libfprint-2-tod1-goodix;
+    };
+  };
 
   # Configure PAM services for fingerprint auth
   # Strategy: Both fingerprint and password available - whichever succeeds first

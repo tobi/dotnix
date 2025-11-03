@@ -45,7 +45,17 @@
 
   # Required for Wayland and portals
   security.rtkit.enable = true;
-  services.dbus.enable = true;
+
+  services = {
+    dbus.enable = true;
+    pulseaudio.enable = false;
+    pipewire = {
+      enable = true;
+      alsa.enable = true;
+      pulse.enable = true;
+    };
+  };
+
   xdg.portal = {
     enable = true;
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
@@ -75,18 +85,10 @@
 
   programs.zsh.enable = true;
 
-  # Enable sound with Pipewire
-  services.pulseaudio.enable = false;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    pulse.enable = true;
-  };
-
   # Fonts
   fonts.packages = with pkgs; [
     noto-fonts
-    noto-fonts-emoji
+    noto-fonts-color-emoji
     nerd-fonts.fira-code
   ];
 

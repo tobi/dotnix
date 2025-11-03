@@ -18,8 +18,8 @@ in
       # Window settings
       window-padding-x = 14;
       window-padding-y = 14;
-      background-opacity = 1;
-      # background-blur-radius = 40;
+      background-opacity = 0.8;
+      background-blur-radius = 40;
       window-decoration = "none";
 
       font-family = "FiraCode Nerd Font";
@@ -31,6 +31,12 @@ in
       clipboard-read = "allow";
       clipboard-write = "allow";
       clipboard-paste-protection = false;
+
+      # Universal clipboard keybindings (IBM CUA standard)
+      keybind = [
+        "shift+insert=paste_from_clipboard"
+        "control+insert=copy_to_clipboard"
+      ];
 
       # Shell integration - enable but disable problematic features
       shell-integration = "detect";

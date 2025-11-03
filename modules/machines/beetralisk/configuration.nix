@@ -134,7 +134,7 @@
     extraCompatPackages = with pkgs; [
       liberation_ttf
       wqy_zenhei
-      vistafonts
+      vista-fonts
     ];
 
     # Add 32-bit libraries including video codecs

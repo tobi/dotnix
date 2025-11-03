@@ -39,9 +39,11 @@ in
   # Boot Configuration
   boot = {
     loader = {
-      systemd-boot.enable = true;
-      systemd-boot.consoleMode = "max";
-      systemd-boot.configurationLimit = 6;
+      systemd-boot = {
+        enable = true;
+        consoleMode = "max";
+        configurationLimit = 6;
+      };
       efi.canTouchEfiVariables = true;
     };
 
@@ -119,16 +121,53 @@ in
   };
 
   # Programs
-  programs.nix-ld = {
-    enable = true;
-    libraries = with pkgs; [
-      stdenv.cc.cc.lib
-      stdenv.cc.cc
-    ];
+  programs = {
+    nix-ld = {
+      enable = true;
+      libraries = with pkgs; [
+        stdenv.cc.cc.lib
+        stdenv.cc.cc
+      ];
+    };
+    fuse.userAllowOther = true;
+    appimage = {
+      enable = true;
+      binfmt = true;
+    };
+    steam = {
+      enable = true;
+      remotePlay.openFirewall = true;
+      dedicatedServer.openFirewall = true;
+      localNetworkGameTransfers.openFirewall = true;
+      gamescopeSession.enable = true;
+      protontricks.enable = true;
+
+      # Fix font rendering issues
+      extraCompatPackages = with pkgs; [
+        liberation_ttf
+        wqy_zenhei
+        vista-fonts
+      ];
+
+      # Add 32-bit libraries including video codecs
+      extraPackages = with pkgs; [
+        libgdiplus
+        ffmpeg
+        kopia
+        kopia-ui
+        restic
+        libva
+        libvdpau
+        gst_all_1.gstreamer
+        gst_all_1.gst-plugins-base
+        gst_all_1.gst-plugins-good
+        gst_all_1.gst-plugins-bad
+        gst_all_1.gst-plugins-ugly
+        gst_all_1.gst-libav
+        gst_all_1.gst-vaapi
+      ];
+    };
   };
-  programs.fuse.userAllowOther = true;
-  programs.appimage.enable = true;
-  programs.appimage.binfmt = true;
 
   # Create plugdev group for U2F/FIDO2 devices
   users.groups.plugdev = { };
@@ -159,11 +198,13 @@ in
     blueman.enable = true;
     seatd.enable = true;
     logind = {
-      extraConfig = ''
-        HandlePowerKey=suspend-then-hibernate
-        HandleLidSwitch=suspend-then-hibernate
-        HandleLidSwitchExternalPower=suspend-then-hibernate
-      '';
+      settings = {
+        Login = {
+          HandlePowerKey = "suspend-then-hibernate";
+          HandleLidSwitch = "suspend-then-hibernate";
+          HandleLidSwitchExternalPower = "suspend-then-hibernate";
+        };
+      };
     };
 
     # SSH with security hardening
@@ -245,40 +286,6 @@ in
     protectKernelImage = lib.mkForce false;
   };
 
-  # Steam
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
-    localNetworkGameTransfers.openFirewall = true;
-    gamescopeSession.enable = true;
-    protontricks.enable = true;
-
-    # Fix font rendering issues
-    extraCompatPackages = with pkgs; [
-      liberation_ttf
-      wqy_zenhei
-      vistafonts
-    ];
-
-    # Add 32-bit libraries including video codecs
-    extraPackages = with pkgs; [
-      libgdiplus
-      ffmpeg
-      kopia
-      kopia-ui
-      restic
-      libva
-      libvdpau
-      gst_all_1.gstreamer
-      gst_all_1.gst-plugins-base
-      gst_all_1.gst-plugins-good
-      gst_all_1.gst-plugins-bad
-      gst_all_1.gst-plugins-ugly
-      gst_all_1.gst-libav
-      gst_all_1.gst-vaapi
-    ];
-  };
 
   # XDG Portals
   xdg.portal = {
@@ -376,7 +383,7 @@ in
   fonts.packages = with pkgs; [
     inter
     noto-fonts
-    noto-fonts-emoji
+    noto-fonts-color-emoji
     noto-fonts-cjk-sans
 
     nerd-fonts.fira-code
