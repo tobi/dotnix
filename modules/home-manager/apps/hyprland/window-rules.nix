@@ -17,12 +17,21 @@ _:
       "float, class:^(nm-connection-editor)$"
 
       # Transparency for most windows
-      "opacity 0.97 0.9, class:.*"
+      "opacity 0.97 0.75, class:.*"
 
       # Opaque for media apps
       "opacity 1 1, class:^(vlc)$"
       "opacity 1 1, class:^(mpv)$"
       "opacity 1 1, title:^(Picture-in-Picture)$"
+
+      # Browsers:
+
+      "tag +chromium-based-browser, class:((google-)?[cC]hrom(e|ium)|[bB]rave-browser|Microsoft-edge|Vivaldi-stable|helium)"
+      "tag +firefox-based-browser, class:([fF]irefox|zen|librewolf)"
+      
+      "opacity 1.0 1.0, initialTitle:((?i)(?:[a-z0-9-]+\\.)*youtube\\.com_/|app\\.zoom\\.us_/wc/home)"      
+
+      "nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0"
     ];
 
     windowrulev2 = [
@@ -32,6 +41,7 @@ _:
 
       # Google Meet full width
       "size 99%, class:^(chrome-meet.google.com__-Default)$"
+      "opacity 1 1, class:^(chrome-meet.google.com__-Default)$"
 
       # Picture-in-Picture always on top
       "float, title:^(Picture-in-Picture)$"
