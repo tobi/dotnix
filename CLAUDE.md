@@ -2,6 +2,15 @@
 
 This file provides context and guidelines for Claude when working on this NixOS configuration.
 
+## 🖥️ Current System Configuration
+
+- **Window Manager**: Hyprland (Wayland compositor)
+- **Primary Machine**: frameling (Framework Laptop 13.5", AMD Ryzen AI 7 350)
+- **Display Setup**: Built-in 2256x1504 @ 1.6x scale + Apple StudioDisplay 5K @ 1.66666x scale
+- **Desktop Environment**: Custom Wayland-based setup with Waybar, Hyprland, and GTK/Qt theming
+
+**Note**: While Niri configurations still exist in the codebase (`modules/nixos/niri.nix`, `modules/home-manager/apps/niri/`), the system is currently running **Hyprland** as the active window manager.
+
 ## 🏗️ Architecture Overview
 
 This is a **clean, modern NixOS flake configuration** with the following key principles:
@@ -15,23 +24,41 @@ This is a **clean, modern NixOS flake configuration** with the following key pri
 ```
 ├── bin/                        # Utility scripts (fix-audio, mdget, etc.)
 ├── config/                     # Global configuration files
-│   ├── niri/config.kdl        # Window manager config (referenced globally)
 │   ├── secrets/               # Age encrypted secrets
 │   └── themes.nix             # Centralized theme system
 ├── modules/                    # All modular configurations
 │   ├── machines/             # Machine-specific configurations
-│   │   ├── frameling/        # Desktop workstation
+│   │   ├── frameling/        # Desktop workstation (Framework 13.5")
+│   │   ├── beetralisk/       # Desktop machine
 │   │   ├── zerg-wsl2/        # WSL2 development
 │   │   └── usb-stick/        # Live USB/installer
 │   ├── home-manager/          # Home-manager modules
-│   │   ├── apps/             # Individual app modules (alacritty, niri, etc.)
+│   │   ├── apps/             # Individual app modules (30+ apps)
+│   │   │   ├── hyprland/     # Hyprland WM config (modular structure)
+│   │   │   │   ├── envs.nix     # Environment variables
+│   │   │   │   ├── input.nix    # Input devices (keyboard, mouse, touchpad)
+│   │   │   │   ├── outputs.nix  # Monitor configuration
+│   │   │   │   ├── layout.nix   # Gaps, borders, animations
+│   │   │   │   ├── binds.nix    # Keybindings
+│   │   │   │   ├── startup.nix  # Autostart programs
+│   │   │   │   └── window-rules.nix # Window and layer rules
+│   │   │   ├── waybar/       # Waybar config (modular structure)
+│   │   │   └── [other apps]  # alacritty, chrome, firefox, etc.
 │   │   ├── desktop.nix       # Desktop environment imports
 │   │   └── home.nix          # Core home configuration
 │   └── nixos/                 # NixOS system modules
+│       ├── audio.nix         # Audio configuration
+│       ├── authentication.nix # Authentication services
+│       ├── common.nix        # Common system settings
 │       ├── config.nix        # dotnix options definition
-│       ├── niri.nix          # Niri window manager config
-│       └── user.nix          # Centralized user management
-└── flake.nix                  # Main flake (no lib/common.nix!)
+│       ├── environment.nix   # System environment variables
+│       ├── hyprland.nix      # Hyprland system integration
+│       ├── niri.nix          # Niri window manager (legacy)
+│       ├── theme.nix         # System theming
+│       ├── user.nix          # Centralized user management
+│       ├── warp.nix          # Warp terminal integration
+│       └── wm.nix            # Window manager abstractions
+└── flake.nix                  # Main flake entry point
 ```
 
 ## 🔧 Key Patterns
@@ -118,6 +145,19 @@ dotnix.desktop.enable = true;  # Enables desktop environment
 1. Create `modules/home-manager/apps/your-app.nix`
 2. Add import to `modules/home-manager/desktop.nix`
 3. Use `theme` parameter for styling: `{ pkgs, theme, ... }`
+4. For complex apps, create a subdirectory like `apps/your-app/` with modular config files
+
+### Modifying Hyprland Configuration
+Hyprland config is split into logical modules under `modules/home-manager/apps/hyprland/`:
+- **envs.nix** - Environment variables (GDK_SCALE, QT settings, etc.)
+- **input.nix** - Keyboard, mouse, touchpad configuration
+- **outputs.nix** - Monitor configuration and scaling
+- **layout.nix** - Gaps, borders, animations, decorations
+- **binds.nix** - Keybindings
+- **startup.nix** - Autostart programs
+- **window-rules.nix** - Window and layer rules
+
+After changes, test with: `hyprctl reload` or restart Hyprland
 
 ### Adding a New Machine
 1. Create `modules/machines/your-machine/configuration.nix`
@@ -165,6 +205,15 @@ nix build .#nixosConfigurations.usb-stick.config.system.build.isoImage
 ### modules/nixos/config.nix
 - Defines dotnix.home.enable and dotnix.desktop.enable options
 - Central place for configuration feature flags
+
+### modules/nixos/hyprland.nix
+- System-level Hyprland integration
+- Enables Hyprland as the default session
+- Sets up necessary system services and security policies
+
+### modules/nixos/wm.nix
+- Window manager abstractions
+- Common settings shared across different WM implementations
 
 ### modules/home-manager/desktop.nix
 - Just imports from apps/ subdirectory
@@ -246,8 +295,9 @@ ast-grep -p 'lib.mkIf config.dotnix.desktop.enable $VAL' -l nix
 
 ## 🔧 Development Commands
 
-- to rebuild nixos or reapply home-manager just run "switch". But keep in mind that this requires sudo so likely just ask the user to do it
-- use the /nix-check command when you want to see if the config is good
-- use the nixos-config-expert agent liberally
-- if you changed config.kdl its good to rerun niri validate
-- for desktop, we exclusively use wayland
+- To rebuild nixos or reapply home-manager just run `switch`. This requires sudo so ask the user to do it
+- Use the `/nix-check` command when you want to see if the config is good
+- Use the `nix-config-expert` agent liberally for NixOS-specific questions
+- For desktop, we exclusively use **Wayland** with **Hyprland** as the window manager
+- Hyprland commands: `hyprctl monitors`, `hyprctl clients`, `hyprctl dispatch`, etc.
+- Check Hyprland config: Review `modules/home-manager/apps/hyprland/` subdirectories
