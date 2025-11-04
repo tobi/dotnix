@@ -88,6 +88,9 @@
       vim.opt.smartcase = true
       vim.opt.termguicolors = true
 
+      -- Clipboard integration with system clipboard
+      vim.opt.clipboard = 'unnamedplus'
+
       vim.cmd('syntax enable')
 
       -- Inherit terminal background
@@ -108,11 +111,23 @@
       vim.keymap.set('n', '<leader>fg', '<cmd>FzfLua live_grep<cr>', { desc = 'Live grep' })
       vim.keymap.set('n', '<leader>fb', '<cmd>FzfLua buffers<cr>', { desc = 'Find buffers' })
 
+      -- LSP keybindings
       vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = 'Go to definition' })
       vim.keymap.set('n', 'K', vim.lsp.buf.hover, { desc = 'Hover documentation' })
       vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, { desc = 'Code actions' })
       vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, { desc = 'Rename' })
       vim.keymap.set('n', 'gr', vim.lsp.buf.references, { desc = 'References' })
+
+      -- Clipboard keybindings (Ctrl+Shift+C/V and Super+C/V/X)
+      vim.keymap.set('v', '<C-S-c>', '"+y', { desc = 'Copy to system clipboard' })
+      vim.keymap.set('n', '<C-S-v>', '"+p', { desc = 'Paste from system clipboard' })
+      vim.keymap.set('i', '<C-S-v>', '<C-r>+', { desc = 'Paste from system clipboard' })
+
+      -- Super (Mod4) key clipboard shortcuts
+      vim.keymap.set('v', '<D-c>', '"+y', { desc = 'Copy to system clipboard' })
+      vim.keymap.set('v', '<D-x>', '"+d', { desc = 'Cut to system clipboard' })
+      vim.keymap.set('n', '<D-v>', '"+p', { desc = 'Paste from system clipboard' })
+      vim.keymap.set('i', '<D-v>', '<C-r>+', { desc = 'Paste from system clipboard' })
     '';
   };
 
