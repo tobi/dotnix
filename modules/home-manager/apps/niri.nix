@@ -1,5 +1,6 @@
 { pkgs, ... }:
 {
+<<<<<<< HEAD
   # Nix-native configuration for niri using sodiboo/niri-flake
   # This generates config.kdl from structured Nix settings with type safety
   #
@@ -17,6 +18,8 @@
   # See docs/niri-flake-settings.md for full settings reference
   imports = [ ./niri ];
 
+=======
+>>>>>>> e314c34 (fixes)
   # Cursor themes for niri
   home.packages = with pkgs; [
     bibata-cursors

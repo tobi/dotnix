@@ -227,6 +227,8 @@ in
       zsync # File synchronization tool
       zellij # Terminal multiplexer
       git-lfs # Git Large File Storage
+      socat # Multipurpose relay
+      netcat-gnu # Network utility
 
       # ── Nice-to-have utilities ───────────────────────────────────────────
       fastfetch # Fast system information tool
