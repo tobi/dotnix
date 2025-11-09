@@ -52,8 +52,13 @@
       # Home Manager expects `homeConfigurations.<name>` at the top level.
       # Provide a concrete configuration for the local Darwin user "tobi".
       homeConfigurations = {
-        "tobi" = home-manager.lib.homeManagerConfiguration {
-          pkgs = mkPkgs builtins.currentSystem;
+        "tobi@x86_64" = home-manager.lib.homeManagerConfiguration {
+          pkgs = mkPkgs "x86_64-linux";
+          extraSpecialArgs = { inherit inputs; };
+          modules = [ ./modules/home-manager/home.nix ];
+        };
+        "tobi@aarch64" = home-manager.lib.homeManagerConfiguration {
+          pkgs = mkPkgs "aarch64-darwin";
           extraSpecialArgs = { inherit inputs; };
           modules = [ ./modules/home-manager/home.nix ];
         };

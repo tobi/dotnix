@@ -13,21 +13,21 @@ in
   # Basic home configuration
   home = {
     stateVersion = "25.05";
-    enableNixpkgsReleaseCheck = false;
+    # enableNixpkgsReleaseCheck = false;
     inherit username;
     homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
 
     # Global environment variables
     sessionVariables = {
       DOTFILES = "$HOME/dotnix";
-      EDITOR = "nvim";
+      # EDITOR = "nvim";
     };
   };
 
   # Allow application launchers to discover apps in ~/Applications
-  xdg.systemDirs.data = lib.optionals isLinux [
-    "${config.home.homeDirectory}/Applications"
-  ];
+  # xdg.systemDirs.data = lib.optionals isLinux [
+  #   "${config.home.homeDirectory}/Applications"
+  # ];
 
   programs = {
     home-manager.enable = true;
@@ -81,31 +81,31 @@ in
 
     # Shell configuration
     zsh = {
-    enable = true;
-    enableCompletion = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-    history.size = 50000;
-    defaultKeymap = "emacs";
+      enable = true;
+      enableCompletion = true;
+      autosuggestion.enable = true;
+      syntaxHighlighting.enable = true;
+      history.size = 50000;
+      defaultKeymap = "emacs";
 
-    # Interactive shell setup
-    initContent = ''
-      # ── Terminal-specific keybindings ──────────────────────────
-      # Emacs mode provides most bindings (Ctrl+A/E, Ctrl+W, etc.)
-      # These map terminal-specific escape sequences to ZSH widgets
+      # Interactive shell setup
+      initContent = ''
+        # ── Terminal-specific keybindings ──────────────────────────
+        # Emacs mode provides most bindings (Ctrl+A/E, Ctrl+W, etc.)
+        # These map terminal-specific escape sequences to ZSH widgets
 
-      bindkey '^[[1;5C' forward-word      # Ctrl+Right
-      bindkey '^[[1;5D' backward-word     # Ctrl+Left
-      bindkey '^[[1;3C' forward-word      # Alt+Right (alternative)
-      bindkey '^[[1;3D' backward-word     # Alt+Left (alternative)
-      bindkey '^[[H' beginning-of-line    # Home key
-      bindkey '^[[F' end-of-line          # End key
+        bindkey '^[[1;5C' forward-word      # Ctrl+Right
+        bindkey '^[[1;5D' backward-word     # Ctrl+Left
+        bindkey '^[[1;3C' forward-word      # Alt+Right (alternative)
+        bindkey '^[[1;3D' backward-word     # Alt+Left (alternative)
+        bindkey '^[[H' beginning-of-line    # Home key
+        bindkey '^[[F' end-of-line          # End key
 
-      export PATH="$HOME/.local/bin:$DOTFILES/bin:$PATH"
+        export PATH="$HOME/.local/bin:$DOTFILES/bin:$PATH"
 
-      # -- Local zshrc ────────────────────────────────────────────
-      [ -f ~/.zshrc.local ] && source ~/.zshrc.local
-    '';
+        # -- Local zshrc ────────────────────────────────────────────
+        [ -f ~/.zshrc.local ] && source ~/.zshrc.local
+      '';
     };
   };
 

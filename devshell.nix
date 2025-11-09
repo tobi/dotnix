@@ -54,6 +54,8 @@ in
         eval "$(starship init bash)"
       fi
 
+      export PATH="$HOME/dotnix/bin:$PATH"
+
       echo "Ruby version: $(ruby --version)"
       echo "Python version: $(python --version)"
       echo "🚀 Development shell activated, you can now compile things"
