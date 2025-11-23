@@ -129,7 +129,7 @@ main() {
 
     # Create temporary log file
     local log_file
-    log_file=$(mktemp /tmp/nixos-rebuild.XXXXXX.log)
+    log_file=$(mktemp "${TMPDIR:-/tmp}/dotnix-switch.XXXXXX")
 
     if [[ "$QUIET" != "true" ]]; then
         echo -e "${BLUE}🔄 Switching configuration...${NC}"
