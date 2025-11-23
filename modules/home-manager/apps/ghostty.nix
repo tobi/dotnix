@@ -32,10 +32,11 @@ in
       clipboard-write = "allow";
       clipboard-paste-protection = false;
 
-      # Universal clipboard keybindings (IBM CUA standard)
+      # Pass through Ctrl+Insert/Shift+Insert to applications (for Neovim Super+C/V)
+      # Use Ctrl+Shift+C/V for terminal-level clipboard instead
       keybind = [
-        "shift+insert=paste_from_clipboard"
-        "control+insert=copy_to_clipboard"
+        "control+shift+c=copy_to_clipboard"
+        "control+shift+v=paste_from_clipboard"
       ];
 
       # Shell integration - enable but disable problematic features

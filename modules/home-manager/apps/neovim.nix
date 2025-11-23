@@ -123,11 +123,12 @@
       vim.keymap.set('n', '<C-S-v>', '"+p', { desc = 'Paste from system clipboard' })
       vim.keymap.set('i', '<C-S-v>', '<C-r>+', { desc = 'Paste from system clipboard' })
 
-      -- Super (Mod4) key clipboard shortcuts
-      vim.keymap.set('v', '<D-c>', '"+y', { desc = 'Copy to system clipboard' })
-      vim.keymap.set('v', '<D-x>', '"+d', { desc = 'Cut to system clipboard' })
-      vim.keymap.set('n', '<D-v>', '"+p', { desc = 'Paste from system clipboard' })
-      vim.keymap.set('i', '<D-v>', '<C-r>+', { desc = 'Paste from system clipboard' })
+      -- Super+C/V/X mapped through Hyprland to Ctrl+Insert/Shift+Insert/Ctrl+X
+      vim.keymap.set('v', '<C-Insert>', '"+y', { desc = 'Copy to system clipboard (Super+C)' })
+      vim.keymap.set('n', '<S-Insert>', '"+p', { desc = 'Paste from system clipboard (Super+V)' })
+      vim.keymap.set('i', '<S-Insert>', '<C-r>+', { desc = 'Paste from system clipboard (Super+V)' })
+      vim.keymap.set('v', '<S-Insert>', '"+p', { desc = 'Paste from system clipboard (Super+V)' })
+      vim.keymap.set('v', '<C-x>', '"+d', { desc = 'Cut to system clipboard (Super+X)' })
     '';
   };
 
