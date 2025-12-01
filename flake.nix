@@ -108,7 +108,7 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nix-colors.url = "github:misterio77/nix-colors";
 
-    try.url = "github:tobi/try";
+    try.url = "github:tobi/try-c";
     try.inputs.nixpkgs.follows = "nixpkgs";
 
     ghostty.url = "github:ghostty-org/ghostty";
