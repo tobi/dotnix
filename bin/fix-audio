@@ -13,6 +13,7 @@ input_priorities = [
   'CM-15',
   'Shure MV7+',
   'Shure MV7',
+  'Yeti GX',
   'Scarlett Solo USB',
   'MacBook Pro Microphone',
 ]

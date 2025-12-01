@@ -57,7 +57,7 @@
           extraSpecialArgs = { inherit inputs; };
           modules = [ ./modules/home-manager/home.nix ];
         };
-        "tobi@aarch64" = home-manager.lib.homeManagerConfiguration {
+        "tobi@aarch64-darwin" = home-manager.lib.homeManagerConfiguration {
           pkgs = mkPkgs "aarch64-darwin";
           extraSpecialArgs = { inherit inputs; };
           modules = [ ./modules/home-manager/home.nix ];
