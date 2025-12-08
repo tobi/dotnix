@@ -120,6 +120,19 @@ in
     bat = "${pkgs.bat}/bin/bat";
     sg = "${pkgs.ast-grep}/bin/ast-grep";
     rg = "${pkgs.ripgrep}/bin/rg";
+    t = "try";
+
+    # GRC colorized commands
+    ping = "${pkgs.grc}/bin/grc --colour=auto ping";
+    traceroute = "${pkgs.grc}/bin/grc --colour=auto traceroute";
+    make = "${pkgs.grc}/bin/grc --colour=auto make";
+    diff = "${pkgs.grc}/bin/grc --colour=auto diff";
+    dig = "${pkgs.grc}/bin/grc --colour=auto dig";
+    mount = "${pkgs.grc}/bin/grc --colour=auto mount";
+    ps = "${pkgs.grc}/bin/grc --colour=auto ps";
+    df = "${pkgs.grc}/bin/grc --colour=auto df";
+    ifconfig = "${pkgs.grc}/bin/grc --colour=auto ifconfig";
+    netstat = "${pkgs.grc}/bin/grc --colour=auto netstat";
 
     # File operations
     ".." = "cd ..";
@@ -186,6 +199,7 @@ in
       fswatch # File change monitor
       fzf # General-purpose command-line fuzzy finder
       gh # GitHub CLI tool
+      grc # Generic text colouriser
       jq # Lightweight and flexible JSON processor
       ripgrep # Fast text search tool
       wget # Network utility to retrieve files
