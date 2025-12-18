@@ -120,13 +120,14 @@ in
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/lib/tailscale-certs 0750 root root - -"
+    "d /var/lib/tailscale-certs 0750 root nginx - -"
   ];
 
   systemd.services."tailscale-cert-${fqdn}" = {
     description = "Fetch and renew Tailscale cert for ${fqdn}";
     after = [ "network-online.target" "tailscaled.service" "nginx.service" ];
-    wants = [ "network-online.target" "tailscaled.service" "nginx.service" ];
+    wants = [ "network-online.target" "tailscaled.service" ];
+    requires = [ "nginx.service" ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = ''
