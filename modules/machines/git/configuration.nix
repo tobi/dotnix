@@ -120,7 +120,7 @@ in
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/lib/tailscale-certs 0750 root root - -"
+    "d /var/lib/tailscale-certs 0750 root nginx - -"
   ];
 
   systemd.services."tailscale-cert-${fqdn}" = {
