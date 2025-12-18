@@ -127,6 +127,8 @@ in
     description = "Fetch and renew Tailscale cert for ${fqdn}";
     after = [ "network-online.target" "tailscaled.service" ];
     wants = [ "network-online.target" "tailscaled.service" ];
+    before = [ "nginx.service" ];
+    wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = ''
@@ -154,8 +156,8 @@ in
     interfaces.tailscale0.allowedTCPPorts = [ 443 forgejoSshPort ];
   };
 
-  systemd.services.nginx.after = [ "tailscaled.service" "tailscale-nginx-auth.service" ];
-  systemd.services.nginx.wants = [ "tailscaled.service" "tailscale-nginx-auth.service" ];
+  systemd.services.nginx.after = [ "tailscaled.service" "tailscale-nginx-auth.service" "tailscale-cert-${fqdn}.service" ];
+  systemd.services.nginx.wants = [ "tailscaled.service" "tailscale-nginx-auth.service" "tailscale-cert-${fqdn}.service" ];
 
   services.openssh = {
     enable = true;
