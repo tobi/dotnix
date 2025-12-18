@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 
 let
+  # TODO: Replace YOUR-TAILNET with your actual Tailscale tailnet domain (e.g., example.ts.net)
   tailnetDomain = "YOUR-TAILNET.ts.net";
   fqdn = "git.${tailnetDomain}";
 
@@ -48,7 +49,7 @@ in
         HTTP_PORT = forgejoHttpPort;
         ROOT_URL = "https://${fqdn}/";
         START_SSH_SERVER = true;
-        SSH_DOMAIN = config.networking.hostName;
+        SSH_DOMAIN = fqdn;
         SSH_PORT = forgejoSshPort;
         SSH_LISTEN_HOST = "0.0.0.0";
       };
@@ -56,6 +57,7 @@ in
       service = {
         DISABLE_REGISTRATION = true;
         ENABLE_REVERSE_PROXY_AUTHENTICATION = true;
+        REVERSE_PROXY_AUTHENTICATION_HEADER = "X-WEBAUTH-USER";
         ENABLE_REVERSE_PROXY_AUTO_REGISTRATION = true;
         ENABLE_REVERSE_PROXY_FULL_NAME = true;
       };
@@ -125,10 +127,13 @@ in
 
   systemd.services."tailscale-cert-${fqdn}" = {
     description = "Fetch and renew Tailscale cert for ${fqdn}";
-    after = [ "network-online.target" "tailscaled.service" ];
-    wants = [ "network-online.target" "tailscaled.service" ];
+    after = [ "network-online.target" "tailscaled.service" "nginx.service" ];
+    wants = [ "network-online.target" "tailscaled.service" "nginx.service" ];
+    before = [ "nginx.service" ];
+    wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
+      RemainAfterExit = true;
       ExecStart = ''
         ${pkgs.tailscale}/bin/tailscale cert \
           --cert-file /var/lib/tailscale-certs/${fqdn}.crt \
@@ -154,8 +159,8 @@ in
     interfaces.tailscale0.allowedTCPPorts = [ 443 forgejoSshPort ];
   };
 
-  systemd.services.nginx.after = [ "tailscaled.service" "tailscale-nginx-auth.service" ];
-  systemd.services.nginx.wants = [ "tailscaled.service" "tailscale-nginx-auth.service" ];
+  systemd.services.nginx.after = [ "tailscaled.service" "tailscale-nginx-auth.service" "tailscale-cert-${fqdn}.service" ];
+  systemd.services.nginx.wants = [ "tailscaled.service" "tailscale-nginx-auth.service" "tailscale-cert-${fqdn}.service" ];
 
   services.openssh = {
     enable = true;
