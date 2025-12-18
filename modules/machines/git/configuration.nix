@@ -127,8 +127,8 @@ in
 
   systemd.services."tailscale-cert-${fqdn}" = {
     description = "Fetch and renew Tailscale cert for ${fqdn}";
-    after = [ "network-online.target" "tailscaled.service" "nginx.service" ];
-    wants = [ "network-online.target" "tailscaled.service" "nginx.service" ];
+    after = [ "network-online.target" "tailscaled.service" ];
+    wants = [ "network-online.target" "tailscaled.service" ];
     before = [ "nginx.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
