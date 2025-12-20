@@ -835,11 +835,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1764892054,
-        "narHash": "sha256-dcMUUp/eO6FvdNbsiBxJhu9g1RK9OULOaHOqsrRDvOA=",
+        "lastModified": 1766273877,
+        "narHash": "sha256-5uyzE4nnq+GsvgZt7wSknRM+oRAQydp6HjAHZlhIfhg=",
         "owner": "tobi",
         "repo": "try-c",
-        "rev": "46988b92270cb70d62c2463231f85589ba3701ff",
+        "rev": "59da0b07cc02746732fabe104c1ed7147a6541ec",
         "type": "github"
       },
       "original": {
