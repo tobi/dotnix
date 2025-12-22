@@ -133,7 +133,7 @@ in
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/lib/tailscale-certs 0750 root nginx - -"
+    "d /var/lib/tailscale-certs 0750 root root - -"
   ];
 
   systemd.services."tailscale-cert-${fqdn}" = {
@@ -145,13 +145,14 @@ in
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
+      ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p /var/lib/tailscale-certs";
       ExecStart = ''
         ${pkgs.tailscale}/bin/tailscale cert \
           --cert-file /var/lib/tailscale-certs/${fqdn}.crt \
           --key-file /var/lib/tailscale-certs/${fqdn}.key \
           ${fqdn}
       '';
-      ExecStartPost = "${pkgs.systemd}/bin/systemctl reload nginx.service";
+      ExecStartPost = "${pkgs.runtimeShell} -lc '${pkgs.systemd}/bin/systemctl -q is-active nginx.service && ${pkgs.systemd}/bin/systemctl reload nginx.service || true'";
     };
   };
 
