@@ -40,13 +40,11 @@
   # from here on it's the same as the default tarball configuration
 
   networking = {
-    # Pick ONE networking stack to avoid dhcpcd and networkd fighting over interfaces.
-    # This module configures `systemd.network` below, so we use networkd only.
-    useNetworkd = true;
-    dhcpcd.enable = false;
-    useDHCP = false;
-    # Container base config defaults this to true; force it off when using systemd-resolved.
-    useHostResolvConf = lib.mkForce false;
+    # Proxmox/LXC: keep it simple and use dhcpcd (no systemd-networkd).
+    # This avoids networkd/resolved interactions and matches the container defaults well.
+    useNetworkd = lib.mkDefault false;
+    dhcpcd.enable = lib.mkDefault true;
+    useDHCP = lib.mkDefault true;
   };
 
   # Tailscale in LXC often lacks /dev/net/tun; use userspace networking by default.
@@ -63,18 +61,6 @@
       StandardInput = "tty";
       StandardOutput = "tty";
       TTYPath = "/dev/console";
-    };
-  };
-
-  systemd.network = {
-    enable = true;
-    networks."50-eth0" = {
-      matchConfig.Name = "eth0";
-      networkConfig = {
-        DHCP = "ipv4";
-        IPv6AcceptRA = true;
-      };
-      linkConfig.RequiredForOnline = "routable";
     };
   };
 }
