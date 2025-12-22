@@ -45,7 +45,8 @@
     useNetworkd = true;
     dhcpcd.enable = false;
     useDHCP = false;
-    useHostResolvConf = false;
+    # Container base config defaults this to true; force it off when using systemd-resolved.
+    useHostResolvConf = lib.mkForce false;
   };
 
   # Tailscale in LXC often lacks /dev/net/tun; use userspace networking by default.
