@@ -1,9 +1,9 @@
 { config, pkgs, ... }:
 
 let
-  # TODO: Replace YOUR-TAILNET with your actual Tailscale tailnet domain (e.g., example.ts.net)
-  tailnetDomain = "YOUR-TAILNET.ts.net";
-  fqdn = "git.${tailnetDomain}";
+  tailnetDomain = "tail250b8.ts.net";
+  hostname = "git";
+  fqdn = "${hostname}.${tailnetDomain}";
 
   forgejoHttpPort = 3000;
   forgejoSshPort = 2222;
@@ -12,9 +12,15 @@ in
 {
   system.stateVersion = "25.11";
 
-  boot.isContainer = true;
+  imports = [
+     ../../nixos/common.nix
+     ../../nixos/user.nix
+     ../../nixos/proxmox.nix
+  ];
 
-  time.timeZone = "UTC";
+  networking.hostName = hostname;
+
+  boot.isContainer = true;
 
   networking.useDHCP = true;
 
@@ -25,6 +31,13 @@ in
       "--accept-dns=true"
     ];
   };
+
+   # I had to suppress these units, since they do not work inside LXC
+  systemd.suppressedSystemUnits = [
+    "dev-mqueue.mount"
+    "sys-kernel-debug.mount"
+    "sys-fs-fuse-connections.mount"
+  ];
 
   systemd.services.tailscale-nginx-auth = {
     description = "Tailscale nginx auth backend";

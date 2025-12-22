@@ -18,6 +18,10 @@
 }:
 
 {
+
+  programs.zsh.enable = true;
+  users.defaultUserShell = pkgs.zsh;
+
   # Nix Settings - Common across all machines
   nix.settings = {
     experimental-features = [
@@ -164,16 +168,18 @@
   };
 
   # ZRAM for better memory management
-  zramSwap = {
+  zramSwap = if config.dotnix.desktop.enable then {
     enable = true;
     algorithm = "zstd";
     memoryPercent = lib.mkDefault 50;
+  } else {
+    enable = false;
   };
 
   # Common boot settings
   boot = {
-    tmp.useTmpfs = true;
-    tmp.tmpfsSize = "50%";
+    tmp.useTmpfs = lib.mkIf config.dotnix.desktop.enable true;
+    tmp.tmpfsSize = lib.mkIf config.dotnix.desktop.enable "50%";
 
     # Additional boot optimizations
     kernel.sysctl = {

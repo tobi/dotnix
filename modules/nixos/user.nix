@@ -31,9 +31,6 @@
     description = "Tobi Lutke";
   };
 
-  # Enable zsh system-wide since it's the user's shell
-  programs.zsh.enable = true;
-
   # Desktop-specific configuration
 
   # Security wrapper for GUI apps
