@@ -82,7 +82,7 @@ in
   };
 
   services.nginx = {
-    enable = true;
+    enable = false;
     recommendedProxySettings = true;
     recommendedTlsSettings = true;
 
@@ -175,12 +175,12 @@ in
   systemd.services.nginx.after = [ "tailscaled.service" "tailscale-nginx-auth.service" "tailscale-cert-${fqdn}.service" ];
   systemd.services.nginx.wants = [ "tailscaled.service" "tailscale-nginx-auth.service" "tailscale-cert-${fqdn}.service" ];
 
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-      PermitRootLogin = "prohibit-password";
-    };
-  };
+  #services.openssh = {
+  #  enable = true;
+  #  settings = {
+  #    PasswordAuthentication = false;
+  #    KbdInteractiveAuthentication = false;
+  #    PermitRootLogin = "prohibit-password";
+  #  };
+  #};
 }

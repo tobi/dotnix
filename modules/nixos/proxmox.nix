@@ -40,6 +40,9 @@
   # from here on it's the same as the default tarball configuration
 
   networking = {
+    # Pick ONE networking stack to avoid dhcpcd and networkd fighting over interfaces.
+    # This module configures `systemd.network` below, so we use networkd only.
+    useNetworkd = true;
     dhcpcd.enable = false;
     useDHCP = false;
     useHostResolvConf = false;

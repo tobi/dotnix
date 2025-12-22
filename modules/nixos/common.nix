@@ -114,7 +114,7 @@
   };
 
   # Common services
-  services.chrony.enable = true;
+  services.chrony.enable = lib.mkIf (!config.boot.isContainer) true;
 
   # Fix NTP startup dependencies
   systemd.services.chronyd = {
@@ -154,6 +154,13 @@
     enable = true;
     rejectPackets = true;
   };
+
+  # Networking defaults (overridable per-machine)
+  # - Laptops/desktops typically use NetworkManager (set in machine config)
+  # - Containers may use systemd-networkd (set in `modules/nixos/proxmox.nix`)
+  networking.useDHCP = lib.mkDefault true;
+  networking.useNetworkd = lib.mkDefault false;
+  systemd.network.enable = lib.mkDefault false;
 
   # System optimizations
   services = {
