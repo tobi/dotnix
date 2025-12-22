@@ -124,6 +124,7 @@ detect_environment() {
 
 # Main switch function
 main() {
+    local args=("$@")
     local env_type
     env_type=$(detect_environment)
 
@@ -144,7 +145,7 @@ main() {
         echo
     fi
 
-    local extras="-b backup"
+    local extras=""
     local nixos_cmd=""
     local home_manager_cmd=""
 
@@ -188,7 +189,7 @@ main() {
     if [[ -n "$nixos_cmd" ]]; then
         echo -e "${BLUE}━━━ ${YELLOW}NixOS System Rebuild${NC} ${BLUE}━━━━━━━━━━━━━━${NC}"
         echo
-        if eval "$nixos_cmd 2>&1 | tee -a '$log_file'"; then
+        if eval "$nixos_cmd $args 2>&1 | tee -a '$log_file'"; then
             echo
             echo -e "${GREEN}✓${NC} NixOS switch ${GREEN}completed successfully${NC}!"
         else
@@ -206,7 +207,7 @@ main() {
     if [[ -n "$home_manager_cmd" ]]; then
         echo -e "${BLUE}━━━ ${YELLOW}Home Manager Configuration${NC} ${BLUE}━━━━━━${NC}"
         echo
-        if eval "$home_manager_cmd 2>&1 | tee -a '$log_file'"; then
+        if eval "$home_manager_cmd $args 2>&1 | tee -a '$log_file'"; then
             echo
             echo -e "${GREEN}✓${NC} Home-manager switch ${GREEN}completed successfully${NC}!"
             if [[ "$QUIET" != "true" ]]; then
