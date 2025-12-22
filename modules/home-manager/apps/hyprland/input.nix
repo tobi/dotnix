@@ -1,7 +1,7 @@
-_:
-
+{ config, lib, ... }:
 {
-  wayland.windowManager.hyprland.settings = {
+  config = lib.mkIf (config.dotnix.wm == "hyprland") {
+    wayland.windowManager.hyprland.settings = {
     input = {
       kb_layout = "us";
       kb_options = "caps:super";
@@ -29,6 +29,7 @@ _:
       no_hardware_cursors = false;
       hide_on_key_press = true;
       default_monitor = "";
+    };
     };
   };
 }

@@ -8,6 +8,7 @@ let
   username = "tobi";
   inherit (pkgs.stdenv) isDarwin;
   inherit (pkgs.stdenv) isLinux;
+  shell = import ./shell.nix { inherit pkgs lib; };
 in
 {
   # Basic home configuration
@@ -90,21 +91,24 @@ in
 
       # Interactive shell setup
       initContent = ''
-        # ── Terminal-specific keybindings ──────────────────────────
-        # Emacs mode provides most bindings (Ctrl+A/E, Ctrl+W, etc.)
-        # These map terminal-specific escape sequences to ZSH widgets
-
-        bindkey '^[[1;5C' forward-word      # Ctrl+Right
-        bindkey '^[[1;5D' backward-word     # Ctrl+Left
-        bindkey '^[[1;3C' forward-word      # Alt+Right (alternative)
-        bindkey '^[[1;3D' backward-word     # Alt+Left (alternative)
-        bindkey '^[[H' beginning-of-line    # Home key
-        bindkey '^[[F' end-of-line          # End key
-
-        export PATH="$HOME/.local/bin:$DOTFILES/bin:$PATH"
+        ${shell.zshInit}
 
         # -- Local zshrc ────────────────────────────────────────────
         [ -f ~/.zshrc.local ] && source ~/.zshrc.local
+      '';
+    };
+
+    bash = {
+      enable = true;
+      enableCompletion = true;
+      historySize = 50000;
+      historyControl = [ "erasedups" "ignoredups" "ignorespace" ];
+
+      initExtra = ''
+        ${shell.bashInit}
+
+        # -- Local bashrc ───────────────────────────────────────────
+        [ -f ~/.bashrc.local ] && source ~/.bashrc.local
       '';
     };
   };
@@ -112,61 +116,25 @@ in
   home.shellAliases = {
     # update home-manager or nixos
     switch = "switch && source $HOME/.zshrc";
-
-    # Editor and tools
-    n = "nvim";
-    lg = "${pkgs.lazygit}/bin/lazygit";
-    gs = "${pkgs.git}/bin/git status";
-    bat = "${pkgs.bat}/bin/bat";
-    sg = "${pkgs.ast-grep}/bin/ast-grep";
-    rg = "${pkgs.ripgrep}/bin/rg";
-    t = "try";
-
-    # GRC colorized commands
-    ping = "${pkgs.grc}/bin/grc --colour=auto ping";
-    traceroute = "${pkgs.grc}/bin/grc --colour=auto traceroute";
-    make = "${pkgs.grc}/bin/grc --colour=auto make";
-    diff = "${pkgs.grc}/bin/grc --colour=auto diff";
-    dig = "${pkgs.grc}/bin/grc --colour=auto dig";
-    mount = "${pkgs.grc}/bin/grc --colour=auto mount";
-    ps = "${pkgs.grc}/bin/grc --colour=auto ps";
-    df = "${pkgs.grc}/bin/grc --colour=auto df";
-    ifconfig = "${pkgs.grc}/bin/grc --colour=auto ifconfig";
-    netstat = "${pkgs.grc}/bin/grc --colour=auto netstat";
-
-    # File operations
-    ".." = "cd ..";
-    ls = "${pkgs.eza}/bin/eza";
-    ll = "${pkgs.eza}/bin/eza -l";
-    la = "${pkgs.eza}/bin/eza -a";
-    lla = "${pkgs.eza}/bin/eza -la";
-    tree = "${pkgs.eza}/bin/eza --tree";
-
-    # clipboard
-    c = "pbcopy";
-    v = "pbpaste";
-
-  }
-  // lib.optionalAttrs pkgs.stdenv.isLinux {
-    # Clipboard (macOS compatibility on Linux)
-    pbcopy = "${pkgs.wl-clipboard}/bin/wl-copy";
-    pbpaste = "${pkgs.wl-clipboard}/bin/wl-paste";
-  };
+  } // shell.aliases;
 
   programs.mise = {
     enable = true;
     enableZshIntegration = true;
+    enableBashIntegration = true;
   };
 
   # Enable additional tools with proper integrations
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
+    enableBashIntegration = true;
   };
 
   programs.direnv = {
     enable = true;
     enableZshIntegration = true;
+    enableBashIntegration = true;
     nix-direnv.enable = true;
   };
 
@@ -243,11 +211,13 @@ in
       git-lfs # Git Large File Storage
       socat # Multipurpose relay
       netcat-gnu # Network utility
+      glow
 
       # ── Nice-to-have utilities ───────────────────────────────────────────
       fastfetch # Fast system information tool
       gum # Tool for glamorous shell scripts
       gcalcli # Google Calendar CLI
+      rclone
 
     ]
     ++ lib.optionals isLinux [

@@ -1,7 +1,7 @@
-_:
-
+{ config, lib, ... }:
 {
-  wayland.windowManager.hyprland.settings = {
+  config = lib.mkIf (config.dotnix.wm == "hyprland") {
+    wayland.windowManager.hyprland.settings = {
     monitor = [
       # Apple StudioDisplay (5K - main display) - listed first for workspace preference
       "desc:Apple Computer Inc StudioDisplay 0xA15CA633,5120x2880@60,auto,2"
@@ -24,5 +24,6 @@ _:
       ", switch:on:Lid Switch, exec, hyprctl keyword monitor 'eDP-1,disable'"
       ", switch:off:Lid Switch, exec, hyprctl keyword monitor 'eDP-1,preferred,0x0,1.6'"
     ];
+    };
   };
 }

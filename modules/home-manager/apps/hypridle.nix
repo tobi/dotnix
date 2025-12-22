@@ -1,7 +1,7 @@
-_:
-
+{ config, lib, ... }:
 {
-  services.hypridle = {
+  config = lib.mkIf (config.dotnix.wm == "hyprland") {
+    services.hypridle = {
     enable = true;
 
     settings = {
@@ -38,6 +38,7 @@ _:
           on-timeout = "systemctl suspend-then-hibernate";
         }
       ];
+    };
     };
   };
 }

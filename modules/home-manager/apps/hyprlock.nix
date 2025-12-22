@@ -1,11 +1,12 @@
-{ theme, ... }:
-
+{ config, lib, ... }:
 let
+  theme = config.dotnix.theme;
   # Convert palette to RGB format for hyprlock
   toRgb = hex: "rgb(${hex})";
 in
 {
-  programs.hyprlock = {
+  config = lib.mkIf (config.dotnix.wm == "hyprland") {
+    programs.hyprlock = {
     enable = true;
 
     settings = {
@@ -78,6 +79,7 @@ in
         halign = "center";
         valign = "center";
       };
+    };
     };
   };
 }

@@ -1,7 +1,10 @@
-{ theme, ... }:
-
+{ config, lib, ... }:
+let
+  theme = config.dotnix.theme;
+in
 {
-  services.hyprpaper = {
+  config = lib.mkIf (config.dotnix.wm == "hyprland") {
+    services.hyprpaper = {
     enable = true;
 
     settings = {
@@ -13,6 +16,7 @@
       wallpaper = [
         ",${theme.wallpaperPath}"
       ];
+    };
     };
   };
 }

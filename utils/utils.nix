@@ -43,7 +43,6 @@ in
             inherit pkgs;
             specialArgs = {
               inherit inputs;
-              inherit (inputs) home-manager;
             };
             modules = [
               # inputs.determinate.nixosModules.default

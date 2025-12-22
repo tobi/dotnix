@@ -4,7 +4,7 @@ let
   pkgs-unstable = inputs.hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 in
 {
-  config = lib.mkIf (config.dotnix.desktop.enable && config.dotnix.desktop.wm == "hyprland") {
+  config = lib.mkIf (config.dotnix.desktop.enable && config.dotnix.wm == "hyprland") {
     # The Hyprland NixOS module (inputs.hyprland.nixosModules.default in utils.nix)
     # automatically provides the latest Hyprland package from the GitHub flake input
     # programs.uswm.enable = true;

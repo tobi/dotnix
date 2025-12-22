@@ -1,7 +1,10 @@
-{ theme, ... }:
-
+{ config, lib, ... }:
+let
+  theme = config.dotnix.theme;
+in
 {
-  wayland.windowManager.hyprland.settings = {
+  config = lib.mkIf (config.dotnix.wm == "hyprland") {
+    wayland.windowManager.hyprland.settings = {
     env = [
       # Cursor configuration - scaled for HiDPI
       "XCURSOR_SIZE,32"
@@ -24,5 +27,6 @@
 
     # Better HiDPI support for X11 apps
     xwayland.force_zero_scaling = true;
+    };
   };
 }

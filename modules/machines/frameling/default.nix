@@ -21,10 +21,8 @@
   # Enable desktop environment with theme configuration
   dotnix = {
     home.enable = true;
-    desktop = {
-      enable = true;
-      wm = "hyprland";
-    };
+    desktop.enable = true;
+    wm = "hyprland";
     theme = {
       name = "everforest";
       variant = "dark";

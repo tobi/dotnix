@@ -1,5 +1,4 @@
 { config, lib, ... }:
-
 let
   binDir = "${../../../../bin}";
 
@@ -41,7 +40,8 @@ let
       hotkeys;
 in
 {
-  wayland.windowManager.hyprland.settings = {
+  config = lib.mkIf (config.dotnix.wm == "hyprland") {
+    wayland.windowManager.hyprland.settings = {
     # Convert modifier keys
     "$mod" = "SUPER";
 
@@ -242,5 +242,6 @@ in
       "$mod, mouse:272, movewindow"
       "$mod, mouse:273, resizewindow"
     ];
+    };
   };
 }

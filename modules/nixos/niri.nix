@@ -4,7 +4,7 @@
     inputs.niri.nixosModules.niri
   ];
 
-  config = lib.mkIf (config.dotnix.desktop.enable && config.dotnix.desktop.wm == "niri") {
+  config = lib.mkIf (config.dotnix.desktop.enable && config.dotnix.wm == "niri") {
     programs = {
       niri.enable = true;
       xwayland.enable = true;

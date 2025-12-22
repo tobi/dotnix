@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ./theme.nix
+    ../theme
   ];
 
   options.dotnix = {
@@ -19,12 +19,6 @@
         type = lib.types.bool;
         default = false;
         description = "Enable dotnix desktop configuration";
-      };
-
-      wm = lib.mkOption {
-        type = lib.types.enum [ "niri" "hyprland" ];
-        default = "niri";
-        description = "Window manager to use (niri or hyprland)";
       };
 
       assertions = [

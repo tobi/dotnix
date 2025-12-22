@@ -3,7 +3,6 @@
 
   outputs =
     { nixpkgs
-    , home-manager
     , ...
     }@inputs:
     let
@@ -49,25 +48,8 @@
       # ------------------------------------------------------------
       # Home Manager configurations
       # ------------------------------------------------------------
-      # Home Manager expects `homeConfigurations.<name>` at the top level.
-      # Provide a concrete configuration for the local Darwin user "tobi".
-      homeConfigurations = {
-        "tobi@x86_64" = home-manager.lib.homeManagerConfiguration {
-          pkgs = mkPkgs "x86_64-linux";
-          extraSpecialArgs = { inherit inputs; };
-          modules = [ ./modules/home-manager/home.nix ];
-        };
-        "tobi@aarch64-darwin" = home-manager.lib.homeManagerConfiguration {
-          pkgs = mkPkgs "aarch64-darwin";
-          extraSpecialArgs = { inherit inputs; };
-          modules = [ ./modules/home-manager/home.nix ];
-        };
-        "tobi@arm64" = home-manager.lib.homeManagerConfiguration {
-          pkgs = mkPkgs "aarch64-darwin";
-          extraSpecialArgs = { inherit inputs; };
-          modules = [ ./modules/home-manager/home.nix ];
-        };
-      };
+      # Home Manager is now managed separately in modules/home-manager/flake.nix
+      # Run: home-manager switch --flake modules/home-manager
 
       # ------------------------------------------------------------
       # Development shell (nix develop .)
@@ -76,7 +58,7 @@
       devShells = forEachSystem (
         system:
         let
-          devConfig = import ./devshell.nix { inherit nixpkgs system; };
+          devConfig = import ./devshell.nix { inherit nixpkgs system inputs; };
         in
         devConfig.devShells.${system}
       );
@@ -93,14 +75,12 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
 
-    home-manager.url = "github:nix-community/home-manager";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     niri.url = "github:sodiboo/niri-flake";
     niri.inputs.nixpkgs.follows = "nixpkgs";
 
     hyprland.url = "github:hyprwm/Hyprland";
-    hyprland.inputs.nixpkgs.follows = "nixpkgs";
+    # Don't follow nixpkgs - avoids nix-functional-tests hang in nix develop
 
     hyprland-plugins.url = "github:hyprwm/hyprland-plugins";
     hyprland-plugins.inputs.hyprland.follows = "hyprland";

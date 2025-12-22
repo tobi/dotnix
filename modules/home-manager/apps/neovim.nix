@@ -1,4 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
+let
+  inherit (pkgs.stdenv) isLinux;
+in
 {
   programs.neovim = {
     enable = true;
@@ -144,5 +147,8 @@
     fzf
     ripgrep
     fd
+  ] ++ lib.optionals isLinux [
+    # Clipboard provider for Wayland (Linux only)
+    wl-clipboard
   ];
 }

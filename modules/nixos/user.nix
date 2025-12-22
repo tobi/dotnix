@@ -1,7 +1,5 @@
 {
   pkgs,
-  home-manager,
-  inputs,
   config,
   lib,
   ...
@@ -11,7 +9,6 @@
   imports = [
     ./config.nix
     ./environment.nix
-    home-manager.nixosModules.home-manager
   ];
 
   # User configuration
@@ -32,28 +29,6 @@
       "libvirtd"
     ];
     description = "Tobi Lutke";
-  };
-
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    backupFileExtension = "backup";
-
-    users.tobi.imports = [
-      inputs.nix-colors.homeManagerModules.default
-    ]
-    ++ lib.optionals config.dotnix.home.enable [
-      ../home-manager/home.nix
-    ]
-    ++ lib.optionals config.dotnix.desktop.enable [
-      ../home-manager/desktop.nix
-    ];
-
-    extraSpecialArgs = {
-      inherit inputs;
-      inherit (config.dotnix) theme;
-      inherit (config.dotnix.desktop) wm;
-    };
   };
 
   # Enable zsh system-wide since it's the user's shell

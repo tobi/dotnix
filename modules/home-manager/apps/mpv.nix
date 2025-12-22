@@ -7,7 +7,10 @@
   - MIME type associations for all common video formats
 */
 
-{ theme, ... }:
+{ config, ... }:
+let
+  theme = config.dotnix.theme;
+in
 {
   programs.mpv = {
     enable = true;

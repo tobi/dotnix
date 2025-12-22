@@ -21,11 +21,12 @@ def extract_tailscale_hosts(binary) #: -> Hash[String, String]
 
     status['Peer'].each_with_object({}) do |(_, params), hosts|
       hostname = params['HostName']
+      dnsname = params['DNSName']
       tailscale_ips = params['TailscaleIPs']
 
       if hostname && tailscale_ips && !tailscale_ips.empty?
         ip = tailscale_ips.first
-        hosts[hostname] = ip if ip
+        hosts[hostname] = [ip, dnsname] if ip
       end
     end.tap { |hosts| hosts.delete('localhost') }
   rescue => e
@@ -64,8 +65,8 @@ def update_hosts_file(tailscale_hosts) #: -> void
     file.puts("# added by tailscale script") unless hosts_content.include?("# added by tailscale script")
     file.puts
 
-    tailscale_hosts.each do |host, ip|
-      file.puts("#{ip}\t#{host}")
+    tailscale_hosts.each do |host, (ip, dnsname)|
+      file.puts("#{ip}\t#{host} #{dnsname}")
     end
   end
 end

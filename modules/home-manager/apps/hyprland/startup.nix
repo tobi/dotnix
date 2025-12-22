@@ -1,7 +1,7 @@
-_:
-
+{ config, lib, ... }:
 {
-  wayland.windowManager.hyprland.settings = {
+  config = lib.mkIf (config.dotnix.wm == "hyprland") {
+    wayland.windowManager.hyprland.settings = {
     # Run once at Hyprland startup
     exec-once = [
       "systemctl --user start hyprpolkitagent"
@@ -14,5 +14,6 @@ _:
       # Preserve lid state after rebuild - disable laptop display if lid is closed
       "sh -c 'grep -q closed /proc/acpi/button/lid/*/state && hyprctl keyword monitor eDP-1,disable || true'"
     ];
+    };
   };
 }

@@ -1,4 +1,7 @@
-{ theme, ... }:
+{ config, ... }:
+let
+  theme = config.dotnix.theme;
+in
 {
   services.mako = {
     enable = true;

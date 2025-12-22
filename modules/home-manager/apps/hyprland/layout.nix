@@ -1,5 +1,7 @@
-{ theme, ... }:
-
+{ config, lib, ... }:
+let
+  theme = config.dotnix.theme;
+in
 let
   # Helper to convert hex color to rgba with alpha
   hexToRgba = hex: alpha: "rgba(${hex}${alpha})";
@@ -9,7 +11,8 @@ let
   inactiveBorder = hexToRgba theme.palette.base03 "66";
 in
 {
-  wayland.windowManager.hyprland.settings = {
+  config = lib.mkIf (config.dotnix.wm == "hyprland") {
+    wayland.windowManager.hyprland.settings = {
     general = {
       gaps_in = 4;
       gaps_out = 5;
@@ -111,6 +114,7 @@ in
 
         gradients = false;
       };
+    };
     };
   };
 }

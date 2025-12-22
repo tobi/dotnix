@@ -1,7 +1,7 @@
-_:
-
+{ config, lib, ... }:
 {
-  wayland.windowManager.hyprland.settings = {
+  config = lib.mkIf (config.dotnix.wm == "hyprland") {
+    wayland.windowManager.hyprland.settings = {
     windowrule = [
       # Suppress maximize events (Hyprland uses tiling)
       "suppressevent maximize, class:.*"
@@ -55,5 +55,6 @@ _:
       "blur, walker"
       "blur, notifications"
     ];
+    };
   };
 }

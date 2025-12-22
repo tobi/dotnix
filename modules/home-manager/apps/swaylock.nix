@@ -1,12 +1,15 @@
 {
   pkgs,
-  theme,
+  config,
+  lib,
   ...
 }:
 let
+  theme = config.dotnix.theme;
   opacity = rgb: "${rgb}AA";
 in
 {
+  config = lib.mkIf (config.dotnix.wm == "niri") {
 
   home.packages = with pkgs; [
     swaylock-effects
@@ -111,5 +114,6 @@ in
       }
     ];
     # extraArgs = [ "-w" ]; # Wait for lock command to finish before continuing
+  };
   };
 }

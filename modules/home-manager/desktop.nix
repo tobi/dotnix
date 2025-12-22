@@ -1,5 +1,9 @@
-{ pkgs, theme, wm, lib, ... }:
+{ pkgs, config, lib, ... }:
+let
+  wm = config.dotnix.wm;
+in
 {
+  # Desktop environment - Linux only (imported conditionally in flake.nix)
 
   home.packages = with pkgs; ([
     # Desktop environment and window management
@@ -62,7 +66,7 @@
   };
 
   # Symlink current theme wallpaper to ~/.config/wallpaper.jpg
-  home.file.".config/wallpaper.jpg".source = theme.wallpaperPath;
+  home.file.".config/wallpaper.jpg".source = config.dotnix.theme.wallpaperPath;
 
   imports = [
     ./dotnix-options.nix
@@ -87,12 +91,9 @@
     ./apps/typora.nix
     ./apps/warp.nix
     ./apps/mpv.nix
-  ]
-  ++ lib.optionals (wm == "niri") [
+    # Window managers
     ./apps/niri.nix
     ./apps/swaylock.nix
-  ]
-  ++ lib.optionals (wm == "hyprland") [
     ./apps/hyprland.nix
     ./apps/hyprlock.nix
     ./apps/hypridle.nix

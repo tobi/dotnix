@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, lib, ... }:
 {
   # Hyprland configuration with modular structure
   # Configuration split into logical sections mirroring niri structure:
@@ -11,11 +11,13 @@
   # - apps/hyprland/window-rules.nix - window and layer rules
   imports = [ ./hyprland ];
 
-  # Cursor themes for Hyprland
-  home.packages = with pkgs; [
-    bibata-cursors
-    capitaine-cursors
-    graphite-cursors
-    numix-cursor-theme
-  ];
+  config = lib.mkIf (config.dotnix.wm == "hyprland") {
+    # Cursor themes for Hyprland
+    home.packages = with pkgs; [
+      bibata-cursors
+      capitaine-cursors
+      graphite-cursors
+      numix-cursor-theme
+    ];
+  };
 }

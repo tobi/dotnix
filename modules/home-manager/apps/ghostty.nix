@@ -7,7 +7,10 @@
   - Modern terminal features
 */
 
-{ theme, ... }:
+{ config, ... }:
+let
+  theme = config.dotnix.theme;
+in
 let
   inherit (theme) palette;
 in
