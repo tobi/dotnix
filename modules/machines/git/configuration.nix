@@ -22,8 +22,6 @@ in
 
   boot.isContainer = true;
 
-  networking.useDHCP = true;
-
   services.tailscale = {
     enable = true;
     extraUpFlags = [

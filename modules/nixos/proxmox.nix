@@ -1,4 +1,4 @@
-{ modulesPath, config, pkgs, ... }:
+{ modulesPath, config, pkgs, lib, ... }:
 
 {
   imports =
@@ -47,6 +47,9 @@
     useDHCP = false;
     useHostResolvConf = false;
   };
+
+  # Tailscale in LXC often lacks /dev/net/tun; use userspace networking by default.
+  services.tailscale.interfaceName = lib.mkDefault "userspace-networking";
 
   systemd.services.console-getty = {
     wantedBy = [ "multi-user.target" ];

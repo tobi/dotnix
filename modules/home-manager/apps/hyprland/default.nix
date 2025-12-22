@@ -1,6 +1,5 @@
 { pkgs, inputs, config, lib, ... }:
 let
-  sys = pkgs.stdenv.hostPlatform.system;
 in
 {
   imports = [
@@ -16,8 +15,8 @@ in
   config = lib.mkIf (config.dotnix.wm == "hyprland") {
     wayland.windowManager.hyprland = {
       enable = true;
-      package = inputs.hyprland.packages.${sys}.hyprland;
-      portalPackage = inputs.hyprland.packages.${sys}.xdg-desktop-portal-hyprland;
+      package = pkgs.hyprland;
+      portalPackage = pkgs.xdg-desktop-portal-hyprland;
     };
 
     services.hyprpolkitagent.enable = true;

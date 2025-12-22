@@ -46,8 +46,6 @@ in
             };
             modules = [
               # inputs.determinate.nixosModules.default
-              inputs.hyprland.nixosModules.default
-
               (machinesPath + "/${name}/default.nix")
             ];
           };
