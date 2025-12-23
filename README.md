@@ -1,5 +1,8 @@
 # dotnix
 
+[![Run in Smithery](https://smithery.ai/badge/skills/tobi)](https://smithery.ai/skills?ns=tobi&utm_source=github&utm_medium=badge)
+
+
 A simple, clean NixOS flake configuration with home-manager.
 
 ## Quick Start
