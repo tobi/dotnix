@@ -3,6 +3,7 @@
 
   outputs =
     { nixpkgs
+    , colmena
     , ...
     }@inputs:
     let
@@ -28,18 +29,61 @@
             # (import ./modules/overlays/ruby.nix)
           ];
         };
+
+      # NixOS configurations (used by both nixosConfigurations and colmena)
+      nixosConfigs = utils.mkMachines {
+        inherit inputs;
+        machinesPath = ./hosts;
+        extraOverlays = [ ];
+      };
     in
     {
 
       formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-tree;
 
+      # Expose colmena for `nix run .#colmena`
+      packages.x86_64-linux.colmena = colmena.packages.x86_64-linux.colmena;
+
       # ------------------------------------------------------------
       # NixOS configurations
       # ------------------------------------------------------------
-      nixosConfigurations = utils.mkMachines {
-        inherit inputs;
-        machinesPath = ./hosts;
-        extraOverlays = [ ];
+      nixosConfigurations = nixosConfigs;
+
+      # ------------------------------------------------------------
+      # Colmena deployment configuration
+      # ------------------------------------------------------------
+      colmenaHive = colmena.lib.makeHive {
+        meta = {
+          nixpkgs = import nixpkgs { system = "x86_64-linux"; };
+          specialArgs = { inherit inputs; };
+        };
+
+        # Server hosts - deployed remotely
+        git = { name, ... }: {
+          imports = [ ./hosts/git ];
+          deployment = {
+            targetHost = "git";
+            targetUser = "root";
+            tags = [ "server" ];
+          };
+        };
+
+        # Desktop hosts - deployed locally via ./apply
+        frameling = { ... }: {
+          imports = [ ./hosts/frameling ];
+          deployment = {
+            allowLocalDeployment = true;
+            tags = [ "desktop" ];
+          };
+        };
+
+        beetralisk = { ... }: {
+          imports = [ ./hosts/beetralisk ];
+          deployment = {
+            allowLocalDeployment = true;
+            tags = [ "desktop" ];
+          };
+        };
       };
 
       # ------------------------------------------------------------
@@ -63,15 +107,13 @@
     };
 
   inputs = {
-    # determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
-    # nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0";
-
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    colmena.url = "github:zhaofengli/colmena";
+    colmena.inputs.nixpkgs.follows = "nixpkgs";
 
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
-
 
     hyprland.url = "github:hyprwm/Hyprland";
     # Don't follow nixpkgs - avoids nix-functional-tests hang in nix develop

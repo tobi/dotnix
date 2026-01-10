@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+#
+# Deploy NixOS configurations to remote hosts using Colmena
+#
+# Usage:
+#   ./deploy git           # Deploy to git server
+#   ./deploy @server       # Deploy to all hosts tagged 'server'
+#   ./deploy --build-only  # Just build, don't deploy
+#
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+DOTNIX_DIR="$(dirname "$SCRIPT_DIR")"
+
+cd "$DOTNIX_DIR"
+
+# Default to switch goal
+GOAL="switch"
+BUILD_ONLY=""
+
+# Parse arguments
+COLMENA_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --build-only)
+            BUILD_ONLY="true"
+            shift
+            ;;
+        --boot|--switch|--test)
+            GOAL="${1#--}"
+            shift
+            ;;
+        *)
+            COLMENA_ARGS+=("$1")
+            shift
+            ;;
+    esac
+done
+
+# Helper to run colmena from the flake
+run_colmena() {
+    nix run .#colmena -- "$@"
+}
+
+if [[ ${#COLMENA_ARGS[@]} -eq 0 ]]; then
+    echo "Usage: deploy <host|@tag> [options]"
+    echo ""
+    echo "Examples:"
+    echo "  deploy git              # Deploy to git server"
+    echo "  deploy @server          # Deploy to all servers"
+    echo "  deploy git --build-only # Just build, don't deploy"
+    echo ""
+    echo "Available hosts:"
+    run_colmena eval -E '{ nodes, ... }: builtins.attrNames nodes' 2>/dev/null | tr -d '[]"' | tr ',' '\n' | sed 's/^/  /'
+    exit 1
+fi
+
+if [[ -n "$BUILD_ONLY" ]]; then
+    echo "Building configuration for: ${COLMENA_ARGS[*]}"
+    exec nix run .#colmena -- build --on "${COLMENA_ARGS[@]}"
+else
+    echo "Deploying ($GOAL) to: ${COLMENA_ARGS[*]}"
+    exec nix run .#colmena -- apply --on "${COLMENA_ARGS[@]}" "$GOAL"
+fi

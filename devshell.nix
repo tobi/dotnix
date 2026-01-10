@@ -44,6 +44,9 @@ in
         statix
         deadnix
 
+        # Deployment tools
+        inputs.colmena.packages.${system}.colmena
+
         # Language runtimes
         ruby_3_4
         python313
