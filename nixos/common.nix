@@ -30,6 +30,11 @@
     ];
     auto-optimise-store = true;
 
+    # Trust root, wheel group, and tobi for remote deployments (colmena)
+    # Note: @wheel should cover tobi, but nix SSH protocol sends UID not username,
+    # so explicit user is needed for cross-machine trust
+    trusted-users = [ "root" "@wheel" "tobi" ];
+
     # Performance optimizations
     download-buffer-size = 2147483648; # 2GB
     max-jobs = "auto";
