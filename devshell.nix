@@ -2,7 +2,7 @@
 let
   pkgs = import nixpkgs { inherit system; };
   lib = pkgs.lib;
-  shell = import ./modules/home-manager/shell.nix { inherit pkgs lib; };
+  shell = import ./home/shell.nix { inherit pkgs lib; };
 
   # Convert aliases attrset to bash alias commands
   aliasLines = lib.mapAttrsToList (name: value: "alias ${name}=${lib.escapeShellArg value}") shell.aliases;

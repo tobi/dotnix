@@ -16,7 +16,7 @@
       forEachSystem = nixpkgs.lib.genAttrs systems;
 
       # Import utilities with centralized overlay system
-      utils = import ./utils/utils.nix { inherit nixpkgs; };
+      utils = import ./lib/utils.nix { inherit nixpkgs; };
 
       # Generate pkgs for home-manager using centralized overlay system
       mkPkgs =
@@ -25,7 +25,6 @@
           inherit system;
 
           extraOverlays = [
-            inputs.niri.overlays.niri
             # (import ./modules/overlays/ruby.nix)
           ];
         };
@@ -39,17 +38,15 @@
       # ------------------------------------------------------------
       nixosConfigurations = utils.mkMachines {
         inherit inputs;
-        machinesPath = ./modules/machines;
-        extraOverlays = [
-          inputs.niri.overlays.niri
-        ];
+        machinesPath = ./hosts;
+        extraOverlays = [ ];
       };
 
       # ------------------------------------------------------------
       # Home Manager configurations
       # ------------------------------------------------------------
-      # Home Manager is now managed separately in modules/home-manager/flake.nix
-      # Run: home-manager switch --flake modules/home-manager
+      # Home Manager is managed separately in home/flake.nix
+      # Run: home-manager switch --flake ./home
 
       # ------------------------------------------------------------
       # Development shell (nix develop .)
@@ -75,9 +72,6 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
 
-
-    niri.url = "github:sodiboo/niri-flake";
-    niri.inputs.nixpkgs.follows = "nixpkgs";
 
     hyprland.url = "github:hyprwm/Hyprland";
     # Don't follow nixpkgs - avoids nix-functional-tests hang in nix develop

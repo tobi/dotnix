@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# apply - Apply NixOS and/or home-manager configuration
+#
+# Automatically detects context and applies the appropriate configuration:
+# - NixOS rebuild if on NixOS with a matching host config
+# - Home-manager if user is tobi
+
+set -euo pipefail
+
+# Resolve symlinks to get the real script location
+SCRIPT_PATH="$(readlink -f "$0")"
+FLAKE_DIR="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
+HOSTNAME="${HOSTNAME:-$(hostname)}"
+ARCH="$(uname -m)"
+USER="${USER:-$(whoami)}"
+
+# Normalize arch for home-manager
+case "$ARCH" in
+  x86_64)  HM_ARCH="x86_64" ;;
+  aarch64) HM_ARCH="aarch64" ;;
+  arm64)   HM_ARCH="aarch64" ;;
+  *)       HM_ARCH="$ARCH" ;;
+esac
+
+echo "Applying configuration..."
+echo "  Host: $HOSTNAME"
+echo "  User: $USER"
+echo "  Arch: $ARCH"
+echo "  Flake: $FLAKE_DIR"
+echo ""
+
+# Apply NixOS if we're on NixOS and have a host config
+if [[ -f /etc/NIXOS ]] && [[ -d "$FLAKE_DIR/hosts/$HOSTNAME" ]]; then
+  echo "==> Applying NixOS configuration for $HOSTNAME"
+  sudo nixos-rebuild switch --flake "$FLAKE_DIR#$HOSTNAME" "$@"
+  echo ""
+fi
+
+# Apply home-manager if user is tobi
+if [[ "$USER" == "tobi" ]]; then
+  echo "==> Applying home-manager configuration for $USER@$HM_ARCH"
+  home-manager switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@"
+  echo ""
+fi
+
+echo "Done!"
