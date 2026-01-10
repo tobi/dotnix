@@ -1,6 +1,6 @@
 { config, ... }:
 let
-  theme = config.dotnix.theme;
+  inherit (config.dotnix) theme;
   # Helper to convert hex color to rgba with alpha
   hexToRgba = hex: alpha: "rgba(${hex}${alpha})";
 

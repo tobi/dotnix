@@ -32,7 +32,7 @@ in
 
     services.forgejo = {
       enable = true;
-      stateDir = stateDir;
+      inherit stateDir;
       settings = {
         repository = {
           ROOT = "${stateDir}/repositories";

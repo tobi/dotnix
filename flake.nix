@@ -20,15 +20,6 @@
       utils = import ./lib/utils.nix { inherit nixpkgs; };
 
       # Generate pkgs for home-manager using centralized overlay system
-      mkPkgs =
-        system:
-        utils.mkPkgs {
-          inherit system;
-
-          extraOverlays = [
-            # (import ./modules/overlays/ruby.nix)
-          ];
-        };
 
       # NixOS configurations (used by both nixosConfigurations and colmena)
       nixosConfigs = utils.mkMachines {
@@ -59,7 +50,7 @@
         };
 
         # Server hosts - deployed remotely
-        git = { name, ... }: {
+        git = { ... }: {
           imports = [ ./hosts/git ];
           deployment = {
             targetHost = "git";

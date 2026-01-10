@@ -9,7 +9,7 @@
   When enabled, requires dotnix.services.tailscale.enable = true.
 */
 
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
   cfg = config.dotnix.services.nginx;

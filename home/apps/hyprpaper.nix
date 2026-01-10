@@ -1,6 +1,6 @@
 { config, ... }:
 let
-  theme = config.dotnix.theme;
+  inherit (config.dotnix) theme;
 in
 {
   services.hyprpaper = {

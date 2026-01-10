@@ -30,12 +30,10 @@
       mkHomeConfig =
         {
           system,
-          username ? "tobi",
           extraModules ? [ ],
         }:
         let
           pkgs = mkPkgs system;
-          isLinux = pkgs.stdenv.isLinux;
         in
         home-manager.lib.homeManagerConfiguration {
           inherit pkgs;

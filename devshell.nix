@@ -1,7 +1,7 @@
 { nixpkgs, system, inputs }:
 let
   pkgs = import nixpkgs { inherit system; };
-  lib = pkgs.lib;
+  inherit (pkgs) lib;
   shell = import ./home/shell.nix { inherit pkgs lib; };
 
   # Convert aliases attrset to bash alias commands

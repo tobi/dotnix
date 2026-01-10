@@ -5,7 +5,7 @@
   Service configuration is handled via dotnix.services.* options.
 */
 
-{ ... }:
+_:
 
 {
   system.stateVersion = "25.11";

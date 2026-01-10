@@ -4,7 +4,7 @@
   ...
 }:
 let
-  theme = config.dotnix.theme;
+  inherit (config.dotnix) theme;
   inherit (theme) palette;
   terminal = "${pkgs.ghostty}/bin/ghostty";
 in

@@ -1,6 +1,6 @@
 { config, ... }:
 let
-  theme = config.dotnix.theme;
+  inherit (config.dotnix) theme;
   # Convert palette to RGB format for hyprlock
   toRgb = hex: "rgb(${hex})";
 in

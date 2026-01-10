@@ -9,9 +9,8 @@
 
 { config, ... }:
 let
-  theme = config.dotnix.theme;
-in
-let
+  inherit (config.dotnix) theme;
+
   inherit (theme) palette;
 in
 {
