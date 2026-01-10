@@ -6,12 +6,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Nix (GitHub only)
-        uses: cachix/install-nix-action@v25
-        # Skip on Forgejo/act runners where nix is pre-installed
-        if: ${{ !env.ACT }}
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
+      - name: Install Nix
+        run: |
+          if ! command -v nix &> /dev/null; then
+            curl -L https://nixos.org/nix/install | sh -s -- --daemon
+            . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+          fi
+          nix --version
       - name: Check flake
         run: nix flake check --no-build
       - name: Lint with statix
