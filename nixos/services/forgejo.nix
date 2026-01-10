@@ -51,10 +51,13 @@ in
         };
 
         security = {
-          # Headers set by nginx tailscaleAuth
-          REVERSE_PROXY_AUTHENTICATION_USER = "Tailscale-User-Login";
-          REVERSE_PROXY_AUTHENTICATION_EMAIL = "Tailscale-User-Login";
-          REVERSE_PROXY_AUTHENTICATION_FULL_NAME = "Tailscale-User-Name";
+          # Headers from NixOS nginx tailscaleAuth (via tailscale nginx-auth):
+          # - X-Webauth-User: user@host (email-like identifier)
+          # - X-Webauth-Login: user (username only)
+          # - X-Webauth-Name: display name
+          REVERSE_PROXY_AUTHENTICATION_USER = "X-Webauth-Login";
+          REVERSE_PROXY_AUTHENTICATION_EMAIL = "X-Webauth-User";
+          REVERSE_PROXY_AUTHENTICATION_FULL_NAME = "X-Webauth-Name";
           REVERSE_PROXY_TRUSTED_PROXIES = "127.0.0.0/8,::1/128,100.64.0.0/10";
         };
       };
