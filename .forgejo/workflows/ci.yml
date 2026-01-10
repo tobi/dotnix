@@ -1,0 +1,14 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: native
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check flake
+        run: nix flake check --no-build
+      - name: Lint with statix
+        run: nix run nixpkgs#statix -- check .
+      - name: Check for dead code
+        run: nix run nixpkgs#deadnix -- .
