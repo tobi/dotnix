@@ -74,7 +74,77 @@ in
           REVERSE_PROXY_AUTHENTICATION_FULL_NAME = "X-Webauth-Name";
           REVERSE_PROXY_TRUSTED_PROXIES = "127.0.0.0/8,::1/128,100.64.0.0/10";
         };
+
+        # Enable Forgejo Actions
+        actions = {
+          ENABLED = true;
+        };
       };
+    };
+
+    # Forgejo Actions Runner - runs workflows natively with nix
+    services.gitea-actions-runner = {
+      package = pkgs.forgejo-runner;
+      instances.nix = {
+        enable = true;
+        name = config.networking.hostName;
+        # Use localhost directly - runner is on same machine, no need for TLS/auth
+        url = "http://127.0.0.1:${toString cfg.httpPort}";
+        tokenFile = "${stateDir}/runner-token";
+        labels = [
+          "nix:host"
+          "native:host"
+          "ubuntu-latest:host"  # Fake ubuntu for compatibility
+        ];
+        hostPackages = with pkgs; [
+          bash
+          coreutils
+          curl
+          gawk
+          git
+          gnused
+          nodejs
+          wget
+          nix
+          gnutar
+          gzip
+        ];
+      };
+    };
+
+    # Generate runner token automatically if it doesn't exist
+    systemd.services.forgejo-runner-token = {
+      description = "Generate Forgejo Actions runner token";
+      after = [ "forgejo.service" ];
+      requires = [ "forgejo.service" ];
+      before = [ "gitea-runner-nix.service" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        User = "forgejo";
+        Group = "forgejo";
+      };
+      script = ''
+        TOKEN_FILE="${stateDir}/runner-token"
+        if [ ! -f "$TOKEN_FILE" ]; then
+          echo "Generating Forgejo runner token..."
+          TOKEN=$(${config.services.forgejo.package}/bin/forgejo \
+            --work-path ${stateDir} \
+            actions generate-runner-token)
+          echo "TOKEN=$TOKEN" > "$TOKEN_FILE"
+          chmod 600 "$TOKEN_FILE"
+          echo "Runner token generated and saved to $TOKEN_FILE"
+        else
+          echo "Runner token already exists at $TOKEN_FILE"
+        fi
+      '';
+    };
+
+    # Ensure the runner service waits for the token
+    systemd.services.gitea-runner-nix = {
+      after = [ "forgejo-runner-token.service" ];
+      requires = [ "forgejo-runner-token.service" ];
     };
 
     # Nginx virtual host for Forgejo
@@ -133,5 +203,8 @@ in
 
     # Firewall: only expose on tailscale interface
     networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 443 cfg.sshPort ];
+
+    # Add domain to /etc/hosts so local services can resolve it
+    networking.hosts."127.0.0.1" = [ domain ];
   };
 }
