@@ -38,9 +38,11 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Helper to run colmena from the flake
+# Build colmena once and use it directly (nix run has issues with not exiting)
+COLMENA_BIN=$(nix build .#colmena --no-link --print-out-paths)/bin/colmena
+
 run_colmena() {
-    nix run .#colmena -- "$@"
+    "$COLMENA_BIN" "$@"
 }
 
 if [[ ${#COLMENA_ARGS[@]} -eq 0 ]]; then
@@ -58,8 +60,8 @@ fi
 
 if [[ -n "$BUILD_ONLY" ]]; then
     echo "Building configuration for: ${COLMENA_ARGS[*]}"
-    exec nix run .#colmena -- build --on "${COLMENA_ARGS[@]}"
+    exec "$COLMENA_BIN" build --on "${COLMENA_ARGS[@]}"
 else
     echo "Deploying ($GOAL) to: ${COLMENA_ARGS[*]}"
-    exec nix run .#colmena -- apply --on "${COLMENA_ARGS[@]}" "$GOAL"
+    exec "$COLMENA_BIN" apply --on "${COLMENA_ARGS[@]}" "$GOAL"
 fi
