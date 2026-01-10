@@ -19,6 +19,9 @@ let
     if cfg.domain != ""
     then cfg.domain
     else "${config.networking.hostName}.${config.dotnix.tailnetDomain}";
+
+  # All Forgejo state goes under /data/forgejo (NFS mount)
+  stateDir = "/data/forgejo";
 in
 {
   config = lib.mkIf cfg.enable {
@@ -29,7 +32,17 @@ in
 
     services.forgejo = {
       enable = true;
+      stateDir = stateDir;
       settings = {
+        repository = {
+          ROOT = "${stateDir}/repositories";
+        };
+        database = {
+          PATH = "${stateDir}/data/forgejo.db";
+        };
+        log = {
+          ROOT_PATH = "${stateDir}/log";
+        };
         server = {
           HTTP_ADDR = "127.0.0.1";
           HTTP_PORT = cfg.httpPort;
