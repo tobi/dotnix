@@ -4,12 +4,23 @@
 # Automatically detects context and applies the appropriate configuration:
 # - NixOS rebuild if on NixOS with a matching host config
 # - Home-manager if user is tobi
+#
+# Usage:
+#   ./apply              # Apply locally
+#   ./apply --to <host>  # Deploy to remote host via apply-to
 
 set -euo pipefail
 
 # Resolve symlinks to get the real script location
 SCRIPT_PATH="$(readlink -f "$0")"
-FLAKE_DIR="$(cd "$(dirname "$SCRIPT_PATH")/.." && pwd)"
+SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
+FLAKE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Handle --to flag for remote deployments
+if [[ "${1:-}" == "--to" ]]; then
+    shift
+    exec "$SCRIPT_DIR/apply-to" "$@"
+fi
 HOSTNAME="${HOSTNAME:-$(hostname)}"
 ARCH="$(uname -m)"
 USER="${USER:-$(whoami)}"
@@ -39,7 +50,14 @@ fi
 # Apply home-manager if user is tobi
 if [[ "$USER" == "tobi" ]]; then
   echo "==> Applying home-manager configuration for $USER@$HM_ARCH"
-  home-manager switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@"
+  if command -v home-manager &>/dev/null; then
+    home-manager switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@"
+  elif command -v nix &>/dev/null; then
+    nix run home-manager -- switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@"
+  else
+    echo "Error: Neither home-manager nor nix found in PATH"
+    exit 1
+  fi
   echo ""
 fi
 
