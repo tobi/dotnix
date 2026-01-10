@@ -93,6 +93,7 @@
       nmap
       traceroute
       iperf3
+      nfs-utils
     ]
     ++ lib.optionals config.dotnix.desktop.enable [
       # Desktop-specific packages

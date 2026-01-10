@@ -26,6 +26,7 @@ in
       enable = true;
       recommendedProxySettings = true;
       recommendedTlsSettings = true;
+      clientMaxBodySize = "100m";
 
       # Enable built-in tailscale auth if we have virtual hosts configured
       tailscaleAuth = {
