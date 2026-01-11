@@ -26,4 +26,7 @@
       # Domain auto-derived as git.tail250b8.ts.net from hostname + tailnetDomain
     };
   };
+
+  # Use real tun interface (LXC has /dev/net/tun enabled)
+  services.tailscale.interfaceName = "tailscale0";
 }

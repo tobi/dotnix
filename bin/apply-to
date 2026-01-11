@@ -15,9 +15,19 @@ DOTNIX_DIR="$(dirname "$SCRIPT_DIR")"
 
 cd "$DOTNIX_DIR"
 
+# Detect local system architecture
+LOCAL_ARCH="$(uname -m)"
+case "$LOCAL_ARCH" in
+  x86_64)  LOCAL_SYSTEM="x86_64-linux" ;;
+  aarch64) LOCAL_SYSTEM="aarch64-linux" ;;
+  arm64)   LOCAL_SYSTEM="aarch64-darwin" ;;  # macOS on Apple Silicon
+  *)       LOCAL_SYSTEM="unknown" ;;
+esac
+
 # Default to switch goal
 GOAL="switch"
 BUILD_ONLY=""
+BUILD_ON_TARGET=""
 
 # Parse arguments
 COLMENA_ARGS=()
@@ -25,6 +35,10 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --build-only)
             BUILD_ONLY="true"
+            shift
+            ;;
+        --build-on-target)
+            BUILD_ON_TARGET="true"
             shift
             ;;
         --boot|--switch|--test)
@@ -58,10 +72,31 @@ if [[ ${#COLMENA_ARGS[@]} -eq 0 ]]; then
     exit 1
 fi
 
+# Auto-enable build-on-target if deploying to x86_64-linux from non-x86_64-linux
+# Check if any target has the x86_64-linux tag and we're not on x86_64-linux
+if [[ -z "$BUILD_ON_TARGET" && "$LOCAL_SYSTEM" != "x86_64-linux" ]]; then
+    # Check if target has x86_64-linux tag (all our Linux servers do)
+    for arg in "${COLMENA_ARGS[@]}"; do
+        if [[ "$arg" != @* ]]; then
+            # It's a host name, check if it's a Linux server
+            if "$COLMENA_BIN" eval -E "{ nodes, ... }: builtins.elem \"x86_64-linux\" nodes.${arg}.config.deployment.tags" 2>/dev/null | grep -q "true"; then
+                BUILD_ON_TARGET="true"
+                echo "Auto-enabling --build-on-target (deploying to x86_64-linux from $LOCAL_SYSTEM)"
+                break
+            fi
+        fi
+    done
+fi
+
+EXTRA_ARGS=()
+if [[ -n "$BUILD_ON_TARGET" ]]; then
+    EXTRA_ARGS+=("--build-on-target")
+fi
+
 if [[ -n "$BUILD_ONLY" ]]; then
     echo "Building configuration for: ${COLMENA_ARGS[*]}"
-    exec "$COLMENA_BIN" build --on "${COLMENA_ARGS[@]}"
+    exec "$COLMENA_BIN" build --on "${COLMENA_ARGS[@]}" "${EXTRA_ARGS[@]}"
 else
     echo "Deploying ($GOAL) to: ${COLMENA_ARGS[*]}"
-    exec "$COLMENA_BIN" apply --on "${COLMENA_ARGS[@]}" "$GOAL"
+    exec "$COLMENA_BIN" apply --on "${COLMENA_ARGS[@]}" "${EXTRA_ARGS[@]}" "$GOAL"
 fi

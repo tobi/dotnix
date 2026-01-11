@@ -10,17 +10,16 @@ git clone <repo> ~/dotnix
 cd ~/dotnix
 
 # Apply configuration (auto-detects NixOS and/or home-manager)
-./apply
+apply
 
 # Deploy to remote host
-./apply --to git
+apply --to git
 ```
 
 ## Structure
 
 ```
 dotnix/
-├── apply                    # Smart apply script (symlink to bin/apply)
 ├── flake.nix               # Main NixOS flake
 │
 ├── home/                   # Home-manager (separate flake)
@@ -108,6 +107,6 @@ nixos-rebuild build --flake .#frameling
 nix build .#nixosConfigurations.usb-stick.config.system.build.isoImage
 
 # Deploy to remote
-./apply --to git
-./bin/apply-to @server  # Deploy to all servers
+apply --to git
+apply-to @server  # Deploy to all servers
 ```

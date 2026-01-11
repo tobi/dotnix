@@ -33,7 +33,9 @@
       formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-tree;
 
       # Expose colmena for `nix run .#colmena`
-      packages.x86_64-linux.colmena = colmena.packages.x86_64-linux.colmena;
+      packages = forEachSystem (system: {
+        colmena = colmena.packages.${system}.colmena;
+      });
 
       # ------------------------------------------------------------
       # NixOS configurations
@@ -55,11 +57,11 @@
           deployment = {
             targetHost = "git";
             targetUser = "root";
-            tags = [ "server" ];
+            tags = [ "server" "x86_64-linux" ];
           };
         };
 
-        # Desktop hosts - deployed locally via ./apply
+        # Desktop hosts - deployed locally via `apply`
         frameling = { ... }: {
           imports = [ ./hosts/frameling ];
           deployment = {

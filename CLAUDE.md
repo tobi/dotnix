@@ -19,7 +19,6 @@ This is a **clean, modern NixOS flake configuration** with clear separation betw
 ### Directory Structure
 ```
 dotnix/
-├── apply                    # Smart apply script (symlink to bin/apply)
 ├── flake.nix               # Main NixOS flake
 ├── flake.lock
 │
@@ -116,8 +115,8 @@ Services in `nixos/services/` are all gated by enable flags:
 
 ### Applying Configuration
 ```bash
-./apply                    # Auto-detects context and applies both NixOS + home-manager
-./apply --help            # Show options
+apply                    # Auto-detects context and applies both NixOS + home-manager
+apply --help            # Show options
 ```
 
 ### Adding a New Application
@@ -163,7 +162,7 @@ cd home && nix flake check --no-build # Check home flake
 
 ```bash
 # Apply configuration
-./apply
+apply
 
 # Check flakes
 nix flake check --no-build

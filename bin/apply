@@ -6,8 +6,8 @@
 # - Home-manager if user is tobi
 #
 # Usage:
-#   ./apply              # Apply locally
-#   ./apply --to <host>  # Deploy to remote host via apply-to
+#   apply              # Apply locally
+#   apply --to <host>  # Deploy to remote host via apply-to
 
 set -euo pipefail
 
