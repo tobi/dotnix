@@ -19,5 +19,10 @@ in
         "--accept-dns=true"
       ] ++ lib.optionals cfg.ssh [ "--ssh" ];
     };
+
+    # Prevent tailscaled from restarting during nixos-rebuild switch.
+    # Restarting tailscaled kills SSH connections over Tailscale, which can
+    # leave remote deployments in a broken state (services stopped but not restarted).
+    systemd.services.tailscaled.restartIfChanged = false;
   };
 }
