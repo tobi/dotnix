@@ -26,7 +26,7 @@ in
       enable = true;
       recommendedProxySettings = true;
       recommendedTlsSettings = true;
-      clientMaxBodySize = "100m";
+      clientMaxBodySize = "0";  # Disable limit for large git pushes
 
       # Enable built-in tailscale auth if we have virtual hosts configured
       tailscaleAuth = {

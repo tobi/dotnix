@@ -36,6 +36,9 @@ in
       settings = {
         repository = {
           ROOT = "${stateDir}/repositories";
+          ENABLE_PUSH_CREATE_USER = true;
+          ENABLE_PUSH_CREATE_ORG = true;
+          DEFAULT_PUSH_CREATE_PRIVATE = true;
         };
         database = {
           PATH = "${stateDir}/data/forgejo.db";
