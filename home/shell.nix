@@ -5,7 +5,7 @@ in
 {
   aliases = {
     # Editor and tools
-    n = "nvim";
+    n = "${pkgs.neovim}/bin/nvim";
     devshell = "nix develop ~/dotnix --impure";
     lg = "${pkgs.lazygit}/bin/lazygit";
     gs = "${pkgs.git}/bin/git status";

@@ -69,6 +69,8 @@ in
 
     fzf = {
       enable = true;
+      enableZshIntegration = true;
+      enableBashIntegration = true;
       defaultCommand = "fd --type f --hidden --follow --exclude .git";
       defaultOptions = [
         "--height 75%"
