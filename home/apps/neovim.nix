@@ -1,6 +1,13 @@
 { pkgs, lib, ... }:
 let
   inherit (pkgs.stdenv) isLinux;
+
+  # LSP server paths
+  bashls = "${pkgs.bash-language-server}/bin/bash-language-server";
+  lua_ls = "${pkgs.lua-language-server}/bin/lua-language-server";
+  ruby_lsp = "${pkgs.ruby-lsp}/bin/ruby-lsp";
+  pyright = "${pkgs.pyright}/bin/pyright-langserver";
+  nil_ls = "${pkgs.nil}/bin/nil";
 in
 {
   programs.neovim = {
@@ -48,13 +55,20 @@ in
 
           -- Configure servers by mutating vim.lsp.config, then enable them
           vim.lsp.config.bashls = vim.tbl_deep_extend('force', vim.lsp.config.bashls or {}, {
+            cmd = { '${bashls}', 'start' },
             filetypes = { 'sh', 'bash', 'zsh' },
           })
 
-          vim.lsp.config.ruby_lsp = vim.tbl_deep_extend('force', vim.lsp.config.ruby_lsp or {}, {})
-          vim.lsp.config.pyright = vim.tbl_deep_extend('force', vim.lsp.config.pyright or {}, {})
+          vim.lsp.config.ruby_lsp = vim.tbl_deep_extend('force', vim.lsp.config.ruby_lsp or {}, {
+            cmd = { '${ruby_lsp}' },
+          })
+
+          vim.lsp.config.pyright = vim.tbl_deep_extend('force', vim.lsp.config.pyright or {}, {
+            cmd = { '${pyright}', '--stdio' },
+          })
 
           vim.lsp.config.lua_ls = vim.tbl_deep_extend('force', vim.lsp.config.lua_ls or {}, {
+            cmd = { '${lua_ls}' },
             settings = {
               Lua = {
                 runtime = { version = 'LuaJIT' },
@@ -68,7 +82,9 @@ in
             },
           })
 
-          vim.lsp.config.nil_ls = vim.tbl_deep_extend('force', vim.lsp.config.nil_ls or {}, {})
+          vim.lsp.config.nil_ls = vim.tbl_deep_extend('force', vim.lsp.config.nil_ls or {}, {
+            cmd = { '${nil_ls}' },
+          })
 
           -- Enable all configured servers
           vim.lsp.enable({ 'bashls', 'ruby_lsp', 'pyright', 'lua_ls', 'nil_ls' })
@@ -136,13 +152,6 @@ in
   };
 
   home.packages = with pkgs; [
-    # LSP servers
-    bash-language-server
-    lua-language-server
-    ruby-lsp
-    pyright
-    nil
-
     # Required for fzf-lua
     fzf
     ripgrep
