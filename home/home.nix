@@ -157,6 +157,7 @@ in
     ./apps/starship.nix
     ./apps/neovim.nix
     ./apps/try.nix
+    ./apps/zellij.nix
   ];
 
   # Essential packages organized by category
@@ -213,7 +214,6 @@ in
       unzip # ZIP archive extraction utility
       zlib.dev # Compression library
       zsync # File synchronization tool
-      zellij # Terminal multiplexer
       git-lfs # Git Large File Storage
       socat # Multipurpose relay
       netcat-gnu # Network utility
