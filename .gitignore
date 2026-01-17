@@ -19,3 +19,4 @@
 *.age.tmp
 
 result
+.claude/
