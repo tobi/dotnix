@@ -209,7 +209,6 @@ in
       shellcheck # Static analysis tool for shell scripts
       pkg-config # Helper tool for compiling applications
       sqlite # SQL database engine
-      stdenv.cc # C/C++ compiler toolchain
       tokei # Count your code, quickly
       unzip # ZIP archive extraction utility
       zlib.dev # Compression library
