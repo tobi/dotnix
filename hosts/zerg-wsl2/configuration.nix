@@ -10,6 +10,8 @@
 
   networking.hostName = "zerg-wsl2";
 
+  services.tailscale.enable = true;
+
   # ───── WSL Configuration ────────────────────────────────────────────────
   wsl = {
     enable = true;
@@ -47,6 +49,9 @@
 
     # Fix missing commands from diagnostics
     tzdata # Fix timezone warnings
+
+    # Headless browser for Clawdbot
+    chromium
   ];
 
   # Environment variables for WSL2 NVIDIA support
