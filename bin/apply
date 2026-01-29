@@ -1,15 +1,27 @@
 #!/usr/bin/env bash
-# apply - Apply NixOS and/or home-manager configuration
+# switch - Apply NixOS and/or home-manager configuration
 #
 # Automatically detects context and applies the appropriate configuration:
 # - NixOS rebuild if on NixOS with a matching host config
-# - Home-manager if user is tobi
+# - Home-manager if user is tobi (works on any distro with Nix)
 #
 # Usage:
-#   apply              # Apply locally
-#   apply --to <host>  # Deploy to remote host via apply-to
+#   switch             # Apply locally
+#   switch --to <host> # Deploy to remote host via apply-to
 
 set -euo pipefail
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+info()  { echo -e "${BLUE}==>${NC} $*"; }
+warn()  { echo -e "${YELLOW}warning:${NC} $*"; }
+error() { echo -e "${RED}error:${NC} $*"; }
+success() { echo -e "${GREEN}✓${NC} $*"; }
 
 # Resolve symlinks to get the real script location
 SCRIPT_PATH="$(readlink -f "$0")"
@@ -21,6 +33,7 @@ if [[ "${1:-}" == "--to" ]]; then
     shift
     exec "$SCRIPT_DIR/apply-to" "$@"
 fi
+
 HOSTNAME="${HOSTNAME:-$(hostname)}"
 ARCH="$(uname -m)"
 USER="${USER:-$(whoami)}"
@@ -33,32 +46,289 @@ case "$ARCH" in
   *)       HM_ARCH="$ARCH" ;;
 esac
 
+# Detect OS/distro
+detect_os() {
+  if [[ -f /etc/NIXOS ]]; then
+    echo "nixos"
+  elif [[ -f /etc/os-release ]]; then
+    . /etc/os-release
+    echo "${ID:-unknown}"
+  elif [[ "$(uname)" == "Darwin" ]]; then
+    echo "macos"
+  else
+    echo "unknown"
+  fi
+}
+
+OS="$(detect_os)"
+
 echo "Applying configuration..."
 echo "  Host: $HOSTNAME"
 echo "  User: $USER"
 echo "  Arch: $ARCH"
+echo "  OS:   $OS"
 echo "  Flake: $FLAKE_DIR"
 echo ""
 
+# Check if nix is available
+check_nix() {
+  if ! command -v nix &>/dev/null; then
+    error "Nix is not installed or not in PATH"
+    echo ""
+    echo "To install Nix, run:"
+    echo "  curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install"
+    echo ""
+    echo "Or the official installer:"
+    echo "  sh <(curl -L https://nixos.org/nix/install) --daemon"
+    echo ""
+    return 1
+  fi
+  return 0
+}
+
+# Check if nix-daemon is running (for multi-user installs)
+check_nix_daemon() {
+  if [[ "$OS" != "nixos" ]]; then
+    # Check for systemd service
+    if command -v systemctl &>/dev/null; then
+      if ! systemctl is-active --quiet nix-daemon 2>/dev/null; then
+        warn "nix-daemon is not running"
+        echo "  Try: sudo systemctl start nix-daemon"
+        echo "  Or:  sudo systemctl enable --now nix-daemon"
+        return 1
+      fi
+    fi
+  fi
+  return 0
+}
+
+# Check if flakes are enabled
+check_flakes_enabled() {
+  # Try a simple flake command to see if flakes work
+  if nix flake metadata "$FLAKE_DIR" --no-write-lock-file &>/dev/null 2>&1; then
+    return 0
+  fi
+
+  # Try with explicit experimental features flag
+  if nix --extra-experimental-features "nix-command flakes" flake metadata "$FLAKE_DIR" --no-write-lock-file &>/dev/null 2>&1; then
+    # Flakes work with the flag, but not by default
+    return 1
+  fi
+
+  # Neither works - probably a deeper issue
+  return 2
+}
+
+# Guide user through enabling flakes
+setup_flakes() {
+  echo ""
+  warn "Flakes are not enabled by default in your Nix installation"
+  echo ""
+  echo "I can fix this for you. Options:"
+  echo ""
+  echo "  1) Enable in user config (~/.config/nix/nix.conf) - no sudo"
+  echo "  2) Enable in system config (/etc/nix/nix.conf) - needs sudo"
+  echo "  3) Just continue with flag for now (no permanent change)"
+  echo "  q) Quit"
+  echo ""
+
+  read -rp "Choice [1/2/3/q]: " choice
+
+  case "$choice" in
+    1)
+      enable_flakes_user
+      return $?
+      ;;
+    2)
+      enable_flakes_system
+      return $?
+      ;;
+    3)
+      info "Continuing with --extra-experimental-features flag"
+      USE_EXTRA_FEATURES=true
+      return 0
+      ;;
+    *)
+      echo "Exiting."
+      exit 0
+      ;;
+  esac
+}
+
+# Enable flakes in user config
+enable_flakes_user() {
+  local user_conf="$HOME/.config/nix/nix.conf"
+
+  mkdir -p "$(dirname "$user_conf")"
+
+  if grep -q "experimental-features" "$user_conf" 2>/dev/null; then
+    warn "$user_conf already contains experimental-features"
+    echo "Current content:"
+    grep "experimental-features" "$user_conf"
+    echo ""
+    read -rp "Replace it? [y/N]: " replace
+    if [[ "${replace,,}" == "y" ]]; then
+      sed -i 's/^experimental-features.*/experimental-features = nix-command flakes/' "$user_conf"
+      success "Updated $user_conf"
+    else
+      USE_EXTRA_FEATURES=true
+      return 0
+    fi
+  else
+    echo "experimental-features = nix-command flakes" >> "$user_conf"
+    success "Added to $user_conf"
+  fi
+
+  return 0
+}
+
+# Enable flakes in system config
+enable_flakes_system() {
+  local system_conf="/etc/nix/nix.conf"
+
+  if grep -q "experimental-features" "$system_conf" 2>/dev/null; then
+    warn "$system_conf already contains experimental-features"
+    echo "Current content:"
+    grep "experimental-features" "$system_conf"
+    echo ""
+    read -rp "Replace it? (needs sudo) [y/N]: " replace
+    if [[ "${replace,,}" == "y" ]]; then
+      sudo sed -i 's/^experimental-features.*/experimental-features = nix-command flakes/' "$system_conf"
+      success "Updated $system_conf"
+    else
+      USE_EXTRA_FEATURES=true
+      return 0
+    fi
+  else
+    echo "experimental-features = nix-command flakes" | sudo tee -a "$system_conf" > /dev/null
+    success "Added to $system_conf"
+  fi
+
+  # Restart daemon if not on NixOS
+  if [[ "$OS" != "nixos" ]] && command -v systemctl &>/dev/null; then
+    info "Restarting nix-daemon..."
+    sudo systemctl restart nix-daemon
+    success "nix-daemon restarted"
+  fi
+
+  return 0
+}
+
+# Build the nix command with appropriate flags
+nix_cmd() {
+  if [[ "${USE_EXTRA_FEATURES:-false}" == "true" ]]; then
+    nix --extra-experimental-features "nix-command flakes" "$@"
+  else
+    nix "$@"
+  fi
+}
+
+# ============================================================================
+# Main logic
+# ============================================================================
+
+USE_EXTRA_FEATURES=false
+
+# Step 1: Check nix is available
+if ! check_nix; then
+  exit 1
+fi
+
+# Step 2: Check nix-daemon on non-NixOS systems
+if [[ "$OS" != "nixos" ]]; then
+  check_nix_daemon || true  # Continue anyway, might be single-user install
+fi
+
+# Step 3: Check flakes are enabled
+flake_status=0
+check_flakes_enabled || flake_status=$?
+
+case $flake_status in
+  0)
+    # Flakes work natively
+    ;;
+  1)
+    # Flakes work with flag, offer to enable permanently
+    setup_flakes
+    ;;
+  2)
+    # Flakes don't work at all
+    error "Nix flakes are not working"
+    echo ""
+    echo "Tried running: nix flake metadata $FLAKE_DIR"
+    echo ""
+    echo "Debug output:"
+    nix --extra-experimental-features "nix-command flakes" flake metadata "$FLAKE_DIR" --no-write-lock-file 2>&1 || true
+    exit 1
+    ;;
+esac
+
 # Apply NixOS if we're on NixOS and have a host config
-if [[ -f /etc/NIXOS ]] && [[ -d "$FLAKE_DIR/hosts/$HOSTNAME" ]]; then
-  echo "==> Applying NixOS configuration for $HOSTNAME"
+if [[ "$OS" == "nixos" ]] && [[ -d "$FLAKE_DIR/hosts/$HOSTNAME" ]]; then
+  info "Applying NixOS configuration for $HOSTNAME"
   sudo nixos-rebuild switch --flake "$FLAKE_DIR#$HOSTNAME" "$@"
+  echo ""
+elif [[ "$OS" == "nixos" ]] && [[ ! -d "$FLAKE_DIR/hosts/$HOSTNAME" ]]; then
+  warn "No NixOS host config found for '$HOSTNAME'"
+  echo "  Available hosts:"
+  for host in "$FLAKE_DIR/hosts"/*/; do
+    echo "    - $(basename "$host")"
+  done
   echo ""
 fi
 
 # Apply home-manager if user is tobi
 if [[ "$USER" == "tobi" ]]; then
-  echo "==> Applying home-manager configuration for $USER@$HM_ARCH"
+  info "Applying home-manager configuration for $USER@$HM_ARCH"
+
   if command -v home-manager &>/dev/null; then
+    # home-manager is already installed
     home-manager switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@"
-  elif command -v nix &>/dev/null; then
-    nix run home-manager -- switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@"
   else
-    echo "Error: Neither home-manager nor nix found in PATH"
-    exit 1
+    # Run home-manager via nix run
+    info "home-manager not in PATH, running via 'nix run'"
+    nix_cmd run home-manager/master -- switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@"
   fi
   echo ""
 fi
 
-echo "Done!"
+# Check if user's shell is correctly set to zsh from nix
+check_shell() {
+  local current_shell
+  current_shell="$(getent passwd "$USER" | cut -d: -f7)"
+
+  # Determine expected zsh path based on OS
+  local expected_shell
+  if [[ "$OS" == "nixos" ]]; then
+    expected_shell="/run/current-system/sw/bin/zsh"
+  else
+    # Non-NixOS: check home-manager profile first, then nix profile
+    if [[ -x "$HOME/.nix-profile/bin/zsh" ]]; then
+      expected_shell="$HOME/.nix-profile/bin/zsh"
+    elif [[ -x "/nix/var/nix/profiles/default/bin/zsh" ]]; then
+      expected_shell="/nix/var/nix/profiles/default/bin/zsh"
+    else
+      # Can't find nix zsh, skip check
+      return 0
+    fi
+  fi
+
+  if [[ "$current_shell" != "$expected_shell" ]]; then
+    echo ""
+    warn "Your shell is not set to zsh from nix profile"
+    echo "  Current: $current_shell"
+    echo "  Expected: $expected_shell"
+    echo ""
+    echo "To fix, run:"
+    echo "  sudo chsh -s $expected_shell $USER"
+    echo ""
+    echo "Then log out and back in."
+  fi
+}
+
+# Check shell for tobi user
+if [[ "$USER" == "tobi" ]]; then
+  check_shell
+fi
+
+success "Done!"

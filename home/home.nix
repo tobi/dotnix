@@ -17,6 +17,9 @@ in
     inherit username;
     homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
 
+    # Ensure home-manager bin is in PATH (needed for standalone HM on NixOS)
+    sessionPath = [ "$HOME/.nix-profile/bin:$HOME" ];
+
     # Global environment variables
     sessionVariables = {
       DOTFILES = "$HOME/dotnix";
@@ -55,6 +58,8 @@ in
           "~/.config/dev/gitconfig"
           "~/.gitconfig"
         ];
+        credential."https://github.com".helper = "!gh auth git-credential";
+        credential."https://gist.github.com".helper = "!gh auth git-credential";
       };
     };
 
