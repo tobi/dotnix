@@ -68,14 +68,25 @@ check_remote_updates() {
   git -C "$FLAKE_DIR" rev-parse --git-dir &>/dev/null || return 0
 
   # Fetch with timeout to avoid blocking on slow networks
-  timeout 2 git -C "$FLAKE_DIR" fetch origin --quiet 2>/dev/null || return 0
+  # Use gtimeout on macOS (from coreutils), timeout on Linux
+  local timeout_cmd
+  if command -v timeout &>/dev/null; then
+    timeout_cmd="timeout 2"
+  elif command -v gtimeout &>/dev/null; then
+    timeout_cmd="gtimeout 2"
+  else
+    timeout_cmd=""
+  fi
+  $timeout_cmd git -C "$FLAKE_DIR" fetch origin --quiet 2>/dev/null || return 0
 
   # Count commits we're behind origin/main (or origin/master)
   local behind
   behind=$(git -C "$FLAKE_DIR" rev-list --count HEAD..origin/main 2>/dev/null) ||
   behind=$(git -C "$FLAKE_DIR" rev-list --count HEAD..origin/master 2>/dev/null) || return 0
 
-  [[ "$behind" -gt 0 ]] && echo -e "${RED}Remote has $behind new commit(s) - consider pulling first${NC}\n"
+  if [[ "$behind" -gt 0 ]]; then
+    echo -e "${RED}Remote has $behind new commit(s) - consider pulling first${NC}\n"
+  fi
 }
 
 check_remote_updates

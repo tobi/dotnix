@@ -198,20 +198,15 @@ in
       duckdb # Analytical database
       envsubst # Substitute environment variables in shell format
       ffmpeg # Multimedia framework
-      gnumake # GNU make utility
       hyperfine # Command-line benchmarking tool
       lazygit # Simple terminal UI for git
-      libffi.dev # Foreign function interface library
       nixfmt-rfc-style # Nix code formatter (RFC style)
       nixfmt-tree # Nix code formatter (tree style)
       nixpkgs-fmt # Nix code formatter
-      openssl.dev # Cryptography and SSL/TLS toolkit
       shellcheck # Static analysis tool for shell scripts
-      pkg-config # Helper tool for compiling applications
       sqlite # SQL database engine
       tokei # Count your code, quickly
       unzip # ZIP archive extraction utility
-      zlib.dev # Compression library
       zsync # File synchronization tool
       git-lfs # Git Large File Storage
       socat # Multipurpose relay

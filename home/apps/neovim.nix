@@ -94,7 +94,7 @@ in
       # Removed explicit colorscheme so terminal background shows through
     ];
 
-    extraLuaConfig = ''
+    initLua = ''
       vim.g.mapleader = " "
 
       vim.opt.number = true
