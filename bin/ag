@@ -1,14 +1,15 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require "digest"
 require "fileutils"
 require "shellwords"
 require "tmpdir"
 
 # ag - tmux agent manager
 #
-# Manage named panels as windows inside a single tmux session called "ag".
-# Every command takes the panel name first.
+# All named panels live as panes inside a single tiled tmux window.
+# State is preserved — every command targeting "foo" goes to the same pane.
 #
 # Module API:
 #   Ag.spawn("name")                -> name
@@ -17,11 +18,13 @@ require "tmpdir"
 #   Ag.send_raw("name", "C-c")      → sends raw control/byte keys
 #   Ag.read("name")                 → captures visible buffer
 #   Ag.read("name", full: true)     → captures full scrollback
-#   Ag.kill("name")                 → removes panel window
-#   Ag.panels                       → { "name" => "name", ... }
-#   Ag.attach                       → execs into tmux
+#   Ag.kill("name")                 → removes panel pane
+#   Ag.panels                       → { "name" => "%id", ... }
+#   Ag.watch                        → execs into tmux (read-only)
 
 SESSION = "ag"
+WINDOW  = "main"
+INIT_TITLE = "_ag_init_"
 
 module Ag
   module_function
@@ -43,52 +46,119 @@ module Ag
 
   def ensure_session!
     return if session?
-    tmux("new-session", "-d", "-s", SESSION, "-n", "shell")
+    tmux("new-session", "-d", "-s", SESSION, "-n", WINDOW)
+    # Show pane titles on borders
+    tmux("set-option", "-t", SESSION, "pane-border-status", "top")
+    tmux("set-option", "-t", SESSION, "pane-border-format",
+         ' #[bold]#{pane_title} ')
+    tmux("set-option", "-t", SESSION, "pane-border-style", "fg=colour240")
+    tmux("set-option", "-t", SESSION, "pane-active-border-style", "fg=green,bold")
+    tmux("set-option", "-t", SESSION, "pane-border-lines", "heavy")
+    # Mark the initial pane so first spawn can reuse it
+    id = tmux("list-panes", "-t", "#{SESSION}:#{WINDOW}",
+              "-F", '#{pane_id}').lines.first&.strip
+    tmux("select-pane", "-t", id, "-T", INIT_TITLE) if id
   end
 
-  def target_for(name)
-    "#{SESSION}:#{name}"
-  end
-
-  def pane_target(name, pane_index = 0)
-    "#{target_for(name)}.#{pane_index}"
-  end
-
-  # -- panel registry --------------------------------------------------------
+  # -- panel registry (panes within the single window) ----------------------
 
   def strip_ansi(text)
     text.gsub(ANSI_ESCAPE, "")
   end
 
-  def tabs
-    return [] unless session?
-    strip_ansi(tmux("list-windows", "-t", SESSION, "-F", "#W"))
-      .lines.map(&:strip).reject(&:empty?)
+  def pane_map
+    return {} unless session?
+    result = {}
+    tmux("list-panes", "-t", "#{SESSION}:#{WINDOW}",
+         "-F", '#{pane_id} #{pane_title}').lines.each do |line|
+      line = line.strip
+      next if line.empty?
+      id, title = line.split(" ", 2)
+      result[title.to_s.strip] = id.strip if id
+    end
+    result
+  end
+
+  def find_pane(name)
+    pane_map[name]
   end
 
   def panels
-    tabs.each_with_object({}) do |name, out|
-      out[name] = name
-    end
+    pm = pane_map
+    pm.delete(INIT_TITLE)
+    pm
   end
 
   def resolve(name)
-    panels[name] or abort("unknown panel: #{name}")
+    find_pane(name) or abort("unknown panel: #{name}")
   end
 
   def focus(name)
-    resolved = resolve(name)
-    tmux("select-window", "-t", target_for(resolved))
-    resolved
+    pane_id = resolve(name)
+    tmux("select-pane", "-t", pane_id)
+    name
+  end
+
+  def retile!
+    tmux("select-layout", "-t", "#{SESSION}:#{WINDOW}", "tiled")
+  end
+
+  # -- pid file: /tmp/ag.pid.<hash> maps pwd → panel name -------------------
+
+  def dir_hash(dir = Dir.pwd)
+    Digest::SHA1.hexdigest(dir)[0, 7]
+  end
+
+  def pid_path(dir = Dir.pwd)
+    "/tmp/ag.pid.#{dir_hash(dir)}"
+  end
+
+  def write_pid(name)
+    pane_id = find_pane(name)
+    return unless pane_id
+    # Get the tmux pane pid
+    pid = tmux("display-message", "-t", pane_id, "-p", '#{pane_pid}').strip
+    File.write(pid_path, "#{name} #{pid} #{pane_id}\n")
+  end
+
+  def read_pid
+    path = pid_path
+    return nil unless File.exist?(path)
+    parts = File.read(path).strip.split(" ", 3)
+    return nil unless parts.size == 3
+    name, pid, pane_id = parts
+    # Verify: pane must still exist with the right name and pid
+    current_id = find_pane(name)
+    return nil unless current_id
+    current_pid = tmux("display-message", "-t", current_id, "-p", '#{pane_pid}').strip
+    return nil unless current_pid == pid
+    name
+  end
+
+  def clear_pid(name)
+    # Remove any pid files pointing to this panel
+    Dir.glob("/tmp/ag.pid.*").each do |path|
+      content = File.read(path).strip rescue next
+      File.delete(path) if content.start_with?("#{name} ")
+    end
   end
 
   # -- core API --------------------------------------------------------------
 
   def spawn(name)
-    return panels[name] if panels[name]
-
+    return name if find_pane(name)
     ensure_session!
-    tmux("new-window", "-d", "-t", SESSION, "-n", name)
+
+    init = find_pane(INIT_TITLE)
+    if init
+      tmux("select-pane", "-t", init, "-T", name)
+    else
+      pane_id = tmux("split-window", "-d", "-t", "#{SESSION}:#{WINDOW}",
+                      "-P", "-F", '#{pane_id}').strip
+      tmux("select-pane", "-t", pane_id, "-T", name)
+    end
+    retile!
+    write_pid(name)
     name
   end
 
@@ -98,10 +168,31 @@ module Ag
     "\e[?25h",    # show cursor
   ].freeze
 
-  # Optionally capture pane output for `timeout` seconds around a block.
-  # Returns early when the output contains a prompt-ready escape and output
-  # has settled. Without timeout, fire-and-forget.
-  def stream_for(resolved_name, timeout: nil)
+  # Text patterns that signal an interactive prompt waiting for input.
+  INTERACTIVE_PROMPT_RE = Regexp.union(
+    /(?:password|passphrase|passcode)\s*:\s*$/i,
+    /\[y\/n\]\s*:?\s*$/i,
+    /\(y\/n\)\s*:?\s*$/i,
+    /\[yes\/no\]\s*:?\s*$/i,
+    /continue\?\s*\[y\/n\]\s*$/i,
+    /press\s+(?:enter|return|any\s+key)/i,
+    /enter\s+(?:password|passphrase|pin)\s*:\s*$/i,
+  ).freeze
+
+  LOG_DIR = File.join(Dir.home, ".ag", "logs")
+
+  def save_timeout_log(raw_bytes, panel_name, context)
+    FileUtils.mkdir_p(LOG_DIR)
+    ts = Time.now.strftime("%Y%m%d-%H%M%S")
+    path = File.join(LOG_DIR, "#{panel_name}-#{context}-#{ts}.raw")
+    File.binwrite(path, raw_bytes)
+    $stderr.puts "ag: raw output saved to #{path}"
+    $stderr.puts "ag: inspect with: xxd #{path} | less"
+  end
+
+  # Capture pane output for `timeout` seconds. Returns early when shell-ready
+  # escape sequences or interactive prompts are detected.
+  def stream_for(pane_id, timeout: nil, panel_name: nil)
     unless timeout
       yield
       return
@@ -110,14 +201,15 @@ module Ag
     dir = Dir.mktmpdir("ag-stream-")
     out_path = File.join(dir, "output")
     FileUtils.touch(out_path)
-    target = pane_target(resolved_name)
+    all_data = String.new(encoding: "BINARY")
 
-    tmux("pipe-pane", "-o", "-t", target, "cat >> #{Shellwords.escape(out_path)}")
+    tmux("pipe-pane", "-o", "-t", pane_id, "cat >> #{Shellwords.escape(out_path)}")
 
     yield
 
     pos = 0
     deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout
+    timed_out = true
 
     File.open(out_path, "rb") do |file|
       loop do
@@ -132,9 +224,18 @@ module Ag
             $stdout.write(data)
             $stdout.flush
             pos += data.bytesize
-            # Shell ready signal — clamp deadline so we drain briefly then stop
+            all_data << data
+
             if READY_SEQUENCES.any? { |seq| data.include?(seq) }
+              timed_out = false
               cap = now + 0.2
+              deadline = cap if cap < deadline
+            end
+
+            tail = strip_ansi(all_data.byteslice(-512, 512) || all_data)
+            if INTERACTIVE_PROMPT_RE.match?(tail)
+              timed_out = false
+              cap = now + 0.3
               deadline = cap if cap < deadline
             end
           end
@@ -144,21 +245,21 @@ module Ag
       end
     end
 
-    tmux("pipe-pane", "-t", target) # stop piping
+    if timed_out && !all_data.empty?
+      save_timeout_log(all_data, panel_name || "unknown", "stream")
+    end
+
+    tmux("pipe-pane", "-t", pane_id) # stop piping
   ensure
     FileUtils.rm_rf(dir) if dir && timeout
   end
 
-  def literal_write(target, text)
-    tmux("send-keys", "-t", target, "-l", "--", text)
-  end
-
   def send_keys(name, text, timeout: nil)
-    resolved = focus(name)
-    target = target_for(resolved)
-    stream_for(resolved, timeout: timeout) do
-      literal_write(target, text)
-      tmux("send-keys", "-t", target, "Enter")
+    pane_id = resolve(name)
+    focus(name)
+    stream_for(pane_id, timeout: timeout, panel_name: name) do
+      tmux("send-keys", "-t", pane_id, "-l", "--", text)
+      tmux("send-keys", "-t", pane_id, "Enter")
     end
   end
 
@@ -176,24 +277,23 @@ module Ag
   end
 
   def send_raw(name, *keys, timeout: nil)
-    resolved = focus(name)
-    target = target_for(resolved)
-    stream_for(resolved, timeout: timeout) do
+    pane_id = resolve(name)
+    focus(name)
+    stream_for(pane_id, timeout: timeout, panel_name: name) do
       keys.each do |token|
         key = SPECIAL_KEYS[token] || normalize_control(token)
         if key
-          tmux("send-keys", "-t", target, key)
+          tmux("send-keys", "-t", pane_id, key)
         else
-          literal_write(target, token)
+          tmux("send-keys", "-t", pane_id, "-l", "--", token)
         end
       end
     end
   end
 
   def read(name, full: false)
-    resolved = resolve(name)
-    target = target_for(resolved)
-    args = ["capture-pane", "-p", "-t", target]
+    pane_id = resolve(name)
+    args = ["capture-pane", "-p", "-t", pane_id]
     args += ["-S", "-"] if full
     output = tmux(*args)
     lines = output.lines
@@ -202,17 +302,22 @@ module Ag
   end
 
   def kill(name)
-    return unless panels[name]
-    tmux("kill-window", "-t", target_for(name))
+    pane_id = find_pane(name)
+    return unless pane_id
+    clear_pid(name)
+    tmux("kill-pane", "-t", pane_id, allow_fail: true)
+    retile! if session?
   end
 
   def kill_all
+    # Clean up all pid files
+    Dir.glob("/tmp/ag.pid.*").each { |f| File.delete(f) rescue nil }
     tmux("kill-session", "-t", SESSION, allow_fail: true)
   end
 
-  def attach(readonly: true)
+  def watch(readonly: true)
     ensure_session!
-    spawn("shell") if panels.empty?
+    spawn("shell") if panels.empty? && !find_pane(INIT_TITLE)
     args = ["tmux", "attach-session", "-t", SESSION]
     args << "-r" if readonly
     exec(*args)
@@ -223,80 +328,20 @@ module Ag
     if p.empty?
       puts "no panels"
     else
-      p.each_key { |name| puts "  #{name}" }
+      p.each { |name, id| puts "  #{name}\t#{id}" }
     end
   end
 
   def shell(name, command, timeout: nil)
     abort("missing command") if command.nil? || command.strip.empty?
-    ensure_session!
+    spawn(name)
+    pane_id = resolve(name)
 
-    Dir.mktmpdir("ag-shell-") do |dir|
-      out_path = File.join(dir, "output")
-      exit_path = File.join(dir, "exit.code")
-      FileUtils.touch(out_path)
+    full_cmd = "#{command}; echo \"\\n\\nEXIT CODE: $?\""
 
-      wrapped = [
-        "bash -lc #{Shellwords.escape(command)}",
-        "printf '%s\\n' \"$?\" > #{Shellwords.escape(exit_path)}"
-      ].join("; ")
-
-      tmux("kill-window", "-t", target_for(name), allow_fail: true)
-      tmux("new-window", "-d", "-t", SESSION, "-n", name, wrapped)
-      tmux("pipe-pane", "-o", "-t", pane_target(name),
-           "cat >> #{Shellwords.escape(out_path)}")
-
-      pos = 0
-      deadline = timeout ? Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout : nil
-      timed_out = false
-
-      File.open(out_path, "rb") do |file|
-        loop do
-          if deadline && Process.clock_gettime(Process::CLOCK_MONOTONIC) >= deadline
-            timed_out = true
-            $stderr.puts "\nag: timeout after #{timeout}s"
-            tmux("kill-window", "-t", target_for(name), allow_fail: true)
-            break
-          end
-
-          size = File.size(out_path) rescue 0
-
-          if size > pos
-            file.seek(pos)
-            data = file.read(size - pos)
-            if data && !data.empty?
-              $stdout.write(data)
-              $stdout.flush
-              pos += data.bytesize
-            end
-            next
-          end
-
-          if File.exist?(exit_path)
-            # drain remaining output after pipe-pane flushes
-            3.times do
-              sleep 0.05
-              new_size = File.size(out_path) rescue 0
-              next unless new_size > pos
-              file.seek(pos)
-              data = file.read(new_size - pos)
-              if data && !data.empty?
-                $stdout.write(data)
-                $stdout.flush
-                pos += data.bytesize
-              end
-            end
-            break
-          end
-
-          sleep 0.05
-        end
-      end
-
-      return 124 if timed_out  # match GNU timeout exit code
-
-      tmux("kill-window", "-t", target_for(name), allow_fail: true)
-      Integer(File.read(exit_path).strip)
+    stream_for(pane_id, timeout: timeout, panel_name: name) do
+      tmux("send-keys", "-t", pane_id, "-l", "--", full_cmd)
+      tmux("send-keys", "-t", pane_id, "Enter")
     end
   end
 end
@@ -306,16 +351,21 @@ end
 HELP = <<~TEXT
   ag - tmux agent manager (session: #{SESSION})
 
+  All panels are panes in a single tiled window. State is preserved.
+
   ag NAME spawn [COMMAND...]  create panel (start here), run command if given
-  ag NAME shell COMMAND...    run command, stream output back
+  ag NAME shell COMMAND...    run command in panel, stream output back
   ag NAME send-keys TEXT...   type text + enter into panel
   ag NAME raw   KEY...        send raw keys (eg. C-c, Enter, Esc)
   ag NAME read  [--full]      capture panel buffer
   ag NAME kill                remove panel
 
+  NAME is optional for all commands except spawn — if omitted, ag looks up
+  the panel previously spawned from the current directory.
+
   ag list                     show all panels
   ag terminate                destroy tmux session
-  ag attach [-rw]              open session (read-only by default)
+  ag watch [-rw]              watch session (read-only by default)
 
   Options:
     -tN                        timeout in seconds (default: -t5), exits 124 on timeout
@@ -341,25 +391,37 @@ when "terminate"
   Ag.kill_all
   puts "session destroyed"
   exit
-when "attach"
+when "watch", "attach"
   rw = ARGV.include?("-rw")
-  Ag.attach(readonly: !rw)
+  Ag.watch(readonly: !rw)
   exit
 when nil, "-h", "--help", "help"
   $stderr.puts HELP
   exit
 end
 
-# Panel commands: ag NAME COMMAND [ARGS...]
-name = ARGV.shift
-cmd = ARGV.shift
+# Panel commands: ag [NAME] COMMAND [ARGS...]
+# If first arg is a known command, NAME is omitted — resolve from pwd pid file.
+COMMANDS = %w[spawn shell send-keys raw read kill].freeze
+
+first = ARGV.first
+if COMMANDS.include?(first)
+  # No name given — resolve from pwd
+  name = Ag.read_pid
+  abort("ag: no panel found for #{Dir.pwd} — spawn one first") unless name || first == "spawn"
+  cmd = ARGV.shift
+else
+  name = ARGV.shift
+  cmd = ARGV.shift
+end
 
 case cmd
 when "spawn"
+  abort(HELP) unless name
   command = ARGV.join(" ")
   Ag.spawn(name)
   if !command.empty?
-    exit Ag.shell(name, command, timeout: TIMEOUT)
+    Ag.shell(name, command, timeout: TIMEOUT)
   else
     puts "+ #{name}"
   end
@@ -367,7 +429,7 @@ when "spawn"
 when "shell"
   command = ARGV.join(" ")
   abort(HELP) if command.empty?
-  exit Ag.shell(name, command, timeout: TIMEOUT)
+  Ag.shell(name, command, timeout: TIMEOUT)
 
 when "send-keys"
   text = ARGV.join(" ")
