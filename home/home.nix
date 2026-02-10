@@ -200,6 +200,7 @@ in
       ffmpeg # Multimedia framework
       hyperfine # Command-line benchmarking tool
       lazygit # Simple terminal UI for git
+      nix-output-monitor # Pretty build output (nom)
       nixfmt-rfc-style # Nix code formatter (RFC style)
       nixfmt-tree # Nix code formatter (tree style)
       nixpkgs-fmt # Nix code formatter
