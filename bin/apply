@@ -292,10 +292,21 @@ case $flake_status in
     ;;
 esac
 
+# Use nom for pretty build output if available
+if command -v nom &>/dev/null; then
+  NOM="nom"
+else
+  NOM=""
+fi
+
 # Apply NixOS if we're on NixOS and have a host config
 if [[ "$OS" == "nixos" ]] && [[ -d "$FLAKE_DIR/hosts/$HOSTNAME" ]]; then
   info "Applying NixOS configuration for $HOSTNAME"
-  sudo nixos-rebuild switch --flake "$FLAKE_DIR#$HOSTNAME" "$@"
+  if [[ -n "$NOM" ]]; then
+    sudo nixos-rebuild switch --flake "$FLAKE_DIR#$HOSTNAME" "$@" |& nom
+  else
+    sudo nixos-rebuild switch --flake "$FLAKE_DIR#$HOSTNAME" "$@"
+  fi
   echo ""
 elif [[ "$OS" == "nixos" ]] && [[ ! -d "$FLAKE_DIR/hosts/$HOSTNAME" ]]; then
   warn "No NixOS host config found for '$HOSTNAME'"
@@ -312,7 +323,11 @@ if [[ "$USER" == "tobi" ]]; then
 
   if command -v home-manager &>/dev/null; then
     # home-manager is already installed
-    home-manager switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@"
+    if [[ -n "$NOM" ]]; then
+      home-manager switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@" |& nom
+    else
+      home-manager switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@"
+    fi
   else
     # Run home-manager via nix run
     info "home-manager not in PATH, running via 'nix run'"
@@ -324,7 +339,13 @@ fi
 # Check if user's shell is correctly set to zsh from nix
 check_shell() {
   local current_shell
-  current_shell="$(getent passwd "$USER" | cut -d: -f7)"
+  if command -v getent &>/dev/null; then
+    current_shell="$(getent passwd "$USER" | cut -d: -f7)"
+  elif [[ "$(uname)" == "Darwin" ]]; then
+    current_shell="$(dscl . -read /Users/"$USER" UserShell 2>/dev/null | awk '{print $2}')"
+  else
+    return 0
+  fi
 
   # Determine expected zsh path based on OS
   local expected_shell
