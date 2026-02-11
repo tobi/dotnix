@@ -37,7 +37,7 @@ in
 
     bat = {
       enable = true;
-      config.theme = "OneHalfDark";
+      config.theme = "Nord";
     };
 
     # Git configuration
