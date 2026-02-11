@@ -73,9 +73,7 @@
         "tobi@aarch64" = mkHomeConfig { system = "aarch64-darwin"; };
       };
 
-      formatter = nixpkgs.lib.genAttrs systems (
-        system: nixpkgs.legacyPackages.${system}.nixfmt
-      );
+      formatter = nixpkgs.lib.genAttrs systems (system: nixpkgs.legacyPackages.${system}.nixfmt);
     };
 
   inputs = {
@@ -94,5 +92,6 @@
 
     ghostty.url = "github:ghostty-org/ghostty";
     ghostty.inputs.nixpkgs.follows = "nixpkgs";
+
   };
 }

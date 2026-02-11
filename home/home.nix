@@ -86,7 +86,11 @@ in
       enable = true;
       enableCompletion = true;
       historySize = 50000;
-      historyControl = [ "erasedups" "ignoredups" "ignorespace" ];
+      historyControl = [
+        "erasedups"
+        "ignoredups"
+        "ignorespace"
+      ];
 
       initExtra = ''
         ${shell.bashInit}
@@ -97,7 +101,8 @@ in
   home.shellAliases = {
     # update home-manager or nixos
     switch = "switch && source $HOME/.zshrc";
-  } // shell.aliases;
+  }
+  // shell.aliases;
 
   programs.mise = {
     enable = true;
@@ -188,6 +193,7 @@ in
       unzip # ZIP archive extraction utility
       zsync # File synchronization tool
       git-lfs # Git Large File Storage
+      gitleaks # Scan git repos for secrets
       socat # Multipurpose relay
       netcat-gnu # Network utility
       glow

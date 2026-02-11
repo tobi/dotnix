@@ -448,4 +448,37 @@ if [[ "$USER" == "tobi" ]]; then
   check_all_dotfile_includes
 fi
 
+# ============================================================================
+# Git hooks
+# ============================================================================
+
+install_git_hooks() {
+  local hooks_dir="$FLAKE_DIR/.git/hooks"
+  [[ -d "$hooks_dir" ]] || return 0
+
+  # pre-commit hook
+  cat > "$hooks_dir/pre-commit" << 'HOOK'
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Running pre-commit hooks..."
+
+# Format check
+if command -v nix &>/dev/null; then
+  echo "  nix fmt --check"
+  nix fmt -- --ci . || { echo "Fix formatting with: nix fmt"; exit 1; }
+fi
+
+# Secrets scan
+if command -v gitleaks &>/dev/null; then
+  echo "  gitleaks"
+  gitleaks protect --no-banner || exit 1
+fi
+HOOK
+  chmod +x "$hooks_dir/pre-commit"
+  success "Git hooks installed"
+}
+
+install_git_hooks
+
 success "Done!"
