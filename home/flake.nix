@@ -74,7 +74,7 @@
       };
 
       formatter = nixpkgs.lib.genAttrs systems (
-        system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style
+        system: nixpkgs.legacyPackages.${system}.nixfmt
       );
     };
 
