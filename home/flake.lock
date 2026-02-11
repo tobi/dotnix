@@ -662,11 +662,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770817760,
-        "narHash": "sha256-SI3nITa3T8qct3yZlnPdUrKEA2tdP79FSetR8s9wdTI=",
+        "lastModified": 1770818161,
+        "narHash": "sha256-reYUto1ux5ketnXs1fgrwIda7rGxjjKhdZJUOnp6m7Q=",
         "owner": "tobi",
         "repo": "try",
-        "rev": "a7ef3b277b049a6abb44db91596bac1ab6341e49",
+        "rev": "8afc187a3f4296d3831a2d40b0771b7d43cfe12d",
         "type": "github"
       },
       "original": {
