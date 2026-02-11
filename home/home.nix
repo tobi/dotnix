@@ -173,6 +173,7 @@ in
       grc # Generic text colouriser
       jq # Lightweight and flexible JSON processor
       ripgrep # Fast text search tool
+      expect # unbuffer for preserving colors in pipes
       wget # Network utility to retrieve files
       zstd # Fast compression algorithm
 

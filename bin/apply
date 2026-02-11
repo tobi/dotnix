@@ -296,11 +296,11 @@ esac
 nomnom() {
   echo ""
   if command -v nom &>/dev/null; then
-    "$@" --log-format internal-json -v |& nom --json
+    "$@" --log-format internal-json |& nom --json
   else
     "$@"
   fi
-  local rc=$?
+  local rc=${PIPESTATUS[0]}
   echo ""
   return $rc
 }
