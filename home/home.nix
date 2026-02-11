@@ -97,6 +97,10 @@ in
 
       # Interactive shell setup
       initContent = ''
+        if [ "$TERM" = "xterm-ghostty" ] && ! infocmp -x xterm-ghostty >/dev/null 2>&1; then
+          TERM=xterm-256color
+        fi
+
         ${shell.zshInit}
 
         # -- Local zshrc ────────────────────────────────────────────

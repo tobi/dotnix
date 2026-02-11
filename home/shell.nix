@@ -66,10 +66,6 @@ in
   zshInit = ''
     bindkey '^[[1;5C' forward-word      # Ctrl+Right
     bindkey '^[[1;5D' backward-word     # Ctrl+Left
-    bindkey '^[[1;3C' forward-word      # Alt+Right (alternative)
-    bindkey '^[[1;3D' backward-word     # Alt+Left (alternative)
-    bindkey '^[[H' beginning-of-line    # Home key
-    bindkey '^[[F' end-of-line          # End key
 
     # Ctrl+X prefix menu with help (uses right prompt area)
     ctrl-x-menu() {
