@@ -40,26 +40,6 @@ in
       config.theme = "Nord";
     };
 
-    # Git configuration
-    git = {
-      enable = true;
-      # SSH commit signing
-      signing = {
-        key = "~/.ssh/id_ed25519.pub";
-        signByDefault = true;
-      };
-
-      settings = {
-        gpg.format = "ssh";
-        gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
-        user.name = "Tobi Lütke";
-        user.email = "tobi@lutke.com";
-        include.path = "~/.config/dev/gitconfig";
-        credential."https://github.com".helper = "!gh auth git-credential";
-        credential."https://gist.github.com".helper = "!gh auth git-credential";
-      };
-    };
-
     micro = {
       enable = true;
       settings = {
@@ -150,6 +130,7 @@ in
 
   imports = [
     ./paths.nix
+    ./apps/git.nix
     ./apps/starship.nix
     ./apps/neovim.nix
     ./apps/try.nix
