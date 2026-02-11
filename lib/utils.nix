@@ -39,12 +39,12 @@ in
         (name: {
           inherit name;
           value = nixpkgs.lib.nixosSystem {
-            system = "x86_64-linux";
             inherit pkgs;
             specialArgs = {
               inherit inputs;
             };
             modules = [
+              { nixpkgs.hostPlatform = "x86_64-linux"; }
               # inputs.determinate.nixosModules.default
               (machinesPath + "/${name}/default.nix")
             ];
