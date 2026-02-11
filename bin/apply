@@ -292,22 +292,23 @@ case $flake_status in
     ;;
 esac
 
-# Use nom for pretty build output if available
-if command -v nom &>/dev/null; then
-  NOM="nom"
-else
-  NOM=""
-fi
+# Run a command, piping through nom for pretty output if available
+nomnom() {
+  echo ""
+  if command -v nom &>/dev/null; then
+    "$@" --log-format internal-json -v |& nom --json
+  else
+    "$@"
+  fi
+  local rc=$?
+  echo ""
+  return $rc
+}
 
 # Apply NixOS if we're on NixOS and have a host config
 if [[ "$OS" == "nixos" ]] && [[ -d "$FLAKE_DIR/hosts/$HOSTNAME" ]]; then
   info "Applying NixOS configuration for $HOSTNAME"
-  if [[ -n "$NOM" ]]; then
-    sudo nixos-rebuild switch --flake "$FLAKE_DIR#$HOSTNAME" "$@" |& nom
-  else
-    sudo nixos-rebuild switch --flake "$FLAKE_DIR#$HOSTNAME" "$@"
-  fi
-  echo ""
+  nomnom sudo nixos-rebuild switch --flake "$FLAKE_DIR#$HOSTNAME" "$@"
 elif [[ "$OS" == "nixos" ]] && [[ ! -d "$FLAKE_DIR/hosts/$HOSTNAME" ]]; then
   warn "No NixOS host config found for '$HOSTNAME'"
   echo "  Available hosts:"
@@ -320,21 +321,86 @@ fi
 # Apply home-manager if user is tobi
 if [[ "$USER" == "tobi" ]]; then
   info "Applying home-manager configuration for $USER@$HM_ARCH"
-
   if command -v home-manager &>/dev/null; then
-    # home-manager is already installed
-    if [[ -n "$NOM" ]]; then
-      home-manager switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@" |& nom
-    else
-      home-manager switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@"
-    fi
+    nomnom home-manager switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@"
   else
-    # Run home-manager via nix run
     info "home-manager not in PATH, running via 'nix run'"
-    nix_cmd run home-manager/master -- switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@"
+    nomnom nix_cmd run home-manager/master -- switch --flake "$FLAKE_DIR/home#$USER@$HM_ARCH" "$@"
   fi
-  echo ""
 fi
+
+# ============================================================================
+# Dotfile include checks
+# ============================================================================
+
+# Ensure user dotfiles source/include the dotnix-managed versions.
+# Seeds the file if it doesn't exist; warns if the include is missing.
+check_dotfile_includes() {
+  local rc="$1" include_line="$2" seed_content="$3"
+
+  if [[ ! -f "$rc" ]] || [[ -L "$rc" && "$(readlink "$rc")" == /nix/store/* ]]; then
+    rm -f "$rc"
+    echo "$seed_content" > "$rc"
+    success "Created $rc"
+    return 0
+  fi
+
+  if ! grep -qF "$include_line" "$rc"; then
+    echo ""
+    warn "$rc is missing the dotnix include!"
+    echo ""
+    echo "  Add this line to $rc:"
+    echo ""
+    echo "    $include_line"
+    echo ""
+  fi
+}
+
+check_all_dotfile_includes() {
+  local dotnix_dir="$HOME/.config/dotnix"
+
+  check_dotfile_includes "$HOME/.zshrc" \
+    'source ~/.config/dotnix/zshrc' \
+    '# Source dotnix-managed zsh config
+source ~/.config/dotnix/zshrc
+
+# Local overrides
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local'
+
+  check_dotfile_includes "$HOME/.zshenv" \
+    'source ~/.config/dotnix/zshenv' \
+    '# Source dotnix-managed zsh environment
+source ~/.config/dotnix/zshenv'
+
+  check_dotfile_includes "$HOME/.bashrc" \
+    'source ~/.config/dotnix/bashrc' \
+    '# Source dotnix-managed bash config
+source ~/.config/dotnix/bashrc
+
+# Local overrides
+[ -f ~/.bashrc.local ] && source ~/.bashrc.local'
+
+  check_dotfile_includes "$HOME/.bash_profile" \
+    'source ~/.config/dotnix/bash_profile' \
+    '# Source dotnix-managed bash profile
+source ~/.config/dotnix/bash_profile'
+
+  check_dotfile_includes "$HOME/.gitconfig" \
+    '[include]' \
+    '[include]
+	path = ~/.config/dotnix/gitconfig'
+
+  # Extra check: gitconfig needs the actual path line too
+  if [[ -f "$HOME/.gitconfig" ]] && ! grep -qF 'path = ~/.config/dotnix/gitconfig' "$HOME/.gitconfig"; then
+    warn "$HOME/.gitconfig is missing the dotnix include path!"
+    echo ""
+    echo "  Add this to $HOME/.gitconfig:"
+    echo ""
+    echo "    [include]"
+    echo "    	path = ~/.config/dotnix/gitconfig"
+    echo ""
+  fi
+}
 
 # Check if user's shell is correctly set to zsh from nix
 check_shell() {
@@ -376,9 +442,10 @@ check_shell() {
   fi
 }
 
-# Check shell for tobi user
+# Check shell and dotfile includes for tobi user
 if [[ "$USER" == "tobi" ]]; then
   check_shell
+  check_all_dotfile_includes
 fi
 
 success "Done!"

@@ -54,10 +54,7 @@ in
         gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
         user.name = "Tobi Lütke";
         user.email = "tobi@lutke.com";
-        include.path = [
-          "~/.config/dev/gitconfig"
-          "~/.gitconfig"
-        ];
+        include.path = "~/.config/dev/gitconfig";
         credential."https://github.com".helper = "!gh auth git-credential";
         credential."https://gist.github.com".helper = "!gh auth git-credential";
       };
@@ -102,9 +99,6 @@ in
         fi
 
         ${shell.zshInit}
-
-        # -- Local zshrc ────────────────────────────────────────────
-        [ -f ~/.zshrc.local ] && source ~/.zshrc.local
       '';
     };
 
@@ -116,9 +110,6 @@ in
 
       initExtra = ''
         ${shell.bashInit}
-
-        # -- Local bashrc ───────────────────────────────────────────
-        [ -f ~/.bashrc.local ] && source ~/.bashrc.local
       '';
     };
   };
@@ -158,6 +149,7 @@ in
   programs.yazi.enable = true;
 
   imports = [
+    ./paths.nix
     ./apps/starship.nix
     ./apps/neovim.nix
     ./apps/try.nix

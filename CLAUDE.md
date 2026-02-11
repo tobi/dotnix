@@ -26,6 +26,7 @@ dotnix/
 │   ├── flake.nix          # Standalone home-manager flake
 │   ├── flake.lock         # Separate lock file
 │   ├── home.nix           # Main home configuration
+│   ├── paths.nix          # Dotfile redirection (HM → ~/.config/dotnix/)
 │   ├── desktop.nix        # Desktop apps entry point
 │   ├── shell.nix          # Shell configuration
 │   ├── apps/              # Individual app configs
@@ -105,6 +106,17 @@ Services in `nixos/services/` are all gated by enable flags:
 - Only enabled services are activated
 - Services can depend on each other (forgejo requires nginx, nginx requires tailscale)
 - Domains auto-derive from `hostname.tailnetDomain` if not specified
+
+### Dotfile Redirection (`home/paths.nix`)
+Home-manager does NOT own `~/.zshrc`, `~/.bashrc`, `~/.gitconfig` etc. directly.
+Instead, HM writes to `~/.config/dotnix/` and the user's actual dotfiles source/include them:
+- `~/.zshrc` → `source ~/.config/dotnix/zshrc`
+- `~/.bashrc` → `source ~/.config/dotnix/bashrc`
+- `~/.gitconfig` → `[include] path = ~/.config/dotnix/gitconfig`
+
+This lets automated tools (IDE plugins, installers, etc.) safely modify the real dotfiles
+without conflicting with read-only nix store symlinks. The `apply` script seeds these
+files on first run and warns if the includes are missing.
 
 ### Theme System
 - `home/theme/default.nix` defines theme options
