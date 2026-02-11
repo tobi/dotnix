@@ -151,13 +151,16 @@ in
     '';
   };
 
-  home.packages = with pkgs; [
-    # Required for fzf-lua
-    fzf
-    ripgrep
-    fd
-  ] ++ lib.optionals isLinux [
-    # Clipboard provider for Wayland (Linux only)
-    wl-clipboard
-  ];
+  home.packages =
+    with pkgs;
+    [
+      # Required for fzf-lua
+      fzf
+      ripgrep
+      fd
+    ]
+    ++ lib.optionals isLinux [
+      # Clipboard provider for Wayland (Linux only)
+      wl-clipboard
+    ];
 }

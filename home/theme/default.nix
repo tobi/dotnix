@@ -26,7 +26,7 @@ in
         example = "Roboto";
       };
 
-        variant = lib.mkOption {
+      variant = lib.mkOption {
         type = lib.types.enum [
           "dark"
           "light"
@@ -44,7 +44,7 @@ in
       };
 
       # Computed theme values
-        colorScheme = lib.mkOption {
+      colorScheme = lib.mkOption {
         type = lib.types.attrs;
         readOnly = true;
         description = "The computed color scheme from nix-colors";
@@ -63,7 +63,7 @@ in
       };
 
       # Named color aliases
-        background = lib.mkOption {
+      background = lib.mkOption {
         type = lib.types.str;
         readOnly = true;
         description = "Background color";
@@ -82,7 +82,7 @@ in
       };
 
       # Terminal colors
-        black = lib.mkOption {
+      black = lib.mkOption {
         type = lib.types.str;
         readOnly = true;
         description = "Black color";

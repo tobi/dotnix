@@ -17,16 +17,18 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    assertions = [{
-      assertion = tailscaleCfg.enable;
-      message = "dotnix.services.nginx requires dotnix.services.tailscale.enable = true";
-    }];
+    assertions = [
+      {
+        assertion = tailscaleCfg.enable;
+        message = "dotnix.services.nginx requires dotnix.services.tailscale.enable = true";
+      }
+    ];
 
     services.nginx = {
       enable = true;
       recommendedProxySettings = true;
       recommendedTlsSettings = true;
-      clientMaxBodySize = "0";  # Disable limit for large git pushes
+      clientMaxBodySize = "0"; # Disable limit for large git pushes
 
       # Enable built-in tailscale auth if we have virtual hosts configured
       tailscaleAuth = {

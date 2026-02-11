@@ -9,26 +9,34 @@
   Requires dotnix.services.nginx.enable = true.
 */
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.dotnix.services.forgejo;
   nginxCfg = config.dotnix.services.nginx;
   # Derive domain from hostname + tailnet if not explicitly set
   domain =
-    if cfg.domain != ""
-    then cfg.domain
-    else "${config.networking.hostName}.${config.dotnix.tailnetDomain}";
+    if cfg.domain != "" then
+      cfg.domain
+    else
+      "${config.networking.hostName}.${config.dotnix.tailnetDomain}";
 
   # All Forgejo state goes under /data/forgejo (NFS mount)
   stateDir = "/data/forgejo";
 in
 {
   config = lib.mkIf cfg.enable {
-    assertions = [{
-      assertion = nginxCfg.enable;
-      message = "dotnix.services.forgejo requires dotnix.services.nginx.enable = true";
-    }];
+    assertions = [
+      {
+        assertion = nginxCfg.enable;
+        message = "dotnix.services.forgejo requires dotnix.services.nginx.enable = true";
+      }
+    ];
 
     services.forgejo = {
       enable = true;
@@ -97,7 +105,7 @@ in
         labels = [
           "nix:host"
           "native:host"
-          "ubuntu-latest:host"  # Fake ubuntu for compatibility
+          "ubuntu-latest:host" # Fake ubuntu for compatibility
         ];
         hostPackages = with pkgs; [
           bash
@@ -168,8 +176,14 @@ in
     # Tailscale certificate management for this domain
     systemd.services."tailscale-cert-${domain}" = {
       description = "Fetch and renew Tailscale cert for ${domain}";
-      after = [ "network-online.target" "tailscaled.service" ];
-      wants = [ "network-online.target" "tailscaled.service" ];
+      after = [
+        "network-online.target"
+        "tailscaled.service"
+      ];
+      wants = [
+        "network-online.target"
+        "tailscaled.service"
+      ];
       before = [ "nginx.service" ];
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
@@ -205,7 +219,10 @@ in
     };
 
     # Firewall: only expose on tailscale interface
-    networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 443 cfg.sshPort ];
+    networking.firewall.interfaces.tailscale0.allowedTCPPorts = [
+      443
+      cfg.sshPort
+    ];
 
     # Add domain to /etc/hosts so local services can resolve it
     networking.hosts."127.0.0.1" = [ domain ];

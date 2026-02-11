@@ -1,5 +1,4 @@
-_:
-{
+_: {
   wayland.windowManager.hyprland.settings = {
     windowrule = [
       # Suppress maximize events (Hyprland uses tiling)
@@ -27,8 +26,8 @@ _:
 
       "tag +chromium-based-browser, class:((google-)?[cC]hrom(e|ium)|[bB]rave-browser|Microsoft-edge|Vivaldi-stable|helium)"
       "tag +firefox-based-browser, class:([fF]irefox|zen|librewolf)"
-      
-      "opacity 1.0 1.0, initialTitle:((?i)(?:[a-z0-9-]+\\.)*youtube\\.com_/|app\\.zoom\\.us_/wc/home)"      
+
+      "opacity 1.0 1.0, initialTitle:((?i)(?:[a-z0-9-]+\\.)*youtube\\.com_/|app\\.zoom\\.us_/wc/home)"
 
       "nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0"
     ];

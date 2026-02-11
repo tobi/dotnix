@@ -301,7 +301,6 @@ in
     protectKernelImage = lib.mkForce false;
   };
 
-
   # XDG Portals
   xdg.portal = {
     enable = true;

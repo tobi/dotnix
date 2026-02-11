@@ -8,7 +8,12 @@
   - PAM configuration for hyprlock
 */
 
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 
 {
   config = lib.mkIf config.dotnix.desktop.enable {

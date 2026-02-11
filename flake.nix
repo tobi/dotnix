@@ -2,9 +2,10 @@
   description = "Tobi's nixworld";
 
   outputs =
-    { nixpkgs
-    , colmena
-    , ...
+    {
+      nixpkgs,
+      colmena,
+      ...
     }@inputs:
     let
       # Support both Linux and Darwin
@@ -30,8 +31,6 @@
     in
     {
 
-      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-tree;
-
       # Expose colmena for `nix run .#colmena`
       packages = forEachSystem (system: {
         colmena = colmena.packages.${system}.colmena;
@@ -52,31 +51,40 @@
         };
 
         # Server hosts - deployed remotely
-        git = { ... }: {
-          imports = [ ./hosts/git ];
-          deployment = {
-            targetHost = "git";
-            targetUser = "root";
-            tags = [ "server" "x86_64-linux" ];
+        git =
+          { ... }:
+          {
+            imports = [ ./hosts/git ];
+            deployment = {
+              targetHost = "git";
+              targetUser = "root";
+              tags = [
+                "server"
+                "x86_64-linux"
+              ];
+            };
           };
-        };
 
         # Desktop hosts - deployed locally via `apply`
-        frameling = { ... }: {
-          imports = [ ./hosts/frameling ];
-          deployment = {
-            allowLocalDeployment = true;
-            tags = [ "desktop" ];
+        frameling =
+          { ... }:
+          {
+            imports = [ ./hosts/frameling ];
+            deployment = {
+              allowLocalDeployment = true;
+              tags = [ "desktop" ];
+            };
           };
-        };
 
-        beetralisk = { ... }: {
-          imports = [ ./hosts/beetralisk ];
-          deployment = {
-            allowLocalDeployment = true;
-            tags = [ "desktop" ];
+        beetralisk =
+          { ... }:
+          {
+            imports = [ ./hosts/beetralisk ];
+            deployment = {
+              allowLocalDeployment = true;
+              tags = [ "desktop" ];
+            };
           };
-        };
       };
 
       # ------------------------------------------------------------

@@ -17,7 +17,8 @@ in
       extraUpFlags = [
         "--hostname=${if cfg.hostname != null then cfg.hostname else config.networking.hostName}"
         "--accept-dns=true"
-      ] ++ lib.optionals cfg.ssh [ "--ssh" ];
+      ]
+      ++ lib.optionals cfg.ssh [ "--ssh" ];
     };
 
     # Prevent tailscaled from restarting during nixos-rebuild switch.

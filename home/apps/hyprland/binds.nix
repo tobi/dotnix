@@ -3,19 +3,26 @@ let
   binDir = "${../../../bin}";
 
   # Convert key (e.g., "Super+B") to Hyprland format (e.g., "$mod, B")
-  convertKey = key:
+  convertKey =
+    key:
     let
       parts = lib.splitString "+" key;
       modifiers = lib.init parts;
       actualKey = lib.last parts;
 
       # Convert modifier names
-      convertMod = mod:
-        if mod == "Super" then "$mod"
-        else if mod == "Shift" then "SHIFT"
-        else if mod == "Alt" then "ALT"
-        else if mod == "Ctrl" then "CTRL"
-        else mod;
+      convertMod =
+        mod:
+        if mod == "Super" then
+          "$mod"
+        else if mod == "Shift" then
+          "SHIFT"
+        else if mod == "Alt" then
+          "ALT"
+        else if mod == "Ctrl" then
+          "CTRL"
+        else
+          mod;
 
       convertedMods = map convertMod modifiers;
       modString = lib.concatStringsSep " " convertedMods;
@@ -24,20 +31,20 @@ let
 
   # Generate hotkey bindings from registered apps
   # Converts dotnix.desktop.hotkeys to Hyprland bind format
-  generateHotkeyBinds = hotkeys:
-    lib.mapAttrsToList
-      (key: cfg:
-        let
-          command =
-            if cfg.focusClass != null then
-              "${binDir}/open-or-focus ${cfg.focusClass} ${cfg.executable}"
-            else
-              "${binDir}/open ${cfg.executable}";
-          hyprKey = convertKey key;
-        in
-        "${hyprKey}, exec, ${command}"
-      )
-      hotkeys;
+  generateHotkeyBinds =
+    hotkeys:
+    lib.mapAttrsToList (
+      key: cfg:
+      let
+        command =
+          if cfg.focusClass != null then
+            "${binDir}/open-or-focus ${cfg.focusClass} ${cfg.executable}"
+          else
+            "${binDir}/open ${cfg.executable}";
+        hyprKey = convertKey key;
+      in
+      "${hyprKey}, exec, ${command}"
+    ) hotkeys;
 in
 {
   wayland.windowManager.hyprland.settings = {
@@ -140,7 +147,7 @@ in
 
       # Fullscreen variants
       "$mod CTRL, F, fullscreenstate, 0 2" # Tiled fullscreen
-      "$mod ALT, F, fullscreen, 1"          # Full width
+      "$mod ALT, F, fullscreen, 1" # Full width
 
       # Scratchpad (omarchy-style)
       "$mod, S, togglespecialworkspace, scratchpad"

@@ -8,7 +8,12 @@
   - Sudo configuration
 */
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   config = lib.mkIf config.dotnix.desktop.enable {

@@ -4,9 +4,9 @@ let
 
   # Function to create pkgs with all overlays
   mkPkgs =
-    { system
-    , extraOverlays ? [ ]
-    ,
+    {
+      system,
+      extraOverlays ? [ ],
     }:
     import nixpkgs {
       inherit system;
@@ -19,10 +19,10 @@ in
 {
   # Create NixOS machines with consistent overlay setup
   mkMachines =
-    { inputs
-    , machinesPath
-    , extraOverlays ? [ ]
-    ,
+    {
+      inputs,
+      machinesPath,
+      extraOverlays ? [ ],
     }:
     let
       # Hardcode host names for now
@@ -35,22 +35,20 @@ in
       };
     in
     builtins.listToAttrs (
-      map
-        (name: {
-          inherit name;
-          value = nixpkgs.lib.nixosSystem {
-            inherit pkgs;
-            specialArgs = {
-              inherit inputs;
-            };
-            modules = [
-              { nixpkgs.hostPlatform = "x86_64-linux"; }
-              # inputs.determinate.nixosModules.default
-              (machinesPath + "/${name}/default.nix")
-            ];
+      map (name: {
+        inherit name;
+        value = nixpkgs.lib.nixosSystem {
+          inherit pkgs;
+          specialArgs = {
+            inherit inputs;
           };
-        })
-        hostNames
+          modules = [
+            { nixpkgs.hostPlatform = "x86_64-linux"; }
+            # inputs.determinate.nixosModules.default
+            (machinesPath + "/${name}/default.nix")
+          ];
+        };
+      }) hostNames
     );
 
   # Expose the overlay system for use in flake.nix

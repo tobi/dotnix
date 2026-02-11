@@ -1,5 +1,4 @@
-_:
-{
+_: {
   wayland.windowManager.hyprland.settings = {
     monitor = [
       # Apple StudioDisplay (5K - main display) - listed first for workspace preference

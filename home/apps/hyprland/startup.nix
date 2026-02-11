@@ -1,5 +1,4 @@
-_:
-{
+_: {
   wayland.windowManager.hyprland.settings = {
     # Run once at Hyprland startup
     exec-once = [

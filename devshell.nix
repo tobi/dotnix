@@ -1,11 +1,17 @@
-{ nixpkgs, system, inputs }:
+{
+  nixpkgs,
+  system,
+  inputs,
+}:
 let
   pkgs = import nixpkgs { inherit system; };
   inherit (pkgs) lib;
   shell = import ./home/shell.nix { inherit pkgs lib; };
 
   # Convert aliases attrset to bash alias commands
-  aliasLines = lib.mapAttrsToList (name: value: "alias ${name}=${lib.escapeShellArg value}") shell.aliases;
+  aliasLines = lib.mapAttrsToList (
+    name: value: "alias ${name}=${lib.escapeShellArg value}"
+  ) shell.aliases;
   aliasScript = lib.concatStringsSep "\n" aliasLines;
 
 in
@@ -18,41 +24,44 @@ in
   # Create a development shell with the packages from devshell.toml
   devShells.${system} = {
     default = pkgs.mkShell {
-      buildInputs = with pkgs; [
-        # Core packages
-        nano
-        micro
-        curl
-        wget
+      buildInputs =
+        with pkgs;
+        [
+          # Core packages
+          nano
+          micro
+          curl
+          wget
 
-        # Development tools
-        gnumake
-        stdenv.cc
-        llvm
-        zlib.dev
-        openssl.dev
-        libffi.dev
-        pkg-config
-        libyaml.dev
-        autoconf
-        automake
-        libtool
-        libuuid
+          # Development tools
+          gnumake
+          stdenv.cc
+          llvm
+          zlib.dev
+          openssl.dev
+          libffi.dev
+          pkg-config
+          libyaml.dev
+          autoconf
+          automake
+          libtool
+          libuuid
 
-        # Nix development tools
-        nixpkgs-fmt
-        statix
-        deadnix
+          # Nix development tools
+          nixpkgs-fmt
+          statix
+          deadnix
 
-        # Deployment tools
-        inputs.colmena.packages.${system}.colmena
+          # Deployment tools
+          inputs.colmena.packages.${system}.colmena
 
-        # Language runtimes
-        ruby_3_4
-        python313
-        starship
-        zsh
-      ] ++ shell.packages;
+          # Language runtimes
+          ruby_3_4
+          python313
+          starship
+          zsh
+        ]
+        ++ shell.packages;
 
       shellHook = ''
         ${shell.bashInit}
