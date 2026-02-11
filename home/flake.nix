@@ -89,7 +89,7 @@
 
     nix-colors.url = "github:misterio77/nix-colors";
 
-    try.url = "github:tobi/try-cli";
+    try.url = "github:tobi/try";
     try.inputs.nixpkgs.follows = "nixpkgs";
 
     ghostty.url = "github:ghostty-org/ghostty";
